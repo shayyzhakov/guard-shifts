@@ -1,7 +1,7 @@
 import {
   GUARD_PERIODS_FOR_CALCULATION,
   type GuardTime,
-  getNextPeriodGuardDate,
+  getNextPeriodGuardTime,
 } from '../../../common/helpers/periodHelpers';
 import { getTeamsForGuardPost } from '../../models/team.model';
 import { isTeamBusy, isSoldierBusy } from '../../models/guardList.model';
@@ -57,7 +57,7 @@ export function teamRoundRobinStrategyHandler(
         error: 'relevant team not found',
         guardTime: currentGuardTime,
       });
-      currentGuardTime = getNextPeriodGuardDate(currentGuardTime);
+      currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
     } else if (freeTeamMembers.length < numOfSoldiersForCurrentPeriod) {
       console.info(
         `team ${currentTeam.name} has only ${freeTeamMembers.length} free members but guard post requires ${numOfSoldiersForCurrentPeriod}`,
@@ -75,7 +75,7 @@ export function teamRoundRobinStrategyHandler(
           team: currentTeam.name,
           guardTime: currentGuardTime,
         });
-        currentGuardTime = getNextPeriodGuardDate(currentGuardTime);
+        currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
       }
 
       if (numOfSoldiersForCurrentPeriod > 0) {

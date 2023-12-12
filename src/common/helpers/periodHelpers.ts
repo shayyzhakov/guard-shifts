@@ -31,13 +31,22 @@ export function getCurrentPeriod(): GuardTime {
   };
 }
 
-export function getNextPeriodGuardDate(guardTime: GuardTime): GuardTime {
+export function getNextPeriodGuardTime(guardTime: GuardTime): GuardTime {
   const nextPeriod = (guardTime.period + 1) % GUARD_PERIODS_PER_DAY;
-  const nextDate = new Date(guardTime.date);
-  if (nextPeriod === 0) nextDate.setDate(guardTime.date.getDate() + 1);
+  const nextDate = nextPeriod === 0 ? getNextDate(guardTime.date) : new Date(guardTime.date);
 
   return {
     period: nextPeriod,
     date: nextDate,
   };
+}
+
+export function getNextDate(date: Date): Date {
+  const nextDate = new Date(date);
+  nextDate.setDate(date.getDate() + 1);
+  return nextDate;
+}
+
+export function compareGuardTime(gt1: GuardTime, gt2: GuardTime): boolean {
+  return gt1.period === gt2.period && gt1.date.toDateString() === gt2.date.toDateString();
 }

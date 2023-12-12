@@ -1,7 +1,7 @@
 import {
   GUARD_PERIODS_FOR_CALCULATION,
   type GuardTime,
-  getNextPeriodGuardDate,
+  getNextPeriodGuardTime,
 } from '../../../common/helpers/periodHelpers';
 import { getPeopleForGuardPost } from '../../models/team.model';
 import { isSoldierBusy } from '../../models/guardList.model';
@@ -57,7 +57,7 @@ export function roundRobinStrategyHandler(
         guardTime: currentGuardTime,
       });
 
-      currentGuardTime = getNextPeriodGuardDate(currentGuardTime);
+      currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
     }
 
     currentSoldierIndex += numOfSoldiersForCurrentPeriod;

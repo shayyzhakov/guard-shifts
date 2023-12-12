@@ -1,5 +1,5 @@
 import type { GuardList } from '../interfaces/guardList.interface';
-import { type GuardTime } from '../../common/helpers/periodHelpers';
+import { compareGuardTime, type GuardTime } from '../../common/helpers/periodHelpers';
 
 export function isTeamBusy(
   guardList: GuardList[],
@@ -7,10 +7,8 @@ export function isTeamBusy(
   teamName: string,
 ): boolean {
   return guardList.some((guardPostList) => {
-    const guardPeriod = guardPostList.guardList.find(
-      (gp) =>
-        gp.guardTime.period === guardTime.period &&
-        gp.guardTime.date.toDateString() === guardTime.date.toDateString(),
+    const guardPeriod = guardPostList.guardList.find((gp) =>
+      compareGuardTime(gp.guardTime, guardTime),
     );
 
     return guardPeriod && guardPeriod.team === teamName;
@@ -23,10 +21,8 @@ export function isSoldierBusy(
   soldierName: string,
 ): boolean {
   return guardList.some((guardPostList) => {
-    const guardPeriod = guardPostList.guardList.find(
-      (gp) =>
-        gp.guardTime.period === guardTime.period &&
-        gp.guardTime.date.toDateString() === guardTime.date.toDateString(),
+    const guardPeriod = guardPostList.guardList.find((glp) =>
+      compareGuardTime(glp.guardTime, guardTime),
     );
 
     return guardPeriod?.soldiers.includes(soldierName);

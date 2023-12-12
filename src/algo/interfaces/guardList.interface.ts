@@ -1,6 +1,6 @@
 import type { GuardTime } from '@/common/helpers/periodHelpers';
 
-export interface GuardListContent {
+export interface GuardListPeriod {
   soldiers: string[];
   guardTime: GuardTime;
   team?: string;
@@ -9,5 +9,5 @@ export interface GuardListContent {
 
 export interface GuardList {
   guardPostName: string;
-  guardList: GuardListContent[];
+  guardList: GuardListPeriod[];
 }

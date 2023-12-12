@@ -1,14 +1,13 @@
 const NIGHT_PERIOD_START = 42;
 const NIGHT_PERIOD_END = 14;
 
-const KONENUT_MORNING_PERIOD_START = 10;
-const KONENUT_MORNING_PERIOD_END = 14;
+const KONENUT_MORNING_PERIOD_START = 11;
+const KONENUT_MORNING_PERIOD_END = 15;
 
 export const guardPosts = [
   {
     name: 'taltal',
     displayName: 'Taltal',
-    hasPeriodOffset: false,
     strategy: 'roundrobin',
     numOfSoldiers: 2,
     occupation: [
@@ -28,7 +27,6 @@ export const guardPosts = [
   {
     name: 'ofek',
     displayName: 'Ofek',
-    hasPeriodOffset: true,
     strategy: 'roundrobin',
     numOfSoldiers: 2,
     occupation: [
@@ -48,7 +46,6 @@ export const guardPosts = [
   {
     name: 'konenut-morning',
     displayName: 'Konenut Morning',
-    hasPeriodOffset: false,
     strategy: 'team-roundrobin',
     numOfSoldiers: 5,
     occupation: [
@@ -63,7 +60,6 @@ export const guardPosts = [
   {
     name: 'konenut-evening',
     displayName: 'Konenut',
-    hasPeriodOffset: false,
     strategy: 'team-roundrobin',
     numOfSoldiers: 5,
     occupation: [

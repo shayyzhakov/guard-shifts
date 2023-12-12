@@ -29,11 +29,6 @@ const guardPosts = getGuardPosts();
           </div>
 
           <div class="card-body-section">
-            <h4>Time Offset</h4>
-            <p>{{ guardPost.hasPeriodOffset ? '+30 minutes' : 'None' }}</p>
-          </div>
-
-          <div class="card-body-section">
             <h4>Guard Duration</h4>
             <div v-for="occupation in guardPost.occupation" :key="`${guardPost.name}-${occupation.from}`">
               {{ stringifyPeriod(occupation.from) }}-{{ stringifyPeriod(occupation.to) }}:

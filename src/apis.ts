@@ -13,7 +13,7 @@ export function getTeams(): Team[] {
   return getTeamsApi();
 }
 
-export interface GuardListContent {
+export interface GuardListPeriod {
   soldiers: string[];
   guardTime: GuardTime;
   team?: string;
@@ -22,7 +22,7 @@ export interface GuardListContent {
 
 export interface GuardList {
   guardPostName: string;
-  guardList: GuardListContent[];
+  guardList: GuardListPeriod[];
 }
 
 export function generateGuardList(): GuardList[] {
@@ -38,7 +38,6 @@ export interface GuardPostOccupation {
 export interface GuardPost {
   name: string;
   displayName: string;
-  hasPeriodOffset: boolean;
   strategy: string; // TODO: change to enum
   numOfSoldiers: number;
   occupation: GuardPostOccupation[];

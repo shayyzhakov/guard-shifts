@@ -1,4 +1,4 @@
-import type { GuardTime } from '@/common/helpers/periodHelpers';
+import { getNextDate, GUARD_PERIODS_PER_DAY, type GuardTime } from '@/common/helpers/periodHelpers';
 import { guardPosts } from '../data/guardPosts.data';
 import type { GuardPost, GuardPostOccupation } from '../interfaces/guardPost.interface';
 
@@ -36,7 +36,7 @@ export function getAllGuardPosts(): GuardPost[] {
   return guardPosts;
 }
 
-export function getUpcomingPeriod(guardPostName: string, fromGuardTime: GuardTime): GuardTime {
+export function getUpcomingGuardTime(guardPostName: string, fromGuardTime: GuardTime): GuardTime {
   const relevantGuardPost: GuardPost | undefined = guardPosts.find(
     (guardPost) => guardPost.name === guardPostName,
   );
@@ -46,14 +46,48 @@ export function getUpcomingPeriod(guardPostName: string, fromGuardTime: GuardTim
   }
 
   // TODO: what about doing modulu to period?
-  if (
-    (relevantGuardPost.hasPeriodOffset && fromGuardTime.period % 2 === 0) || // starting period should take into account the period offset of the current guard post
-    (!relevantGuardPost.hasPeriodOffset && fromGuardTime.period % 2 === 1)
-  ) {
-    return { period: fromGuardTime.period + 1, date: fromGuardTime.date };
-  }
+  const upcomingPeriod = getUpcomingPeriod(relevantGuardPost, fromGuardTime.period);
+  const upcomingDate =
+    fromGuardTime.period <= upcomingPeriod ? fromGuardTime.date : getNextDate(fromGuardTime.date);
 
-  return fromGuardTime;
+  return {
+    period: upcomingPeriod,
+    date: upcomingDate,
+  };
+}
+
+function getUpcomingPeriod(guardPost: GuardPost, fromPeriod: number): number {
+  const occupation = occupationByPeriod(guardPost, fromPeriod);
+  if (occupation) {
+    let i = 0;
+    if (fromPeriod >= occupation.from) {
+      while (occupation.from + occupation.duration * i < fromPeriod) {
+        i++;
+      }
+    } else {
+      // fromPeriod < occupation.from
+      // iterate until modulu applies
+      while (
+        (occupation.from + occupation.duration * i) % GUARD_PERIODS_PER_DAY >=
+        occupation.from
+      ) {
+        i++;
+      }
+
+      while ((occupation.from + occupation.duration * i) % GUARD_PERIODS_PER_DAY < fromPeriod) {
+        i++;
+      }
+    }
+    return (occupation.from + occupation.duration * i) % GUARD_PERIODS_PER_DAY;
+  } else {
+    let currentPeriod = fromPeriod;
+    const occupationsStartingTimes = guardPost.occupation.map((o) => o.from);
+    while (!occupationsStartingTimes.includes(currentPeriod)) {
+      currentPeriod = (currentPeriod + 1) % GUARD_PERIODS_PER_DAY;
+    }
+
+    return currentPeriod;
+  }
 }
 
 export function getGuardPostSoldiersAmount(guardPostName: string, period: number): number {
@@ -82,7 +116,10 @@ export function getGuardPostGuardPeriodDuration(guardPostName: string, period: n
   return occupation?.duration ?? 1;
 }
 
-function occupationByPeriod(guardPost: GuardPost, period: number): GuardPostOccupation | undefined {
+export function occupationByPeriod(
+  guardPost: GuardPost,
+  period: number,
+): GuardPostOccupation | undefined {
   return guardPost.occupation.find((occupation) => {
     if (occupation.from < occupation.to) {
       if (period >= occupation.from && period < occupation.to) return occupation;
