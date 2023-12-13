@@ -5,22 +5,23 @@ import {
 } from '../../../common/helpers/periodHelpers';
 import { getPeopleForGuardPost } from '../../models/team.model';
 import { isSoldierBusy } from '../../models/guardList.model';
-import type { GuardList } from '@/algo/interfaces/guardList.interface';
+import type { GuardList, GuardListPeriod } from '@/algo/interfaces/guardList.interface';
 import {
   getGuardPostGuardPeriodDuration,
   getGuardPostSoldiersAmount,
 } from '@/algo/models/guardPost.model';
 import type { GuardPost } from '@/algo/interfaces/guardPost.interface';
+import type { StrategyHandler } from '@/algo/interfaces/strategyHandler.interface';
 
 // TODO: implement StrategyHandler
-export function roundRobinStrategyHandler(
+export const roundRobinStrategyHandler: StrategyHandler = (
   guardPost: GuardPost,
   guardList: GuardList[],
-  guardListHistory,
+  guardListHistory: GuardList[],
   startingGuardTime: GuardTime,
-) {
+): GuardListPeriod[] => {
   const people = getPeopleForGuardPost(guardPost.name);
-  const guardListPerPeriod = [];
+  const guardListPerPeriod: GuardListPeriod[] = [];
   let currentGuardTime = startingGuardTime;
   let currentSoldierIndex = 0;
 
@@ -55,6 +56,7 @@ export function roundRobinStrategyHandler(
       guardListPerPeriod.push({
         soldiers,
         guardTime: currentGuardTime,
+        duration: 1,
       });
 
       currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
@@ -64,4 +66,4 @@ export function roundRobinStrategyHandler(
   }
 
   return guardListPerPeriod;
-}
+};

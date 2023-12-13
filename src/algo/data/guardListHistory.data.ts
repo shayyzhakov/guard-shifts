@@ -6,6 +6,7 @@ export interface DbGuardTime {
 export interface DbGuardListPeriod {
   soldiers: string[];
   guardTime: DbGuardTime;
+  duration: number;
   team?: string;
   error?: string;
 }
@@ -26,6 +27,7 @@ export const guardListHistory: DbGuardList[] = [
           period: 11,
           date: 'Wed Dec 13 2023',
         },
+        duration: 4,
         error: undefined,
       },
       {
@@ -35,6 +37,7 @@ export const guardListHistory: DbGuardList[] = [
           period: 11,
           date: 'Thu Dec 14 2023',
         },
+        duration: 4,
         error: undefined,
       },
       {
@@ -44,6 +47,7 @@ export const guardListHistory: DbGuardList[] = [
           period: 11,
           date: 'Fri Dec 15 2023',
         },
+        duration: 4,
         error: undefined,
       },
     ],

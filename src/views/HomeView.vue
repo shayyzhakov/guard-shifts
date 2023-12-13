@@ -52,8 +52,10 @@ function generateShifts() {
         <el-table :data="guardPostShifts.guardList" stripe style="width: 100%">
           <el-table-column prop="guardTime" label="Time" width="220">
             <template #default="{ row }">
-              {{ stringifyPeriod(row.guardTime.period) }} {{ row.guardTime.date.toDateString() === now ? '' :
-                `(${row.guardTime.date.toLocaleDateString('en-GB')})` }}
+              {{ stringifyPeriod(row.guardTime.period) }}-{{ stringifyPeriod(row.guardTime.period +
+                row.duration)
+              }} {{ row.guardTime.date.toDateString() === now ? '' :
+  `(${row.guardTime.date.toLocaleDateString('en-GB')})` }}
             </template>
           </el-table-column>
           <el-table-column v-if="guardPostShifts.guardList[0]?.team" prop="team" label="Team" width="120" />

@@ -5,21 +5,22 @@ import {
 } from '../../../common/helpers/periodHelpers';
 import { getTeamsForGuardPost } from '../../models/team.model';
 import { isTeamBusy, isSoldierBusy } from '../../models/guardList.model';
-import type { GuardList } from '@/algo/interfaces/guardList.interface';
+import type { GuardList, GuardListPeriod } from '@/algo/interfaces/guardList.interface';
 import {
   getGuardPostGuardPeriodDuration,
   getGuardPostSoldiersAmount,
 } from '@/algo/models/guardPost.model';
 import type { GuardPost } from '@/algo/interfaces/guardPost.interface';
+import type { StrategyHandler } from '@/algo/interfaces/strategyHandler.interface';
 
 // TODO: implement StrategyHandler
-export function teamRoundRobinStrategyHandler(
+export const teamRoundRobinStrategyHandler: StrategyHandler = (
   guardPost: GuardPost,
   guardList: GuardList[],
-  guardListHistory,
+  guardListHistory: GuardList[],
   startingGuardTime: GuardTime,
-) {
-  const guardListPerPeriod = [];
+): GuardListPeriod[] => {
+  const guardListPerPeriod: GuardListPeriod[] = [];
   let currentGuardTime = startingGuardTime;
   let currentTeamIndex = 0;
   const relevantTeams = getTeamsForGuardPost(guardPost.name);
@@ -56,6 +57,7 @@ export function teamRoundRobinStrategyHandler(
         team: undefined,
         error: 'relevant team not found',
         guardTime: currentGuardTime,
+        duration: 1,
       });
       currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
     } else if (freeTeamMembers.length < numOfSoldiersForCurrentPeriod) {
@@ -74,6 +76,7 @@ export function teamRoundRobinStrategyHandler(
           soldiers,
           team: currentTeam.name,
           guardTime: currentGuardTime,
+          duration: 1,
         });
         currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
       }
@@ -85,4 +88,4 @@ export function teamRoundRobinStrategyHandler(
   }
 
   return guardListPerPeriod;
-}
+};

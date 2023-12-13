@@ -16,6 +16,7 @@ export function getTeams(): Team[] {
 export interface GuardListPeriod {
   soldiers: string[];
   guardTime: GuardTime;
+  duration: number;
   team?: string;
   error?: string;
 }

@@ -43,7 +43,7 @@ export function buildGuardList(): GuardList[] {
 function buildGuardListForGuardPost(
   guardPost: GuardPost,
   guardList: GuardList[],
-  guardListHistory,
+  guardListHistory: GuardList[],
   startingGuardTime: GuardTime,
 ): GuardList {
   const upcomingGuardTime = getUpcomingGuardTimeForGuardPost(guardPost.name, startingGuardTime);
@@ -88,6 +88,7 @@ function simplifyGuardList(guardListForGuardPost: GuardListPeriod[]): GuardListP
     (acc, guardListPeriod) => {
       if (acc.length > 0 && isGuardListPeriodsEqual(guardListPeriod, acc[acc.length - 1])) {
         acc[acc.length - 1].error ||= guardListPeriod.error;
+        acc[acc.length - 1].duration += guardListPeriod.duration;
       } else {
         acc.push(guardListPeriod);
       }
