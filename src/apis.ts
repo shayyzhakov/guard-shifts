@@ -1,5 +1,5 @@
 import { getTeamsApi } from './algo/apis/teams.api';
-import { generateGuardListApi } from './algo/apis/guardList.api';
+import { generateGuardListApi, getGuardListHistoryApi } from './algo/apis/guardList.api';
 import { getGuardPostsApi } from './algo/apis/guardPosts.api';
 import type { GuardTime } from './common/helpers/periodHelpers';
 
@@ -27,6 +27,10 @@ export interface GuardList {
 
 export function generateGuardList(): GuardList[] {
   return generateGuardListApi();
+}
+
+export function getGuardListHistory(): GuardList[] {
+  return getGuardListHistoryApi();
 }
 
 export interface GuardPostOccupation {

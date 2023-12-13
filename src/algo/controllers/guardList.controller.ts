@@ -1,7 +1,7 @@
-import { getCurrentPeriod, type GuardTime } from '../../common/helpers/periodHelpers';
+import { getUpcomingGuardTime, type GuardTime } from '../../common/helpers/periodHelpers';
 import {
   getAllGuardPosts,
-  getUpcomingGuardTime,
+  getUpcomingGuardTimeForGuardPost,
   getGuardPostOrder,
 } from '../models/guardPost.model';
 import {
@@ -11,10 +11,11 @@ import {
 import type { GuardList, GuardListPeriod } from '../interfaces/guardList.interface';
 import type { GuardPost } from '../interfaces/guardPost.interface';
 import type { StrategyHandler } from '../interfaces/strategyHandler.interface';
-import { compareSoldiers } from '../models/soldier.model';
+import { isSoldiersEqual } from '../models/soldier.model';
+import { getFullGuardListHistory, saveGuardLists } from '../models/guardList.model';
 
 export function buildGuardList(): GuardList[] {
-  const currentPeriod = getCurrentPeriod();
+  const upcomingGuardTime = getUpcomingGuardTime();
 
   const guardPosts = getAllGuardPosts();
   guardPosts.sort((a, b) => {
@@ -28,10 +29,12 @@ export function buildGuardList(): GuardList[] {
       guardPosts[i],
       fullGuardList,
       [], // TODO: replace with history
-      currentPeriod,
+      upcomingGuardTime,
     );
     fullGuardList.push(guardListForGuardPost);
   }
+
+  saveGuardLists(fullGuardList, upcomingGuardTime);
 
   return fullGuardList;
 }
@@ -43,7 +46,7 @@ function buildGuardListForGuardPost(
   guardListHistory,
   startingGuardTime: GuardTime,
 ): GuardList {
-  const upcomingGuardTime = getUpcomingGuardTime(guardPost.name, startingGuardTime);
+  const upcomingGuardTime = getUpcomingGuardTimeForGuardPost(guardPost.name, startingGuardTime);
 
   let strategyHandler: StrategyHandler;
   switch (guardPost.strategy) {
@@ -83,7 +86,7 @@ function simplifyGuardList(guardListForGuardPost: GuardListPeriod[]): GuardListP
   // merge consequetive guard periods
   simplifiedGuardListForGuardPost = simplifiedGuardListForGuardPost.reduce(
     (acc, guardListPeriod) => {
-      if (acc.length > 0 && compareGuardListPeriods(guardListPeriod, acc[acc.length - 1])) {
+      if (acc.length > 0 && isGuardListPeriodsEqual(guardListPeriod, acc[acc.length - 1])) {
         acc[acc.length - 1].error ||= guardListPeriod.error;
       } else {
         acc.push(guardListPeriod);
@@ -96,11 +99,15 @@ function simplifyGuardList(guardListForGuardPost: GuardListPeriod[]): GuardListP
   return simplifiedGuardListForGuardPost;
 }
 
-function compareGuardListPeriods(glp1: GuardListPeriod, glp2: GuardListPeriod): boolean {
+function isGuardListPeriodsEqual(glp1: GuardListPeriod, glp2: GuardListPeriod): boolean {
   const equalTeams = glp1.team === glp2.team;
 
   const equalSoldiers = glp1.soldiers.every((soldier1) =>
-    glp2.soldiers.some((soldier2) => compareSoldiers(soldier1, soldier2)),
+    glp2.soldiers.some((soldier2) => isSoldiersEqual(soldier1, soldier2)),
   );
   return equalTeams && equalSoldiers;
+}
+
+export function getGuardListHistory(): GuardList[] {
+  return getFullGuardListHistory();
 }

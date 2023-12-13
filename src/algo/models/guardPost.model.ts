@@ -36,7 +36,10 @@ export function getAllGuardPosts(): GuardPost[] {
   return guardPosts;
 }
 
-export function getUpcomingGuardTime(guardPostName: string, fromGuardTime: GuardTime): GuardTime {
+export function getUpcomingGuardTimeForGuardPost(
+  guardPostName: string,
+  fromGuardTime: GuardTime,
+): GuardTime {
   const relevantGuardPost: GuardPost | undefined = guardPosts.find(
     (guardPost) => guardPost.name === guardPostName,
   );
@@ -45,8 +48,7 @@ export function getUpcomingGuardTime(guardPostName: string, fromGuardTime: Guard
     return fromGuardTime;
   }
 
-  // TODO: what about doing modulu to period?
-  const upcomingPeriod = getUpcomingPeriod(relevantGuardPost, fromGuardTime.period);
+  const upcomingPeriod = getUpcomingPeriodForGuardPost(relevantGuardPost, fromGuardTime.period);
   const upcomingDate =
     fromGuardTime.period <= upcomingPeriod ? fromGuardTime.date : getNextDate(fromGuardTime.date);
 
@@ -56,7 +58,7 @@ export function getUpcomingGuardTime(guardPostName: string, fromGuardTime: Guard
   };
 }
 
-function getUpcomingPeriod(guardPost: GuardPost, fromPeriod: number): number {
+function getUpcomingPeriodForGuardPost(guardPost: GuardPost, fromPeriod: number): number {
   const occupation = occupationByPeriod(guardPost, fromPeriod);
   if (occupation) {
     let i = 0;

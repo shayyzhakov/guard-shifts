@@ -1,4 +1,4 @@
-import { buildGuardList } from '../controllers/guardList.controller';
+import { buildGuardList, getGuardListHistory } from '../controllers/guardList.controller';
 
 export function generateGuardListApi() {
   try {
@@ -7,4 +7,8 @@ export function generateGuardListApi() {
     console.error(err);
     return [];
   }
+}
+
+export function getGuardListHistoryApi() {
+  return getGuardListHistory();
 }

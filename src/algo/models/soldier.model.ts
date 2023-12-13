@@ -12,6 +12,6 @@ export function getSoldierTeam(soldierName: string): Team | undefined {
 }
 
 // works as long as Soldier is a string
-export function compareSoldiers(soldier1: Soldier, soldier2: Soldier): boolean {
+export function isSoldiersEqual(soldier1: Soldier, soldier2: Soldier): boolean {
   return soldier1 === soldier2;
 }

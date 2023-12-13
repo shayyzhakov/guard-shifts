@@ -40,4 +40,4 @@ h3 {
   gap: 6px;
   align-items: center;
 }
-</style>../algo/controllers/teams.controller
+</style>

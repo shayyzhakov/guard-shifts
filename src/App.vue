@@ -23,6 +23,9 @@ onBeforeMount(() => {
         <el-menu-item index="guard-posts">
           <template #title>Guard Posts</template>
         </el-menu-item>
+        <el-menu-item index="shifts-history">
+          <template #title>Shifts History</template>
+        </el-menu-item>
       </el-menu>
     </el-aside>
 

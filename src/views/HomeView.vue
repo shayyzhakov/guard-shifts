@@ -112,4 +112,4 @@ h1 {
   gap: 8px;
   height: 80%;
 }
-</style>../stores/shifts.store
+</style>
