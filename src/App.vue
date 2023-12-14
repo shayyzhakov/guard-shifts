@@ -39,6 +39,7 @@ onBeforeMount(() => {
 .main {
   height: 100%;
   user-select: none;
+  background: white;
 }
 
 .sidebar {
