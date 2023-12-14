@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { generateGuardList } from '../apis'
 import { useShiftsStore } from '../stores/shifts.store'
-import { stringifyPeriod } from '@/common/helpers/periodHelpers';
+import { GUARD_PERIODS_PER_DAY, stringifyPeriod } from '@/common/helpers/periodHelpers';
 
 const shiftsStore = useShiftsStore();
 
@@ -52,8 +52,8 @@ function generateShifts() {
         <el-table :data="guardPostShifts.guardList" stripe style="width: 100%">
           <el-table-column prop="guardTime" label="Time" width="220">
             <template #default="{ row }">
-              {{ stringifyPeriod(row.guardTime.period) }}-{{ stringifyPeriod(row.guardTime.period +
-                row.duration)
+              {{ stringifyPeriod(row.guardTime.period) }}-{{ stringifyPeriod((row.guardTime.period +
+                row.duration) % GUARD_PERIODS_PER_DAY)
               }} {{ row.guardTime.date.toDateString() === now ? '' :
   `(${row.guardTime.date.toLocaleDateString('en-GB')})` }}
             </template>
