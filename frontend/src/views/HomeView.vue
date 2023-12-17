@@ -45,7 +45,7 @@ async function generateShifts() {
         <template #header>
           <div class="card-header">
             <!-- TODO: convert to displayName -->
-            <h3>{{ guardPostShifts.guardPostName }}</h3>
+            <h3>{{ guardPostShifts.guardPostDisplayName }}</h3>
           </div>
         </template>
 

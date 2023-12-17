@@ -130,3 +130,15 @@ export function occupationByPeriod(
     }
   });
 }
+
+export function getGuardPostDisplayName(guardPostName: string): string {
+  const relevantGuardPost: GuardPost | undefined = guardPosts.find(
+    (guardPost) => guardPost.name === guardPostName
+  );
+  if (!relevantGuardPost) {
+    console.error(`could not find guard post named ${guardPostName}`);
+    return '';
+  }
+
+  return relevantGuardPost.displayName;
+}

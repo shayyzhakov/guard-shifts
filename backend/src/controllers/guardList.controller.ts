@@ -3,6 +3,7 @@ import {
   getAllGuardPosts,
   getUpcomingGuardTimeForGuardPost,
   getGuardPostOrder,
+  getGuardPostDisplayName,
 } from '../models/guardPost.model';
 import {
   roundRobinStrategyHandler,
@@ -13,9 +14,10 @@ import type { GuardPost } from '../interfaces/guardPost.interface';
 import type { StrategyHandler } from '../interfaces/strategyHandler.interface';
 import { isSoldiersEqual } from '../models/soldier.model';
 import { getFullGuardListHistory, saveGuardLists } from '../models/guardList.model';
-import { DbGuardList } from '../data/guardListHistory.data';
 
-export function buildGuardList(): GuardList[] {
+type GuardListResponse = Array<GuardList & { guardPostDisplayName: string }>;
+
+export function buildGuardList(): GuardListResponse {
   const upcomingGuardTime = getUpcomingGuardTime();
 
   const guardPosts = getAllGuardPosts();
@@ -37,7 +39,14 @@ export function buildGuardList(): GuardList[] {
 
   saveGuardLists(fullGuardList, upcomingGuardTime);
 
-  return fullGuardList;
+  const guardListResponse: GuardListResponse = fullGuardList.map((guardList) => {
+    return {
+      ...guardList,
+      guardPostDisplayName: getGuardPostDisplayName(guardList.guardPostName),
+    };
+  });
+
+  return guardListResponse;
 }
 
 // TODO: add input: history, currently built guard list, remove startingPeriod
@@ -110,6 +119,11 @@ function isGuardListPeriodsEqual(glp1: GuardListPeriod, glp2: GuardListPeriod): 
   return equalTeams && equalSoldiers;
 }
 
-export function getGuardListHistory(): DbGuardList[] {
-  return getFullGuardListHistory();
+export function getGuardListHistory(): GuardListResponse {
+  return getFullGuardListHistory().map((guardList) => {
+    return {
+      ...guardList,
+      guardPostDisplayName: getGuardPostDisplayName(guardList.guardPostName),
+    };
+  });
 }
