@@ -69,15 +69,15 @@ function serializeGuardList(guardList: GuardList): DbGuardList {
   };
 }
 
-function deserializeGuardList(dbGuardList: DbGuardList): GuardList {
-  return {
-    ...dbGuardList,
-    guardList: dbGuardList.guardList.map((glp) => ({
-      ...glp,
-      guardTime: deserializeGuardTime(glp.guardTime),
-    })),
-  };
-}
+// function deserializeGuardList(dbGuardList: DbGuardList): GuardList {
+//   return {
+//     ...dbGuardList,
+//     guardList: dbGuardList.guardList.map((glp) => ({
+//       ...glp,
+//       guardTime: deserializeGuardTime(glp.guardTime),
+//     })),
+//   };
+// }
 
 function serializeGuardTime(guardTime: GuardTime): DbGuardTime {
   return {
@@ -93,6 +93,6 @@ function deserializeGuardTime(dbGuardTime: DbGuardTime): GuardTime {
   };
 }
 
-export function getFullGuardListHistory(): GuardList[] {
-  return guardListHistory.map(deserializeGuardList);
+export function getFullGuardListHistory(): DbGuardList[] {
+  return guardListHistory; //.map(deserializeGuardList);
 }

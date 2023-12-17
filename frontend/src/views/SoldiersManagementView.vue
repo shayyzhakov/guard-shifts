@@ -1,19 +1,29 @@
 <script setup lang="ts">
-import { getTeams } from '../apis'
+import { onMounted, ref } from 'vue';
+import { getTeams, type Team } from '../apis';
 
-const teams = getTeams();
+const teams = ref<Team[]>();
+
+onMounted(async () => {
+  teams.value = await getTeams();
+});
 </script>
 
 <template>
   <div>
     <h1>Soldiers Management</h1>
 
-    <section class="team-cards">
+    <section v-if="teams" class="team-cards">
       <el-card v-for="team in teams" :key="team.name">
         <template #header>
           <div class="card-header">
             <h3>Team {{ team.name }}</h3>
-            <el-tag v-for="guardPost in team.guardPosts" :key="guardPost" class="mx-1" effect="light">
+            <el-tag
+              v-for="guardPost in team.guardPosts"
+              :key="guardPost"
+              class="mx-1"
+              effect="light"
+            >
               {{ guardPost }}
             </el-tag>
           </div>
@@ -21,6 +31,8 @@ const teams = getTeams();
         <div v-for="soldier in team.people" :key="soldier">{{ soldier }}</div>
       </el-card>
     </section>
+
+    <div v-else>loading...</div>
   </div>
 </template>
 

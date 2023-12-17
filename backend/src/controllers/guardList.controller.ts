@@ -13,6 +13,7 @@ import type { GuardPost } from '../interfaces/guardPost.interface';
 import type { StrategyHandler } from '../interfaces/strategyHandler.interface';
 import { isSoldiersEqual } from '../models/soldier.model';
 import { getFullGuardListHistory, saveGuardLists } from '../models/guardList.model';
+import { DbGuardList } from '../data/guardListHistory.data';
 
 export function buildGuardList(): GuardList[] {
   const upcomingGuardTime = getUpcomingGuardTime();
@@ -109,6 +110,6 @@ function isGuardListPeriodsEqual(glp1: GuardListPeriod, glp2: GuardListPeriod): 
   return equalTeams && equalSoldiers;
 }
 
-export function getGuardListHistory(): GuardList[] {
+export function getGuardListHistory(): DbGuardList[] {
   return getFullGuardListHistory();
 }

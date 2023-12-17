@@ -3,10 +3,13 @@ import dotenv from 'dotenv';
 import guardListApis from './apis/guardList.api';
 import guardPostsApis from './apis/guardPosts.api';
 import teamsApis from './apis/teams.api';
+import cors from 'cors';
 
 dotenv.config();
 
 const app: Express = express();
+app.use(cors());
+
 const port = process.env.PORT || 3000;
 
 app.get('/', (req: Request, res: Response) => {

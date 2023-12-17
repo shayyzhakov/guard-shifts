@@ -1,7 +1,4 @@
-import { getTeamsApi } from './algo/apis/teams.api';
-import { generateGuardListApi, getGuardListHistoryApi } from './algo/apis/guardList.api';
-import { getGuardPostsApi } from './algo/apis/guardPosts.api';
-import type { GuardTime } from './common/helpers/periodHelpers';
+import type { GuardTime } from './helpers/periodHelpers';
 
 export interface Team {
   name: string;
@@ -9,9 +6,10 @@ export interface Team {
   guardPosts: string[];
 }
 
-export function getTeams(): Team[] {
-  // const a = await fetch('http://localhost:3000/teams');
-  return getTeamsApi();
+export async function getTeams(): Promise<Team[]> {
+  const response = await fetch('http://localhost:3000/teams');
+  const responseJson = await response.json();
+  return responseJson.teams;
 }
 
 export interface GuardListPeriod {
@@ -27,12 +25,18 @@ export interface GuardList {
   guardList: GuardListPeriod[];
 }
 
-export function generateGuardList(): GuardList[] {
-  return generateGuardListApi();
+export async function generateGuardList(): Promise<GuardList[]> {
+  const response = await fetch('http://localhost:3000/guard-list/generate', {
+    method: 'POST',
+  });
+  const responseJson = await response.json();
+  return responseJson.guardLists;
 }
 
-export function getGuardListHistory(): GuardList[] {
-  return getGuardListHistoryApi();
+export async function getGuardListHistory(): Promise<GuardList[]> {
+  const response = await fetch('http://localhost:3000/guard-list/history');
+  const responseJson = await response.json();
+  return responseJson.guardLists;
 }
 
 export interface GuardPostOccupation {
@@ -50,6 +54,8 @@ export interface GuardPost {
   constraints: string[]; // TODO: implement
 }
 
-export function getGuardPosts(): GuardPost[] {
-  return getGuardPostsApi();
+export async function getGuardPosts(): Promise<GuardPost[]> {
+  const response = await fetch('http://localhost:3000/guard-posts');
+  const responseJson = await response.json();
+  return responseJson.guardPosts;
 }

@@ -1,47 +1,47 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { generateGuardList } from '../apis'
-import { useShiftsStore } from '../stores/shifts.store'
-import { GUARD_PERIODS_PER_DAY, stringifyPeriod } from '@/common/helpers/periodHelpers';
+import { generateGuardList } from '../apis';
+import { useShiftsStore } from '../stores/shifts.store';
+import { GUARD_PERIODS_PER_DAY, stringifyPeriod } from '@/helpers/periodHelpers';
 
 const shiftsStore = useShiftsStore();
 
-const isLoading = ref<boolean>()
+const isLoading = ref<boolean>();
 let now = new Date().toDateString();
 
-function generateShifts() {
+async function generateShifts() {
   isLoading.value = true;
   setTimeout(async () => {
-    const shifts = generateGuardList();
+    const shifts = await generateGuardList();
     shiftsStore.setShiftsPerGuardPost(shifts);
     now = new Date().toDateString();
     isLoading.value = false;
-  }, 1)
+  }, 1);
 }
 </script>
 
 <template>
   <div class="content">
     <div class="header">
-      <h1>
-        Home
-      </h1>
+      <h1>Home</h1>
       <span class="action-buttons">
         <el-button type="primary" @click="generateShifts">Generate Shifts</el-button>
       </span>
     </div>
 
     <section class="shifts-cards">
-      <div v-if="isLoading" class="empty-state-container">
-        loading...
-      </div>
+      <div v-if="isLoading" class="empty-state-container">loading...</div>
       <div v-else-if="!shiftsStore.shiftsPerGuardPost" class="empty-state-container">
         <el-empty description="Generate shifts to display shifts data">
           <el-button type="primary" @click="generateShifts">Generate Shifts</el-button>
         </el-empty>
       </div>
 
-      <el-card v-else v-for="guardPostShifts in shiftsStore.shiftsPerGuardPost" :key="guardPostShifts.guardPostName">
+      <el-card
+        v-else
+        v-for="guardPostShifts in shiftsStore.shiftsPerGuardPost"
+        :key="guardPostShifts.guardPostName"
+      >
         <template #header>
           <div class="card-header">
             <!-- TODO: convert to displayName -->
@@ -52,13 +52,22 @@ function generateShifts() {
         <el-table :data="guardPostShifts.guardList" stripe style="width: 100%">
           <el-table-column prop="guardTime" label="Time" width="220">
             <template #default="{ row }">
-              {{ stringifyPeriod(row.guardTime.period) }}-{{ stringifyPeriod((row.guardTime.period +
-                row.duration) % GUARD_PERIODS_PER_DAY)
-              }} {{ row.guardTime.date.toDateString() === now ? '' :
-  `(${row.guardTime.date.toLocaleDateString('en-GB')})` }}
+              {{ stringifyPeriod(row.guardTime.period) }}-{{
+                stringifyPeriod((row.guardTime.period + row.duration) % GUARD_PERIODS_PER_DAY)
+              }}
+              {{
+                new Date(row.guardTime.date).toDateString() === now
+                  ? ''
+                  : `(${new Date(row.guardTime.date).toLocaleDateString('en-GB')})`
+              }}
             </template>
           </el-table-column>
-          <el-table-column v-if="guardPostShifts.guardList[0]?.team" prop="team" label="Team" width="120" />
+          <el-table-column
+            v-if="guardPostShifts.guardList[0]?.team"
+            prop="team"
+            label="Team"
+            width="120"
+          />
           <el-table-column prop="soldiers" label="Soldiers">
             <template #default="{ row }">
               {{ row.soldiers.join(', ') }}
@@ -79,7 +88,7 @@ function generateShifts() {
 }
 
 h1 {
-  margin: 0
+  margin: 0;
 }
 
 .header {

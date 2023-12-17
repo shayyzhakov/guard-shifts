@@ -1,8 +1,13 @@
 <script setup lang="ts">
-import { stringifyPeriod } from '@/common/helpers/periodHelpers';
-import { getGuardPosts } from '../apis'
+import { stringifyPeriod } from '@/helpers/periodHelpers';
+import { getGuardPosts, type GuardPost } from '../apis';
+import { onMounted, ref } from 'vue';
 
-const guardPosts = getGuardPosts();
+const guardPosts = ref<GuardPost[]>();
+
+onMounted(async () => {
+  guardPosts.value = await getGuardPosts();
+});
 </script>
 
 <template>
@@ -30,7 +35,10 @@ const guardPosts = getGuardPosts();
 
           <div class="card-body-section">
             <h4>Guard Duration</h4>
-            <div v-for="occupation in guardPost.occupation" :key="`${guardPost.name}-${occupation.from}`">
+            <div
+              v-for="occupation in guardPost.occupation"
+              :key="`${guardPost.name}-${occupation.from}`"
+            >
               {{ stringifyPeriod(occupation.from) }}-{{ stringifyPeriod(occupation.to) }}:
               {{ occupation.duration / 2 }}h
             </div>
@@ -67,6 +75,6 @@ h3 {
 }
 
 .card-body-section h4 {
-  font-weight: 600
+  font-weight: 600;
 }
 </style>
