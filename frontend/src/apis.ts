@@ -10,6 +10,7 @@ export interface Team {
 }
 
 export function getTeams(): Team[] {
+  // const a = await fetch('http://localhost:3000/teams');
   return getTeamsApi();
 }
 
