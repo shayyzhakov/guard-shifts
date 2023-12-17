@@ -18,7 +18,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
   guardPost: GuardPost,
   guardList: GuardList[],
   guardListHistory: GuardList[],
-  startingGuardTime: GuardTime,
+  startingGuardTime: GuardTime
 ): GuardListPeriod[] => {
   const guardListPerPeriod: GuardListPeriod[] = [];
   let currentGuardTime = startingGuardTime;
@@ -30,17 +30,17 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
   while (guardListPerPeriod.length < GUARD_PERIODS_FOR_CALCULATION) {
     const numOfSoldiersForCurrentPeriod = getGuardPostSoldiersAmount(
       guardPost.name,
-      currentGuardTime.period,
+      currentGuardTime.period
     );
     const periodsPerGuard = getGuardPostGuardPeriodDuration(
       guardPost.name,
-      currentGuardTime.period,
+      currentGuardTime.period
     );
 
     const currentTeam = relevantTeams[currentTeamIndex];
     const isCurrentTeamBusy = isTeamBusy(guardList, currentGuardTime, currentTeam.name);
     const freeTeamMembers = currentTeam.people.filter(
-      (soldier) => !isSoldierBusy(guardList, currentGuardTime, soldier),
+      (soldier) => !isSoldierBusy(guardList, currentGuardTime, soldier)
     );
 
     if (isCurrentTeamBusy) {
@@ -49,7 +49,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
       currentTeamIndex = (currentTeamIndex + 1) % relevantTeams.length;
     } else if (biggestTeamSize < numOfSoldiersForCurrentPeriod) {
       console.error(
-        `no teams has enough members for guard post that requires ${numOfSoldiersForCurrentPeriod}`,
+        `no teams has enough members for guard post that requires ${numOfSoldiersForCurrentPeriod}`
       );
 
       guardListPerPeriod.push({
@@ -62,7 +62,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
       currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
     } else if (freeTeamMembers.length < numOfSoldiersForCurrentPeriod) {
       console.info(
-        `team ${currentTeam.name} has only ${freeTeamMembers.length} free members but guard post requires ${numOfSoldiersForCurrentPeriod}`,
+        `team ${currentTeam.name} has only ${freeTeamMembers.length} free members but guard post requires ${numOfSoldiersForCurrentPeriod}`
       );
 
       currentTeamIndex = (currentTeamIndex + 1) % relevantTeams.length;

@@ -1,20 +1,16 @@
 import type { GuardList } from '../interfaces/guardList.interface';
-import {
-  isGuardTimeEqual,
-  type GuardTime,
-  compareGuardTime,
-} from '../helpers/periodHelpers';
+import { isGuardTimeEqual, type GuardTime, compareGuardTime } from '../helpers/periodHelpers';
 import { guardListHistory } from '../data/guardListHistory.data';
 import type { DbGuardList, DbGuardTime } from '../data/guardListHistory.data';
 
 export function isTeamBusy(
   guardList: GuardList[],
   guardTime: GuardTime,
-  teamName: string,
+  teamName: string
 ): boolean {
   return guardList.some((guardPostList) => {
     const guardPeriod = guardPostList.guardList.find((gp) =>
-      isGuardTimeEqual(gp.guardTime, guardTime),
+      isGuardTimeEqual(gp.guardTime, guardTime)
     );
 
     return guardPeriod && guardPeriod.team === teamName;
@@ -24,11 +20,11 @@ export function isTeamBusy(
 export function isSoldierBusy(
   guardList: GuardList[],
   guardTime: GuardTime,
-  soldierName: string,
+  soldierName: string
 ): boolean {
   return guardList.some((guardPostList) => {
     const guardPeriod = guardPostList.guardList.find((glp) =>
-      isGuardTimeEqual(glp.guardTime, guardTime),
+      isGuardTimeEqual(glp.guardTime, guardTime)
     );
 
     return guardPeriod?.soldiers.includes(soldierName);
@@ -44,13 +40,13 @@ export function saveGuardLists(guardLists: GuardList[], overrideFromGuardTime: G
 
       // remove overlapping items before index overrideFromGuardTime
       const glNewOverrideIndex = gl.guardList.findIndex(
-        (glp) => compareGuardTime(glp.guardTime, overrideFromGuardTime) <= 0,
+        (glp) => compareGuardTime(glp.guardTime, overrideFromGuardTime) <= 0
       );
       const finalGuardListToAdd = serializedGuardList.guardList.slice(glNewOverrideIndex);
 
       // remove overlapping items starting after index overrideFromGuardTime
       const glOldOverrideIndex = historyGl.guardList.findIndex(
-        (glp) => compareGuardTime(deserializeGuardTime(glp.guardTime), overrideFromGuardTime) <= 0,
+        (glp) => compareGuardTime(deserializeGuardTime(glp.guardTime), overrideFromGuardTime) <= 0
       );
       if (glOldOverrideIndex > -1) {
         historyGl.guardList.splice(glOldOverrideIndex);

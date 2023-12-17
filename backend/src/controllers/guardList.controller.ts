@@ -29,7 +29,7 @@ export function buildGuardList(): GuardList[] {
       guardPosts[i],
       fullGuardList,
       [], // TODO: replace with history
-      upcomingGuardTime,
+      upcomingGuardTime
     );
     fullGuardList.push(guardListForGuardPost);
   }
@@ -44,7 +44,7 @@ function buildGuardListForGuardPost(
   guardPost: GuardPost,
   guardList: GuardList[],
   guardListHistory: GuardList[],
-  startingGuardTime: GuardTime,
+  startingGuardTime: GuardTime
 ): GuardList {
   const upcomingGuardTime = getUpcomingGuardTimeForGuardPost(guardPost.name, startingGuardTime);
 
@@ -67,7 +67,7 @@ function buildGuardListForGuardPost(
     guardPost,
     guardList,
     guardListHistory,
-    upcomingGuardTime,
+    upcomingGuardTime
   );
 
   const guardListForGuardPost = simplifyGuardList(guardListPerPeriod);
@@ -80,7 +80,7 @@ function buildGuardListForGuardPost(
 function simplifyGuardList(guardListForGuardPost: GuardListPeriod[]): GuardListPeriod[] {
   // remove empty periods
   let simplifiedGuardListForGuardPost = guardListForGuardPost.filter(
-    (guardPeriod) => guardPeriod.soldiers.length > 0,
+    (guardPeriod) => guardPeriod.soldiers.length > 0
   );
 
   // merge consequetive guard periods
@@ -95,7 +95,7 @@ function simplifyGuardList(guardListForGuardPost: GuardListPeriod[]): GuardListP
 
       return acc;
     },
-    [] as GuardListPeriod[],
+    [] as GuardListPeriod[]
   );
   return simplifiedGuardListForGuardPost;
 }
@@ -104,7 +104,7 @@ function isGuardListPeriodsEqual(glp1: GuardListPeriod, glp2: GuardListPeriod): 
   const equalTeams = glp1.team === glp2.team;
 
   const equalSoldiers = glp1.soldiers.every((soldier1) =>
-    glp2.soldiers.some((soldier2) => isSoldiersEqual(soldier1, soldier2)),
+    glp2.soldiers.some((soldier2) => isSoldiersEqual(soldier1, soldier2))
   );
   return equalTeams && equalSoldiers;
 }

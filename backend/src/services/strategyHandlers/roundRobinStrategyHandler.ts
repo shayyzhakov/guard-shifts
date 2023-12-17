@@ -18,7 +18,7 @@ export const roundRobinStrategyHandler: StrategyHandler = (
   guardPost: GuardPost,
   guardList: GuardList[],
   guardListHistory: GuardList[],
-  startingGuardTime: GuardTime,
+  startingGuardTime: GuardTime
 ): GuardListPeriod[] => {
   const people = getPeopleForGuardPost(guardPost.name);
   const guardListPerPeriod: GuardListPeriod[] = [];
@@ -27,15 +27,15 @@ export const roundRobinStrategyHandler: StrategyHandler = (
 
   while (guardListPerPeriod.length < GUARD_PERIODS_FOR_CALCULATION) {
     const freeSoldiers = people.filter(
-      (soldier) => !isSoldierBusy(guardList, currentGuardTime, soldier),
+      (soldier) => !isSoldierBusy(guardList, currentGuardTime, soldier)
     );
     const numOfSoldiersForCurrentPeriod = getGuardPostSoldiersAmount(
       guardPost.name,
-      currentGuardTime.period,
+      currentGuardTime.period
     );
     const periodsPerGuard = getGuardPostGuardPeriodDuration(
       guardPost.name,
-      currentGuardTime.period,
+      currentGuardTime.period
     );
 
     // insert the next soldier to the list
@@ -46,7 +46,7 @@ export const roundRobinStrategyHandler: StrategyHandler = (
         console.error(
           `could not find soldier for guard post ${guardPost.name}. there are ${
             freeSoldiers.length
-          } soldiers and index ${(currentSoldierIndex + g) % freeSoldiers.length} is missing`,
+          } soldiers and index ${(currentSoldierIndex + g) % freeSoldiers.length} is missing`
         );
       }
       soldiers.push(currentSoldier);

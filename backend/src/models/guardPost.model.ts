@@ -16,7 +16,7 @@ export const strategies = [
 
 export function getGuardPostOrder(guardPostName: string): number {
   const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.name === guardPostName,
+    (guardPost) => guardPost.name === guardPostName
   );
   if (!relevantGuardPost) {
     console.error(`could not find guard post named ${guardPostName}`);
@@ -38,10 +38,10 @@ export function getAllGuardPosts(): GuardPost[] {
 
 export function getUpcomingGuardTimeForGuardPost(
   guardPostName: string,
-  fromGuardTime: GuardTime,
+  fromGuardTime: GuardTime
 ): GuardTime {
   const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.name === guardPostName,
+    (guardPost) => guardPost.name === guardPostName
   );
   if (!relevantGuardPost) {
     console.error(`could not find guard post named ${guardPostName}`);
@@ -94,7 +94,7 @@ function getUpcomingPeriodForGuardPost(guardPost: GuardPost, fromPeriod: number)
 
 export function getGuardPostSoldiersAmount(guardPostName: string, period: number): number {
   const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.name === guardPostName,
+    (guardPost) => guardPost.name === guardPostName
   );
   if (!relevantGuardPost) {
     console.error(`could not find guard post named ${guardPostName}`);
@@ -107,7 +107,7 @@ export function getGuardPostSoldiersAmount(guardPostName: string, period: number
 
 export function getGuardPostGuardPeriodDuration(guardPostName: string, period: number): number {
   const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.name === guardPostName,
+    (guardPost) => guardPost.name === guardPostName
   );
   if (!relevantGuardPost) {
     console.error(`could not find guard post named ${guardPostName}`);
@@ -120,7 +120,7 @@ export function getGuardPostGuardPeriodDuration(guardPostName: string, period: n
 
 export function occupationByPeriod(
   guardPost: GuardPost,
-  period: number,
+  period: number
 ): GuardPostOccupation | undefined {
   return guardPost.occupation.find((occupation) => {
     if (occupation.from < occupation.to) {
