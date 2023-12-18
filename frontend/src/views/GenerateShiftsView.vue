@@ -15,7 +15,7 @@ const router = useRouter();
 
 const configForm = reactive({
   startTime: getUpcomingTime(),
-  duration: 2,
+  duration: 24,
 });
 
 const endTime = computed<string>(() => {

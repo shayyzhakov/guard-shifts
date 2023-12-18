@@ -70,6 +70,7 @@ async function goTogenerateShifts() {
 .content {
   display: flex;
   flex-direction: column;
+  height: 100%;
 }
 
 .shifts-cards {
