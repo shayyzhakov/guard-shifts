@@ -15,3 +15,8 @@ export function stringifyPeriod(period: number): string {
 
   return `${formattedHours}:${min}`;
 }
+
+export function timeToPeriod(time: string): number {
+  const [hour, min] = time.split(':').map((n) => parseInt(n, 10));
+  return Math.floor((hour + min / 60) * (GUARD_PERIODS_PER_DAY / 24));
+}

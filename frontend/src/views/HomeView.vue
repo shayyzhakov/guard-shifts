@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { useShiftsStore } from '../stores/shifts.store';
 import { GUARD_PERIODS_PER_DAY, stringifyPeriod } from '@/helpers/periodHelpers';
 import { useRouter } from 'vue-router';
 
 const shiftsStore = useShiftsStore();
 
-const isLoading = ref<boolean>();
 let now = new Date().toDateString();
 const router = useRouter();
 
-async function generateShifts() {
+async function goTogenerateShifts() {
   router.push('generate-shifts');
 }
 </script>
@@ -20,10 +18,9 @@ async function generateShifts() {
     <h1>Home</h1>
 
     <section class="shifts-cards">
-      <div v-if="isLoading" class="empty-state-container">loading...</div>
-      <div v-else-if="!shiftsStore.shiftsPerGuardPost" class="empty-state-container">
+      <div v-if="!shiftsStore.shiftsPerGuardPost" class="empty-state-container">
         <el-empty description="Generate shifts to display shifts data">
-          <el-button type="primary" @click="generateShifts">Generate Shifts</el-button>
+          <el-button type="primary" @click="goTogenerateShifts">Generate Shifts</el-button>
         </el-empty>
       </div>
 
@@ -34,7 +31,6 @@ async function generateShifts() {
       >
         <template #header>
           <div class="card-header">
-            <!-- TODO: convert to displayName -->
             <h3>{{ guardPostShifts.guardPostDisplayName }}</h3>
           </div>
         </template>
