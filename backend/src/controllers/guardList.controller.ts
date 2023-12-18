@@ -1,4 +1,8 @@
-import { getUpcomingGuardTime, type GuardTime } from '../helpers/periodHelpers';
+import {
+  addDurationToGuardTime,
+  getUpcomingGuardTime,
+  type GuardTime,
+} from '../helpers/periodHelpers';
 import {
   getAllGuardPosts,
   getUpcomingGuardTimeForGuardPost,
@@ -15,10 +19,16 @@ import type { StrategyHandler } from '../interfaces/strategyHandler.interface';
 import { isSoldiersEqual } from '../models/soldier.model';
 import { getFullGuardListHistory, saveGuardLists } from '../models/guardList.model';
 
+interface BuildGuardListParams {
+  startPeriod: number;
+  duration: number;
+}
+
 type GuardListResponse = Array<GuardList & { guardPostDisplayName: string }>;
 
-export function buildGuardList(): GuardListResponse {
-  const upcomingGuardTime = getUpcomingGuardTime();
+export function buildGuardList({ startPeriod, duration }: BuildGuardListParams): GuardListResponse {
+  const upcomingGuardTime = getUpcomingGuardTime(startPeriod);
+  const endGuardTime = addDurationToGuardTime(upcomingGuardTime, duration);
 
   const guardPosts = getAllGuardPosts();
   guardPosts.sort((a, b) => {
@@ -32,7 +42,8 @@ export function buildGuardList(): GuardListResponse {
       guardPosts[i],
       fullGuardList,
       [], // TODO: replace with history
-      upcomingGuardTime
+      upcomingGuardTime,
+      endGuardTime
     );
     fullGuardList.push(guardListForGuardPost);
   }
@@ -49,12 +60,13 @@ export function buildGuardList(): GuardListResponse {
   return guardListResponse;
 }
 
-// TODO: add input: history, currently built guard list, remove startingPeriod
+// TODO: add input: history, currently built guard list
 function buildGuardListForGuardPost(
   guardPost: GuardPost,
   guardList: GuardList[],
   guardListHistory: GuardList[],
-  startingGuardTime: GuardTime
+  startingGuardTime: GuardTime,
+  endingGuardTime: GuardTime
 ): GuardList {
   const upcomingGuardTime = getUpcomingGuardTimeForGuardPost(guardPost.name, startingGuardTime);
 
@@ -77,7 +89,8 @@ function buildGuardListForGuardPost(
     guardPost,
     guardList,
     guardListHistory,
-    upcomingGuardTime
+    upcomingGuardTime,
+    endingGuardTime
   );
 
   const guardListForGuardPost = simplifyGuardList(guardListPerPeriod);

@@ -65,7 +65,6 @@ onMounted(async () => {
 .content {
   display: flex;
   flex-direction: column;
-  height: 100%;
 }
 
 .shifts-cards {

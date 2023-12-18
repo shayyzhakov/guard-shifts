@@ -6,5 +6,6 @@ export type StrategyHandler = (
   guardPost: GuardPost,
   guardList: GuardList[],
   guardListHistory: any,
-  startingGuardTime: GuardTime
+  startingGuardTime: GuardTime,
+  endingGuardTime: GuardTime
 ) => GuardListPeriod[];

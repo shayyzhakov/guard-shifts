@@ -2,6 +2,7 @@ import {
   GUARD_PERIODS_FOR_CALCULATION,
   type GuardTime,
   getNextPeriodGuardTime,
+  compareGuardTime,
 } from '../../helpers/periodHelpers';
 import { getTeamsForGuardPost } from '../../models/team.model';
 import { isTeamBusy, isSoldierBusy } from '../../models/guardList.model';
@@ -18,7 +19,8 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
   guardPost: GuardPost,
   guardList: GuardList[],
   guardListHistory: GuardList[],
-  startingGuardTime: GuardTime
+  startingGuardTime: GuardTime,
+  endingGuardTime: GuardTime
 ): GuardListPeriod[] => {
   const guardListPerPeriod: GuardListPeriod[] = [];
   let currentGuardTime = startingGuardTime;
@@ -27,7 +29,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
 
   const biggestTeamSize = Math.max(...relevantTeams.map((team) => team.people.length));
 
-  while (guardListPerPeriod.length < GUARD_PERIODS_FOR_CALCULATION) {
+  while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
     const numOfSoldiersForCurrentPeriod = getGuardPostSoldiersAmount(
       guardPost.name,
       currentGuardTime.period

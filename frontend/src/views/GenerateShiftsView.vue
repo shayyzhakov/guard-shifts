@@ -15,13 +15,13 @@ const router = useRouter();
 
 const configForm = reactive({
   startTime: getUpcomingTime(),
-  duration: '',
+  duration: 2,
 });
 
 const endTime = computed<string>(() => {
-  const duration = parseInt(configForm.duration, 10);
   if (!configForm.duration) return '';
 
+  const duration = configForm.duration * 2;
   const startTime = configForm.startTime;
   const startPeriod = timeToPeriod(startTime);
   const endPeriod = (startPeriod + duration) % GUARD_PERIODS_PER_DAY;
@@ -35,7 +35,7 @@ async function generateShifts() {
 
   const shifts = await generateGuardList({
     startPeriod: timeToPeriod(configForm.startTime),
-    duration: parseInt(configForm.duration, 10),
+    duration: configForm.duration * 2,
   });
 
   shiftsStore.setShiftsPerGuardPost(shifts);

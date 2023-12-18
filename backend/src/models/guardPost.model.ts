@@ -1,4 +1,4 @@
-import { getNextDate, GUARD_PERIODS_PER_DAY, type GuardTime } from '../helpers/periodHelpers';
+import { addDays, GUARD_PERIODS_PER_DAY, type GuardTime } from '../helpers/periodHelpers';
 import { guardPosts } from '../data/guardPosts.data';
 import type { GuardPost, GuardPostOccupation } from '../interfaces/guardPost.interface';
 
@@ -50,7 +50,7 @@ export function getUpcomingGuardTimeForGuardPost(
 
   const upcomingPeriod = getUpcomingPeriodForGuardPost(relevantGuardPost, fromGuardTime.period);
   const upcomingDate =
-    fromGuardTime.period <= upcomingPeriod ? fromGuardTime.date : getNextDate(fromGuardTime.date);
+    fromGuardTime.period <= upcomingPeriod ? fromGuardTime.date : addDays(fromGuardTime.date, 1);
 
   return {
     period: upcomingPeriod,
@@ -58,7 +58,7 @@ export function getUpcomingGuardTimeForGuardPost(
   };
 }
 
-function getUpcomingPeriodForGuardPost(guardPost: GuardPost, fromPeriod: number): number {
+export function getUpcomingPeriodForGuardPost(guardPost: GuardPost, fromPeriod: number): number {
   const occupation = occupationByPeriod(guardPost, fromPeriod);
   if (occupation) {
     let i = 0;
