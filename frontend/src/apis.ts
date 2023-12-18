@@ -26,9 +26,16 @@ export interface GuardList {
   guardList: GuardListPeriod[];
 }
 
-export async function generateGuardList(): Promise<GuardList[]> {
+export interface GenerateGuardListParams {
+  startPeriod: number;
+  duration: number;
+}
+
+export async function generateGuardList(params: GenerateGuardListParams): Promise<GuardList[]> {
   const response = await fetch('http://localhost:3000/guard-list/generate', {
     method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(params),
   });
   const responseJson = await response.json();
   return responseJson.guardLists;

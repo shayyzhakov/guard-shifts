@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.post('/generate', (req: Request, res: Response) => {
   try {
+    const { startPeriod, duration } = req.body;
     const guardLists = buildGuardList();
     return res.json({ guardLists });
   } catch (e: unknown) {

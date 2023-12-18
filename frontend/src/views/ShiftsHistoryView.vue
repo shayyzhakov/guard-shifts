@@ -71,7 +71,7 @@ onMounted(async () => {
 .shifts-cards {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
   flex: 1;
 }
 
@@ -86,7 +86,7 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 16px;
   height: 80%;
 }
 </style>

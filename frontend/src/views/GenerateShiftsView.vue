@@ -1,50 +1,89 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { generateGuardList } from '../apis';
 import { useShiftsStore } from '../stores/shifts.store';
 import { useRouter } from 'vue-router';
-import { timeToPeriod } from '@/helpers/periodHelpers';
+import {
+  GUARD_PERIODS_PER_DAY,
+  getUpcomingTime,
+  stringifyPeriod,
+  timeToPeriod,
+} from '@/helpers/periodHelpers';
 
 const shiftsStore = useShiftsStore();
 const router = useRouter();
+
+const configForm = reactive({
+  startTime: getUpcomingTime(),
+  duration: '',
+});
+
+const endTime = computed<string>(() => {
+  const duration = parseInt(configForm.duration, 10);
+  if (!configForm.duration) return '';
+
+  const startTime = configForm.startTime;
+  const startPeriod = timeToPeriod(startTime);
+  const endPeriod = (startPeriod + duration) % GUARD_PERIODS_PER_DAY;
+  return `${stringifyPeriod(endPeriod)}`;
+});
 
 const isLoading = ref<boolean>();
 
 async function generateShifts() {
   isLoading.value = true;
 
-  const period = timeToPeriod(startTime.value);
-  console.log(period);
-
-  const shifts = await generateGuardList();
+  const shifts = await generateGuardList({
+    startPeriod: timeToPeriod(configForm.startTime),
+    duration: parseInt(configForm.duration, 10),
+  });
 
   shiftsStore.setShiftsPerGuardPost(shifts);
   router.push('home');
   isLoading.value = false;
 }
-
-const startTime = ref();
 </script>
 
 <template>
-  <div class="content">
+  <div>
     <h1>Generate Shifts</h1>
 
     <section class="config-cards">
       <el-card>
         <template #header>
           <div class="card-header">
-            <h3>Configuration</h3>
+            <h3>Basic Configuration</h3>
           </div>
         </template>
 
-        <el-time-select
-          v-model="startTime"
-          start="00:00"
-          step="00:30"
-          end="23:30"
-          placeholder="Select time"
-        />
+        <el-form :model="configForm" label-width="120px" label-position="left">
+          <el-form-item label="Start Time">
+            <!-- TODO: extract to PeriodSelector.vue -->
+            <el-time-select
+              v-model="configForm.startTime"
+              start="00:00"
+              step="00:30"
+              end="23:30"
+              placeholder="Select time"
+            />
+          </el-form-item>
+
+          <el-form-item label="Duration (hours)">
+            <el-input-number v-model="configForm.duration" :min="1" :max="168" />
+          </el-form-item>
+
+          <el-form-item label="End Time">
+            <!-- TODO: extract to PeriodSelector.vue -->
+            <el-time-select
+              v-model="endTime"
+              disabled
+              start="00:00"
+              step="00:30"
+              end="23:30"
+              placeholder="Select time"
+            />
+          </el-form-item>
+        </el-form>
       </el-card>
 
       <el-card>
@@ -75,16 +114,10 @@ const startTime = ref();
 </template>
 
 <style scoped>
-.content {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-
 .config-cards {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
   flex: 1;
 }
 
@@ -95,6 +128,6 @@ const startTime = ref();
 }
 
 .buttons {
-  margin-top: 16px;
+  margin-top: 8px;
 }
 </style>
