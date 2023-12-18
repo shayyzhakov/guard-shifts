@@ -1,19 +1,33 @@
 <script setup lang="ts">
-import { onBeforeMount } from 'vue';
-import { RouterView, useRouter } from 'vue-router';
+import { ref, watch } from 'vue';
+import { RouterView, useRoute } from 'vue-router';
 
-const router = useRouter();
+const route = useRoute();
 
-onBeforeMount(() => {
-  router.push('home');
-});
+const activeRoute = ref<string>('home');
+
+watch(
+  () => route.path,
+  (newValue) => {
+    activeRoute.value = newValue.split('/')[1] ?? 'home';
+  },
+  {
+    immediate: true,
+  },
+);
 </script>
 
 <template>
   <el-container class="main">
     <el-aside width="200px">
-      <el-menu router active-text-color="#ffd04b" background-color="#545c64" class="sidebar" default-active="home"
-        text-color="#fff">
+      <el-menu
+        router
+        active-text-color="#ffd04b"
+        background-color="#545c64"
+        class="sidebar"
+        :default-active="activeRoute"
+        text-color="#fff"
+      >
         <el-menu-item index="home">
           <template #title>Home</template>
         </el-menu-item>
@@ -25,6 +39,9 @@ onBeforeMount(() => {
         </el-menu-item>
         <el-menu-item index="shifts-history">
           <template #title>Shifts History</template>
+        </el-menu-item>
+        <el-menu-item index="generate-shifts">
+          <template #title>Generate Shifts</template>
         </el-menu-item>
       </el-menu>
     </el-aside>

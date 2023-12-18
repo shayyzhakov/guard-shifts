@@ -1,23 +1,28 @@
 <script setup lang="ts">
 import { ref } from 'vue';
+import { generateGuardList } from '../apis';
 import { useShiftsStore } from '../stores/shifts.store';
 import { GUARD_PERIODS_PER_DAY, stringifyPeriod } from '@/helpers/periodHelpers';
-import { useRouter } from 'vue-router';
 
 const shiftsStore = useShiftsStore();
 
 const isLoading = ref<boolean>();
 let now = new Date().toDateString();
-const router = useRouter();
 
 async function generateShifts() {
-  router.push('generate-shifts');
+  isLoading.value = true;
+  setTimeout(async () => {
+    const shifts = await generateGuardList();
+    shiftsStore.setShiftsPerGuardPost(shifts);
+    now = new Date().toDateString();
+    isLoading.value = false;
+  }, 1);
 }
 </script>
 
 <template>
   <div class="content">
-    <h1>Home</h1>
+    <h1>Generate Shifts</h1>
 
     <section class="shifts-cards">
       <div v-if="isLoading" class="empty-state-container">loading...</div>
