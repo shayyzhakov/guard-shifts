@@ -1,7 +1,5 @@
 export const GUARD_PERIODS_PER_DAY = 48; // 1 period = 30min
 
-export const GUARD_PERIODS_FOR_CALCULATION = GUARD_PERIODS_PER_DAY * 3; // 3 days
-
 export interface GuardTime {
   period: number;
   date: Date;

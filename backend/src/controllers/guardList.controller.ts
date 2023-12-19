@@ -41,7 +41,7 @@ export function buildGuardList({ startPeriod, duration }: BuildGuardListParams):
     const guardListForGuardPost = buildGuardListForGuardPost(
       guardPosts[i],
       fullGuardList,
-      [], // TODO: replace with history
+      getFullGuardListHistory(),
       upcomingGuardTime,
       endGuardTime
     );

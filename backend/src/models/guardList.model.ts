@@ -59,6 +59,22 @@ export function saveGuardLists(guardLists: GuardList[], overrideFromGuardTime: G
   });
 }
 
+export function mergeGuardLists(guardLists1: GuardList[], guardLists2: GuardList[]): GuardList[] {
+  const mergedGuardLists = [...guardLists1];
+
+  guardLists2.forEach((gl) => {
+    const gl1 = guardLists1.find((gl1) => gl1.guardPostName === gl.guardPostName);
+    if (gl1) {
+      // TODO: delete overlapping periods
+      gl1.guardList.push(...gl.guardList);
+    } else {
+      mergedGuardLists.push(gl);
+    }
+  });
+
+  return mergedGuardLists;
+}
+
 function serializeGuardList(guardList: GuardList): DbGuardList {
   return {
     ...guardList,

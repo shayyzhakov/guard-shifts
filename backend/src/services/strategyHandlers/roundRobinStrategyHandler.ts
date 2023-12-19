@@ -1,5 +1,4 @@
 import {
-  GUARD_PERIODS_FOR_CALCULATION,
   type GuardTime,
   getNextPeriodGuardTime,
   compareGuardTime,
@@ -14,7 +13,6 @@ import {
 import type { GuardPost } from '../../interfaces/guardPost.interface';
 import type { StrategyHandler } from '../../interfaces/strategyHandler.interface';
 
-// TODO: implement StrategyHandler
 export const roundRobinStrategyHandler: StrategyHandler = (
   guardPost: GuardPost,
   guardList: GuardList[],
@@ -27,6 +25,7 @@ export const roundRobinStrategyHandler: StrategyHandler = (
   let currentGuardTime = startingGuardTime;
   let currentSoldierIndex = 0;
 
+  // TODO: calculate 3 times the duration, then submit just the requested duration
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
     const freeSoldiers = people.filter(
       (soldier) => !isSoldierBusy(guardList, currentGuardTime, soldier)
@@ -40,7 +39,7 @@ export const roundRobinStrategyHandler: StrategyHandler = (
       currentGuardTime.period
     );
 
-    // insert the next soldier to the list
+    // find the relevant soldiers
     const soldiers = [];
     for (let g = 0; g < numOfSoldiersForCurrentPeriod; g++) {
       const currentSoldier = freeSoldiers[(currentSoldierIndex + g) % freeSoldiers.length];
