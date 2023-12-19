@@ -17,7 +17,11 @@ import type { GuardList, GuardListPeriod } from '../interfaces/guardList.interfa
 import type { GuardPost } from '../interfaces/guardPost.interface';
 import type { StrategyHandler } from '../interfaces/strategyHandler.interface';
 import { isSoldiersEqual } from '../models/soldier.model';
-import { getFullGuardListHistory, saveGuardLists } from '../models/guardList.model';
+import {
+  getFullGuardListHistory,
+  removeHistoryGuardListPeriodsFrom,
+  saveGuardLists,
+} from '../models/guardList.model';
 
 interface BuildGuardListParams {
   startPeriod: number;
@@ -37,11 +41,15 @@ export function buildGuardList({ startPeriod, duration }: BuildGuardListParams):
 
   const fullGuardList: GuardList[] = [];
 
+  // truncate history at the start of the upcoming guard time, since we are going to build the guard list from this point
+  removeHistoryGuardListPeriodsFrom(upcomingGuardTime);
+  const guardListHistory = getFullGuardListHistory();
+
   for (let i = 0; i < guardPosts.length; i++) {
     const guardListForGuardPost = buildGuardListForGuardPost(
       guardPosts[i],
       fullGuardList,
-      getFullGuardListHistory(),
+      guardListHistory,
       upcomingGuardTime,
       endGuardTime
     );

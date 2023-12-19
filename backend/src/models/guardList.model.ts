@@ -17,6 +17,9 @@ export function isTeamBusy(
   });
 }
 
+/**
+ * returns true if the soldier is busy in the specified guard time, given a guard list
+ */
 export function isSoldierBusy(
   guardList: GuardList[],
   guardTime: GuardTime,
@@ -38,19 +41,13 @@ export function saveGuardLists(guardLists: GuardList[], overrideFromGuardTime: G
     if (historyGl) {
       // guard list history exist for this guard post. merge lists
 
-      // remove overlapping items before index overrideFromGuardTime
+      // remove overlapping items before index overrideFromGuardTime (should do nothing as the list was created starting from overrideFromGuardTime)
       const glNewOverrideIndex = gl.guardList.findIndex(
         (glp) => compareGuardTime(glp.guardTime, overrideFromGuardTime) <= 0
       );
       const finalGuardListToAdd = serializedGuardList.guardList.slice(glNewOverrideIndex);
 
-      // remove overlapping items starting after index overrideFromGuardTime
-      const glOldOverrideIndex = historyGl.guardList.findIndex(
-        (glp) => compareGuardTime(deserializeGuardTime(glp.guardTime), overrideFromGuardTime) <= 0
-      );
-      if (glOldOverrideIndex > -1) {
-        historyGl.guardList.splice(glOldOverrideIndex);
-      }
+      // add the new guard list to the history
       historyGl.guardList.push(...finalGuardListToAdd);
     } else {
       // guard list history does not exist for this guard post
@@ -59,14 +56,33 @@ export function saveGuardLists(guardLists: GuardList[], overrideFromGuardTime: G
   });
 }
 
+/**
+ * removes all guard list periods that start after the specified guard time
+ * @param fromGuardTime remove all guard list periods that start after this guard time
+ */
+export function removeHistoryGuardListPeriodsFrom(fromGuardTime: GuardTime): void {
+  guardListHistory.forEach((glh) => {
+    const glOldOverrideIndex = glh.guardList.findIndex(
+      (glp) => compareGuardTime(deserializeGuardTime(glp.guardTime), fromGuardTime) <= 0
+    );
+    if (glOldOverrideIndex > -1) {
+      glh.guardList.splice(glOldOverrideIndex);
+    }
+  });
+}
+
+/**
+ * merges two guard lists
+ * @returns merged guard list array
+ */
 export function mergeGuardLists(guardLists1: GuardList[], guardLists2: GuardList[]): GuardList[] {
   const mergedGuardLists = [...guardLists1];
 
   guardLists2.forEach((gl) => {
-    const gl1 = guardLists1.find((gl1) => gl1.guardPostName === gl.guardPostName);
-    if (gl1) {
+    const mergedGuardList = mergedGuardLists.find((gl1) => gl1.guardPostName === gl.guardPostName);
+    if (mergedGuardList) {
       // TODO: delete overlapping periods
-      gl1.guardList.push(...gl.guardList);
+      mergedGuardList.guardList.push(...gl.guardList);
     } else {
       mergedGuardLists.push(gl);
     }
