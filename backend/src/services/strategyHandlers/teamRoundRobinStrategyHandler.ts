@@ -113,7 +113,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
  * based on the guard list history, get a sorted list of teams that should be used next
  * @returns sorted list of teams (lower index should be used first)
  */
-export function getNextTeamsQueue(
+function getNextTeamsQueue(
   guardPostName: string,
   historyGuardListPeriods: GuardListPeriod[]
 ): Team[] {

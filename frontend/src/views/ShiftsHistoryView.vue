@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { getGuardListHistory, type GuardList } from '@/apis';
-import { stringifyPeriod } from '@/helpers/periodHelpers';
+import { GUARD_PERIODS_PER_DAY, stringifyPeriod } from '@/helpers/periodHelpers';
 import { computed, onMounted, ref } from 'vue';
+
+const now = new Date().toDateString();
 
 const guardListHistory = ref<GuardList[]>();
 
@@ -38,9 +40,14 @@ onMounted(async () => {
         <el-table :data="guardPostShifts.guardList" stripe style="width: 100%">
           <el-table-column prop="guardTime" label="Time" width="220">
             <template #default="{ row }">
-              {{ stringifyPeriod(row.guardTime.period) }} ({{
-                new Date(row.guardTime.date).toLocaleDateString('en-GB')
-              }})
+              {{ stringifyPeriod(row.guardTime.period) }}-{{
+                stringifyPeriod((row.guardTime.period + row.duration) % GUARD_PERIODS_PER_DAY)
+              }}
+              {{
+                new Date(row.guardTime.date).toDateString() === now
+                  ? ''
+                  : `(${new Date(row.guardTime.date).toLocaleDateString('en-GB')})`
+              }}
             </template>
           </el-table-column>
           <el-table-column

@@ -5,7 +5,7 @@ import { useRouter } from 'vue-router';
 
 const shiftsStore = useShiftsStore();
 
-let now = new Date().toDateString();
+const now = new Date().toDateString();
 const router = useRouter();
 
 async function goTogenerateShifts() {
