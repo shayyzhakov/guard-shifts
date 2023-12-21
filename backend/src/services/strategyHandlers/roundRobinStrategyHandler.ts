@@ -3,8 +3,7 @@ import {
   getNextPeriodGuardTime,
   compareGuardTime,
 } from '../../helpers/periodHelpers';
-import { getPeopleForGuardPost } from '../../models/team.model';
-import { isSoldierBusy, mergeGuardLists } from '../../models/guardList.model';
+import { mergeGuardLists } from '../../models/guardList.model';
 import type { GuardList, GuardListPeriod } from '../../interfaces/guardList.interface';
 import {
   getGuardPostGuardPeriodDuration,
@@ -12,7 +11,7 @@ import {
 } from '../../models/guardPost.model';
 import type { GuardPost } from '../../interfaces/guardPost.interface';
 import type { StrategyHandler } from '../../interfaces/strategyHandler.interface';
-import { Soldier } from '../../interfaces/soldier.interface';
+import { SoldiersQueue } from '../queues/soldiersQueue';
 
 export const roundRobinStrategyHandler: StrategyHandler = (
   guardPost: GuardPost,
@@ -39,7 +38,7 @@ export const roundRobinStrategyHandler: StrategyHandler = (
       currentGuardTime.period
     );
 
-    // find the relevant soldiers
+    // find the next soldiers to guard
     const soldiers = relevantSoldiersQueue.next(currentGuardTime, numOfSoldiersForCurrentPeriod);
 
     for (let i = 0; i < periodsPerGuard; i++) {
@@ -55,36 +54,3 @@ export const roundRobinStrategyHandler: StrategyHandler = (
 
   return guardListPerPeriod;
 };
-
-class SoldiersQueue {
-  private soldiersForGuardPost: Soldier[];
-
-  constructor(guardPostName: string, private guardLists: GuardList[]) {
-    this.soldiersForGuardPost = getPeopleForGuardPost(guardPostName);
-  }
-
-  next(guardTime: GuardTime, amount: number = 1): Soldier[] {
-    const soldiers: Soldier[] = [];
-    const busySoldiers: Soldier[] = [];
-
-    while (soldiers.length < amount) {
-      const nextSoldier = this.soldiersForGuardPost.shift();
-
-      if (!nextSoldier) {
-        throw new Error('no soldiers in queue');
-      }
-
-      const isBusy = isSoldierBusy(this.guardLists, guardTime, nextSoldier);
-      if (isBusy) {
-        busySoldiers.push(nextSoldier);
-      } else {
-        soldiers.push(nextSoldier);
-      }
-    }
-
-    this.soldiersForGuardPost.push(...soldiers); // add the soldiers to the end of the queue
-    this.soldiersForGuardPost.unshift(...busySoldiers); // add the busy soldiers to the top of the queue so they will be the ones to use next
-
-    return soldiers;
-  }
-}
