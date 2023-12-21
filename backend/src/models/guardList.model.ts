@@ -2,6 +2,7 @@ import type { GuardList } from '../interfaces/guardList.interface';
 import { isGuardTimeEqual, type GuardTime, compareGuardTime } from '../helpers/periodHelpers';
 import { guardListHistory } from '../data/guardListHistory.data';
 import type { DbGuardList, DbGuardTime } from '../data/guardListHistory.data';
+import { Soldier } from '../interfaces/soldier.interface';
 
 export function isTeamBusy(
   guardList: GuardList[],
@@ -127,4 +128,27 @@ function deserializeGuardTime(dbGuardTime: DbGuardTime): GuardTime {
 
 export function getFullGuardListHistory(): GuardList[] {
   return guardListHistory.map(deserializeGuardList);
+}
+
+export function getSoldiersByLatestGuardOrder(guardLists: GuardList[]): Soldier[] {
+  const soldiers: Soldier[] = [];
+
+  // flatten guard lists to array of guard periods
+  const guardPeriods = guardLists.flatMap((gl) => gl.guardList);
+
+  // sort guard periods by guard time from latest to oldest
+  const sortedGuardPeriods = guardPeriods.sort((a, b) =>
+    compareGuardTime(a.guardTime, b.guardTime) > 0 ? 1 : -1
+  );
+
+  // add soldiers to the list, from the oldest to the newest
+  sortedGuardPeriods.forEach((gp) => {
+    gp.soldiers.forEach((soldier) => {
+      if (!soldiers.includes(soldier)) {
+        soldiers.unshift(soldier);
+      }
+    });
+  });
+
+  return soldiers;
 }
