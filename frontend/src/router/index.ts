@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import SoldiersManagementView from '../views/SoldiersManagementView.vue';
 import GuardPostsView from '../views/GuardPostsView.vue';
-import ShiftsHistoryView from '../views/ShiftsHistoryView.vue';
 import GenerateShiftsView from '../views/GenerateShiftsView.vue';
 
 const router = createRouter({
@@ -23,11 +22,7 @@ const router = createRouter({
       name: 'guard-posts',
       component: GuardPostsView,
     },
-    {
-      path: '/shifts-history',
-      name: 'shifts-history',
-      component: ShiftsHistoryView,
-    },
+
     {
       path: '/generate-shifts',
       name: 'generate-shifts',

@@ -1,32 +1,42 @@
 <script setup lang="ts">
-import { useShiftsStore } from '../stores/shifts.store';
+import { getGuardListHistory, type GuardList } from '@/apis';
 import { GUARD_PERIODS_PER_DAY, stringifyPeriod } from '@/helpers/periodHelpers';
+import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
-const shiftsStore = useShiftsStore();
-
-const now = new Date().toDateString();
 const router = useRouter();
 
-async function goTogenerateShifts() {
+const now = new Date().toDateString();
+
+const guardListHistory = ref<GuardList[]>();
+
+const noHistory = computed<boolean>(
+  () => !!(guardListHistory.value && !guardListHistory.value.length),
+);
+
+onMounted(async () => {
+  guardListHistory.value = await getGuardListHistory();
+});
+
+async function goToGenerateShifts() {
   router.push('generate-shifts');
 }
 </script>
 
 <template>
   <div class="content">
-    <h1>Home</h1>
+    <h1>Shifts History</h1>
 
     <section class="shifts-cards">
-      <div v-if="!shiftsStore.shiftsPerGuardPost" class="empty-state-container">
+      <div v-if="noHistory" class="empty-state-container">
         <el-empty description="Generate shifts to display shifts data">
-          <el-button type="primary" @click="goTogenerateShifts">Generate Shifts</el-button>
+          <el-button type="primary" @click="goToGenerateShifts">Generate Shifts</el-button>
         </el-empty>
       </div>
 
       <el-card
         v-else
-        v-for="guardPostShifts in shiftsStore.shiftsPerGuardPost"
+        v-for="guardPostShifts in guardListHistory"
         :key="guardPostShifts.guardPostName"
       >
         <template #header>

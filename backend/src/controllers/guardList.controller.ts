@@ -18,10 +18,13 @@ import type { GuardPost } from '../interfaces/guardPost.interface';
 import type { StrategyHandler } from '../interfaces/strategyHandler.interface';
 import { isSoldiersEqual } from '../models/soldier.model';
 import {
+  deserializeGuardList,
   getFullGuardListHistory,
-  removeHistoryGuardListPeriodsFrom,
   saveGuardLists,
+  truncateGuardListFromGuardTime,
 } from '../models/guardList.model';
+import { deserialize } from 'v8';
+import { DbGuardList } from '../data/guardListHistory.data';
 
 interface BuildGuardListParams {
   startPeriod: number;
@@ -31,19 +34,21 @@ interface BuildGuardListParams {
 type GuardListResponse = Array<GuardList & { guardPostDisplayName: string }>;
 
 export function buildGuardList({ startPeriod, duration }: BuildGuardListParams): GuardListResponse {
+  const fullGuardList: GuardList[] = [];
+
   const upcomingGuardTime = getUpcomingGuardTime(startPeriod);
   const endGuardTime = addDurationToGuardTime(upcomingGuardTime, duration);
 
   const guardPosts = getAllGuardPosts();
+
+  // handle higher priority strategies first
   guardPosts.sort((a, b) => {
     return getGuardPostOrder(a.name) - getGuardPostOrder(b.name);
   });
 
-  const fullGuardList: GuardList[] = [];
-
   // truncate history at the start of the upcoming guard time, since we are going to build the guard list from this point
-  removeHistoryGuardListPeriodsFrom(upcomingGuardTime);
   const guardListHistory = getFullGuardListHistory();
+  truncateGuardListFromGuardTime(guardListHistory, upcomingGuardTime);
 
   for (let i = 0; i < guardPosts.length; i++) {
     const guardListForGuardPost = buildGuardListForGuardPost(
@@ -55,8 +60,6 @@ export function buildGuardList({ startPeriod, duration }: BuildGuardListParams):
     );
     fullGuardList.push(guardListForGuardPost);
   }
-
-  saveGuardLists(fullGuardList, upcomingGuardTime);
 
   const guardListResponse: GuardListResponse = fullGuardList.map((guardList) => {
     return {
@@ -147,4 +150,12 @@ export function getGuardListHistory(): GuardListResponse {
       guardPostDisplayName: getGuardPostDisplayName(guardList.guardPostName),
     };
   });
+}
+
+export function commitGuardLists(guardLists: GuardList[]): void {
+  saveGuardLists(guardLists);
+}
+
+export function parseGuardLists(guardLists: DbGuardList[]): GuardList[] {
+  return guardLists.map((guardList) => deserializeGuardList(guardList));
 }

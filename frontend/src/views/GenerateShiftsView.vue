@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
-import { generateGuardList } from '../apis';
-import { useShiftsStore } from '../stores/shifts.store';
+import { commitGuardList, generateGuardList, type GuardList } from '../apis';
 import { useRouter } from 'vue-router';
 import {
   GUARD_PERIODS_PER_DAY,
@@ -9,8 +8,10 @@ import {
   stringifyPeriod,
   timeToPeriod,
 } from '@/helpers/periodHelpers';
+import { ElNotification } from 'element-plus';
 
-const shiftsStore = useShiftsStore();
+const now = new Date().toDateString();
+
 const router = useRouter();
 
 const configForm = reactive({
@@ -29,19 +30,48 @@ const endTime = computed<string>(() => {
 });
 
 const isLoading = ref<boolean>();
+const shiftsDraft = ref<GuardList[]>([]);
 
 async function generateShifts() {
   isLoading.value = true;
 
-  const shifts = await generateGuardList({
+  shiftsDraft.value = await generateGuardList({
     startPeriod: timeToPeriod(configForm.startTime),
     duration: configForm.duration * 2,
   });
 
-  shiftsStore.setShiftsPerGuardPost(shifts);
-  router.push('home');
+  showShiftsDialog.value = true;
+
   isLoading.value = false;
 }
+
+async function submitShifts() {
+  isLoading.value = true;
+
+  showShiftsDialog.value = false;
+
+  try {
+    await commitGuardList(shiftsDraft.value);
+
+    ElNotification({
+      title: 'Commition Succeeded',
+      message: 'Shifts were commited successfully',
+      type: 'success',
+    });
+
+    router.push('home');
+  } catch (e) {
+    ElNotification({
+      title: 'Action Failed',
+      message: 'Failed to commit shifts',
+      type: 'error',
+    });
+  } finally {
+    isLoading.value = false;
+  }
+}
+
+const showShiftsDialog = ref<boolean>(false);
 </script>
 
 <template>
@@ -110,6 +140,52 @@ async function generateShifts() {
         <el-button type="primary" @click="generateShifts">Generate Shifts</el-button>
       </div>
     </section>
+
+    <el-dialog v-model="showShiftsDialog" title="Shifts Draft" align-center class="centered-modal">
+      <section class="shifts-cards">
+        <el-card v-for="guardPostShifts in shiftsDraft" :key="guardPostShifts.guardPostName">
+          <template #header>
+            <div class="card-header">
+              <h3>{{ guardPostShifts.guardPostDisplayName }}</h3>
+            </div>
+          </template>
+
+          <el-table :data="guardPostShifts.guardList" stripe style="width: 100%">
+            <el-table-column prop="guardTime" label="Time" width="220">
+              <template #default="{ row }">
+                {{ stringifyPeriod(row.guardTime.period) }}-{{
+                  stringifyPeriod((row.guardTime.period + row.duration) % GUARD_PERIODS_PER_DAY)
+                }}
+                {{
+                  new Date(row.guardTime.date).toDateString() === now
+                    ? ''
+                    : `(${new Date(row.guardTime.date).toLocaleDateString('en-GB')})`
+                }}
+              </template>
+            </el-table-column>
+            <el-table-column
+              v-if="guardPostShifts.guardList[0]?.team"
+              prop="team"
+              label="Team"
+              width="120"
+            />
+            <el-table-column prop="soldiers" label="Soldiers">
+              <template #default="{ row }">
+                {{ row.soldiers.join(', ') }}
+              </template>
+            </el-table-column>
+            <!-- <el-table-column prop="error" label="Error" width="180" /> -->
+          </el-table>
+        </el-card>
+      </section>
+
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="showShiftsDialog = false">Cancel</el-button>
+          <el-button type="primary" @click="submitShifts">Commit</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -129,5 +205,28 @@ async function generateShifts() {
 
 .buttons {
   margin-top: 8px;
+}
+
+:deep(.centered-modal) {
+  max-height: 90%;
+  display: flex;
+  flex-direction: column;
+}
+
+:deep(.el-dialog__body) {
+  overflow: auto;
+}
+
+.shifts-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+}
+
+.card-header {
+  display: flex;
+  gap: 6px;
+  align-items: center;
 }
 </style>

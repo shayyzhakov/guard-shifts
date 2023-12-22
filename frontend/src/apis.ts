@@ -41,6 +41,16 @@ export async function generateGuardList(params: GenerateGuardListParams): Promis
   return responseJson.guardLists;
 }
 
+export async function commitGuardList(guardLists: GuardList[]): Promise<void> {
+  const response = await fetch('http://localhost:3000/guard-list/commit', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ guardLists }),
+  });
+  const responseJson = await response.json();
+  return responseJson.guardLists;
+}
+
 export async function getGuardListHistory(): Promise<GuardList[]> {
   const response = await fetch('http://localhost:3000/guard-list/history');
   const responseJson = await response.json();

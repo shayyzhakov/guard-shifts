@@ -17,39 +17,19 @@ export interface DbGuardList {
 }
 
 export const guardListHistory: DbGuardList[] = [
-  {
-    guardPostName: 'konenut-morning',
-    guardList: [
-      {
-        soldiers: ['1ba', '1bb', '1bc', '1bd', '1be'],
-        team: '1B',
-        guardTime: {
-          period: 11,
-          date: 'Wed Dec 13 2023',
-        },
-        duration: 4,
-        error: undefined,
-      },
-      {
-        soldiers: ['1ba', '1bb', '1bc', '1bd', '1be'],
-        team: '1B',
-        guardTime: {
-          period: 11,
-          date: 'Thu Dec 14 2023',
-        },
-        duration: 4,
-        error: undefined,
-      },
-      {
-        soldiers: ['1ba', '1bb', '1bc', '1bd', '1be'],
-        team: '1B',
-        guardTime: {
-          period: 11,
-          date: 'Fri Dec 15 2023',
-        },
-        duration: 4,
-        error: undefined,
-      },
-    ],
-  },
+  // {
+  //   guardPostName: 'konenut-morning',
+  //   guardList: [
+  //     {
+  //       soldiers: ['1ba', '1bb', '1bc', '1bd', '1be'],
+  //       team: '1B',
+  //       guardTime: {
+  //         period: 11,
+  //         date: 'Fri Dec 15 2023',
+  //       },
+  //       duration: 4,
+  //       error: undefined,
+  //     },
+  //   ],
+  // },
 ];
