@@ -7,7 +7,7 @@ router.get('/', (req: Request, res: Response) => {
   try {
     const guardPosts = getGuardPosts();
     return res.json({ guardPosts });
-  } catch (e: unknown) {
+  } catch (e) {
     console.log('[server] error:', e);
     return res.status(500).json({ message: 'unable to get guard posts' });
   }

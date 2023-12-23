@@ -82,3 +82,19 @@ export async function getGuardPosts(): Promise<GuardPost[]> {
   const responseJson = await response.json();
   return responseJson.guardPosts;
 }
+
+interface ChangeTeamParams {
+  name: string;
+  people: string[];
+  guardPosts: string[];
+}
+
+export async function updateTeam(oldTeamName: string, params: ChangeTeamParams): Promise<void> {
+  const response = await fetch('http://localhost:3000/teams/' + oldTeamName, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+  const responseJson = await response.json();
+  return responseJson.guardLists;
+}

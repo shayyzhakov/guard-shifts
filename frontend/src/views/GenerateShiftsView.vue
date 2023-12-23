@@ -181,10 +181,8 @@ const showShiftsDialog = ref<boolean>(false);
       </section>
 
       <template #footer>
-        <span class="dialog-footer">
-          <el-button @click="showShiftsDialog = false">Cancel</el-button>
-          <el-button type="primary" @click="submitShifts">Commit</el-button>
-        </span>
+        <el-button @click="showShiftsDialog = false">Cancel</el-button>
+        <el-button type="primary" @click="submitShifts">Commit</el-button>
       </template>
     </el-dialog>
   </div>
