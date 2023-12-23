@@ -46,12 +46,11 @@ async function generateShifts() {
 }
 
 async function submitShifts() {
-  isLoading.value = true;
-
-  showShiftsDialog.value = false;
-
   try {
-    await commitGuardList(shiftsDraft.value);
+    await commitGuardList({
+      guardLists: shiftsDraft.value,
+      startPeriod: timeToPeriod(configForm.startTime),
+    });
 
     ElNotification({
       title: 'Commition Succeeded',
@@ -59,7 +58,7 @@ async function submitShifts() {
       type: 'success',
     });
 
-    router.push('home');
+    router.push('shifts');
   } catch (e) {
     ElNotification({
       title: 'Action Failed',
@@ -67,18 +66,20 @@ async function submitShifts() {
       type: 'error',
     });
   } finally {
-    isLoading.value = false;
+    showShiftsDialog.value = false;
   }
 }
 
 const showShiftsDialog = ref<boolean>(false);
+
+('.el-main');
 </script>
 
 <template>
   <div>
     <h1>Generate Shifts</h1>
 
-    <section class="config-cards">
+    <section v-loading.fullscreen.lock="isLoading" class="config-cards">
       <el-card>
         <template #header>
           <div class="card-header">

@@ -41,18 +41,23 @@ export async function generateGuardList(params: GenerateGuardListParams): Promis
   return responseJson.guardLists;
 }
 
-export async function commitGuardList(guardLists: GuardList[]): Promise<void> {
+export interface CommitGuardListParams {
+  guardLists: GuardList[];
+  startPeriod: number;
+}
+
+export async function commitGuardList(params: CommitGuardListParams): Promise<void> {
   const response = await fetch('http://localhost:3000/guard-list/commit', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ guardLists }),
+    body: JSON.stringify(params),
   });
   const responseJson = await response.json();
   return responseJson.guardLists;
 }
 
-export async function getGuardListHistory(): Promise<GuardList[]> {
-  const response = await fetch('http://localhost:3000/guard-list/history');
+export async function getGuardLists(): Promise<GuardList[]> {
+  const response = await fetch('http://localhost:3000/guard-list');
   const responseJson = await response.json();
   return responseJson.guardLists;
 }

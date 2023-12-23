@@ -4,12 +4,12 @@ import { RouterView, useRoute } from 'vue-router';
 
 const route = useRoute();
 
-const activeRoute = ref<string>('home');
+const activeRoute = ref<string>('shifts');
 
 watch(
   () => route.path,
   (newValue) => {
-    activeRoute.value = newValue.split('/')[1] ?? 'home';
+    activeRoute.value = newValue.split('/')[1] ?? 'shifts';
   },
   {
     immediate: true,
@@ -28,8 +28,8 @@ watch(
         :default-active="activeRoute"
         text-color="#fff"
       >
-        <el-menu-item index="home">
-          <template #title>Home</template>
+        <el-menu-item index="shifts">
+          <template #title>Shifts</template>
         </el-menu-item>
         <el-menu-item index="soldiers-management">
           <template #title>Soldiers Management</template>

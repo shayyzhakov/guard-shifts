@@ -31,3 +31,14 @@ export function getUpcomingTime(): string {
   const currentPeriod = Math.ceil(totalMinutesPassed / minutesPerPeriod);
   return stringifyPeriod(currentPeriod);
 }
+
+export function guardTimeToDate(guardTime: GuardTime): Date {
+  const date = new Date(guardTime.date);
+  const hour = Math.floor(guardTime.period * (24 / GUARD_PERIODS_PER_DAY));
+  const min = guardTime.period % 2 ? 30 : 0;
+
+  date.setHours(hour);
+  date.setMinutes(min);
+
+  return date;
+}

@@ -152,8 +152,15 @@ export function getGuardListHistory(): GuardListResponse {
   });
 }
 
-export function commitGuardLists(guardLists: GuardList[]): void {
-  saveGuardLists(guardLists);
+interface CommitGuardListParams {
+  guardLists: GuardList[];
+  startPeriod: number;
+}
+
+export function commitGuardLists({ guardLists, startPeriod }: CommitGuardListParams): void {
+  const upcomingGuardTime = getUpcomingGuardTime(startPeriod);
+
+  saveGuardLists(guardLists, upcomingGuardTime);
 }
 
 export function parseGuardLists(guardLists: DbGuardList[]): GuardList[] {

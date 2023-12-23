@@ -35,19 +35,15 @@ export function isSoldierBusy(
   });
 }
 
-export function saveGuardLists(guardLists: GuardList[]): void {
+export function saveGuardLists(guardLists: GuardList[], startingFromGuardTime: GuardTime): void {
   guardLists.forEach((gl) => {
-    if (!gl.guardList.length) {
-      return;
-    }
-
     const historyGl = guardListHistory.find((glh) => glh.guardPostName === gl.guardPostName);
     const serializedGuardList = serializeGuardList(gl);
     if (historyGl) {
       // guard list history exist for this guard post. merge lists
 
       // remove overlapping items from the history
-      removeHistoryGuardListPeriodsFromGuardTime(gl.guardPostName, gl.guardList[0].guardTime);
+      removeHistoryGuardListPeriodsFromGuardTime(gl.guardPostName, startingFromGuardTime);
 
       // add the new guard list to the history
       historyGl.guardList.push(...serializedGuardList.guardList);
