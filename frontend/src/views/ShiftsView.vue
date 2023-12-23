@@ -43,9 +43,7 @@ async function goToGenerateShifts() {
   router.push('generate-shifts');
 }
 
-const defaultFilterFromDate = new Date();
-defaultFilterFromDate.setTime(defaultFilterFromDate.getTime() - 3600 * 1000 * 24);
-const filterFromDate = ref<Date>(defaultFilterFromDate);
+const filterFromDate = ref<Date>(new Date());
 
 const dateShortcuts = [
   {
@@ -118,6 +116,7 @@ const dateShortcuts = [
             date-format="DD/MM/YYYY"
             time-format="HH:mm"
             format="DD/MM/YYYY HH:mm"
+            :clearable="false"
           />
         </div>
 

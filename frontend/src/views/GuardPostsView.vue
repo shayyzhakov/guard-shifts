@@ -34,7 +34,7 @@ onMounted(async () => {
           </div>
 
           <div class="card-body-section">
-            <h4>Guard Duration</h4>
+            <h4>Guard Time</h4>
             <div
               v-for="occupation in guardPost.occupation"
               :key="`${guardPost.name}-${occupation.from}`"
