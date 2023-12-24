@@ -6,15 +6,15 @@ export function getAllTeams(): Team[] {
   return teams;
 }
 
-export function changeTeam(teamId: string, newPeople: Soldier[]): void {
-  const team = teams.find((team) => team.name === teamId);
-  if (!team) {
-    console.error(`team ${teamId} not found`);
-    return;
-  }
+// export function changeTeamById(teamId: string, newPeople: Soldier[]): void {
+//   const team = teams.find((team) => team.id === teamId);
+//   if (!team) {
+//     console.error(`team ${teamId} not found`);
+//     return;
+//   }
 
-  team.people = newPeople;
-}
+//   team.people = newPeople;
+// }
 
 export function getPeopleForGuardPost(guardPostName: string): Soldier[] {
   return teams
@@ -27,7 +27,7 @@ export function getTeamsForGuardPost(guardPostName: string): Team[] {
 }
 
 export function updateTeamById(teamId: string, updateParams: Partial<Team>): void {
-  const team = teams.find((team) => team.name === teamId);
+  const team = teams.find((team) => team.id === teamId);
   if (!team) {
     console.error(`team ${teamId} not found`);
     return;

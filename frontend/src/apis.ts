@@ -1,6 +1,7 @@
 import type { GuardTime } from './helpers/periodHelpers';
 
 export interface Team {
+  id: string;
   name: string;
   people: string[];
   guardPosts: string[];
@@ -83,14 +84,14 @@ export async function getGuardPosts(): Promise<GuardPost[]> {
   return responseJson.guardPosts;
 }
 
-interface ChangeTeamParams {
+export interface UpdateTeamParams {
   name: string;
   people: string[];
   guardPosts: string[];
 }
 
-export async function updateTeam(oldTeamName: string, params: ChangeTeamParams): Promise<void> {
-  const response = await fetch('http://localhost:3000/teams/' + oldTeamName, {
+export async function updateTeam(teamId: string, params: UpdateTeamParams): Promise<void> {
+  const response = await fetch('http://localhost:3000/teams/' + teamId, {
     method: 'PUT',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(params),

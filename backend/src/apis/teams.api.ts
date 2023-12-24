@@ -18,7 +18,7 @@ router.put('/:team_id', (req: Request, res: Response) => {
     const teamId = req.params.team_id;
     const { name, people, guardPosts } = req.body;
 
-    const teams = updateTeam(teamId, { name, people, guardPosts });
+    updateTeam(teamId, { name, people, guardPosts });
     return res.json({});
   } catch (e) {
     console.log('[server] error:', e);

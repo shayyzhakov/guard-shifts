@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue';
-import { getGuardPosts, getTeams, updateTeam, type GuardPost, type Team } from '../apis';
+import {
+  getGuardPosts,
+  getTeams,
+  updateTeam,
+  type GuardPost,
+  type Team,
+  type UpdateTeamParams,
+} from '../apis';
 import { ElNotification } from 'element-plus';
 
 const teams = ref<Team[]>();
@@ -15,8 +22,8 @@ onMounted(async () => {
 
 const showEditTeamModal = ref<boolean>(false);
 
-const selectedTeamName = ref<string>();
-const selectedTeam = reactive<Team>({
+const selectedTeamId = ref<string>();
+const selectedTeamParams = reactive<UpdateTeamParams>({
   name: '',
   people: [],
   guardPosts: [],
@@ -47,22 +54,22 @@ const soldiersOptions = computed<{ value: string; label: string }[]>(() => {
 async function editTeam(team: Team) {
   guardPosts.value = await getGuardPosts();
 
-  selectedTeamName.value = team.name;
-  selectedTeam.name = team.name;
-  selectedTeam.people = JSON.parse(JSON.stringify(team.people));
-  selectedTeam.guardPosts = JSON.parse(JSON.stringify(team.guardPosts));
+  selectedTeamId.value = team.id;
+  selectedTeamParams.name = team.name;
+  selectedTeamParams.people = JSON.parse(JSON.stringify(team.people));
+  selectedTeamParams.guardPosts = JSON.parse(JSON.stringify(team.guardPosts));
 
   showEditTeamModal.value = true;
 }
 
 async function saveTeamChanges() {
   try {
-    if (!selectedTeamName.value) throw new Error('No team was selected');
+    if (!selectedTeamId.value) throw new Error('No team was selected');
 
-    await updateTeam(selectedTeamName.value, {
-      name: selectedTeam.name,
-      people: selectedTeam.people,
-      guardPosts: selectedTeam.guardPosts,
+    await updateTeam(selectedTeamId.value, {
+      name: selectedTeamParams.name,
+      people: selectedTeamParams.people,
+      guardPosts: selectedTeamParams.guardPosts,
     });
 
     ElNotification({
@@ -116,14 +123,14 @@ async function saveTeamChanges() {
     <div v-else>loading...</div>
 
     <el-dialog v-model="showEditTeamModal" title="Edit Team">
-      <el-form :model="selectedTeam" label-width="120px" label-position="left">
+      <el-form :model="selectedTeamParams" label-width="120px" label-position="left">
         <el-form-item label="Team name">
-          <el-input v-model="selectedTeam.name" />
+          <el-input v-model="selectedTeamParams.name" />
         </el-form-item>
 
         <el-form-item label="Guard posts">
           <el-select
-            v-model="selectedTeam.guardPosts"
+            v-model="selectedTeamParams.guardPosts"
             multiple
             placeholder="Select"
             class="form-select"
@@ -139,7 +146,7 @@ async function saveTeamChanges() {
 
         <el-form-item label="Soldiers">
           <el-select
-            v-model="selectedTeam.people"
+            v-model="selectedTeamParams.people"
             multiple
             placeholder="Select"
             class="form-select"
