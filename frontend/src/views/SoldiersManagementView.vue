@@ -2,22 +2,19 @@
 import { computed, onMounted, reactive, ref } from 'vue';
 import {
   getGuardPosts,
-  getTeams,
   updateTeam,
   type GuardPost,
   type Team,
   type UpdateTeamParams,
 } from '../apis';
 import { ElNotification } from 'element-plus';
+import { useTeamsStore } from '@/stores/teams.store';
 
-const teams = ref<Team[]>();
-
-async function refreshTeams() {
-  teams.value = await getTeams();
-}
+const teamsStore = useTeamsStore();
 
 onMounted(async () => {
-  await refreshTeams();
+  // ensures that the teams data is up to date
+  await teamsStore.refreshTeams();
 });
 
 const showEditTeamModal = ref<boolean>(false);
@@ -41,7 +38,7 @@ const guardPostsOptions = computed<{ value: string; label: string }[]>(() => {
 });
 
 const allSoldiers = computed<string[]>(() => [
-  ...new Set(teams.value?.flatMap((team) => team.people) ?? []),
+  ...new Set(teamsStore.teams?.flatMap((team) => team.people) ?? []),
 ]);
 
 const soldiersOptions = computed<{ value: string; label: string }[]>(() => {
@@ -87,7 +84,7 @@ async function saveTeamChanges() {
     showEditTeamModal.value = false;
   }
 
-  refreshTeams();
+  teamsStore.refreshTeams();
 }
 </script>
 
@@ -95,8 +92,8 @@ async function saveTeamChanges() {
   <div>
     <h1>Soldiers Management</h1>
 
-    <section v-if="teams" class="team-cards">
-      <el-card v-for="team in teams" :key="team.id">
+    <section v-if="teamsStore.teams" class="team-cards">
+      <el-card v-for="team in teamsStore.teams" :key="team.id">
         <template #header>
           <div class="card-header">
             <h3>Team {{ team.name }}</h3>

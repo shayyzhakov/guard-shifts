@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
+import { useTeamsStore } from './stores/teams.store';
 
 const route = useRoute();
 
@@ -15,6 +16,12 @@ watch(
     immediate: true,
   },
 );
+
+const teamsStore = useTeamsStore();
+
+onMounted(async () => {
+  await teamsStore.refreshTeams();
+});
 </script>
 
 <template>

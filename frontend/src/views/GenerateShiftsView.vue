@@ -9,10 +9,12 @@ import {
   timeToPeriod,
 } from '@/helpers/periodHelpers';
 import { ElNotification } from 'element-plus';
-
-const now = new Date().toDateString();
+import { useTeamsStore } from '@/stores/teams.store';
 
 const router = useRouter();
+const teamsStore = useTeamsStore();
+
+const now = new Date().toDateString();
 
 const configForm = reactive({
   startTime: getUpcomingTime(),
@@ -95,6 +97,7 @@ const showShiftsDialog = ref<boolean>(false);
               start="00:00"
               step="00:30"
               end="23:30"
+              :clearable="false"
               placeholder="Select time"
             />
           </el-form-item>
@@ -104,15 +107,7 @@ const showShiftsDialog = ref<boolean>(false);
           </el-form-item>
 
           <el-form-item label="End Time">
-            <!-- TODO: extract to PeriodSelector.vue -->
-            <el-time-select
-              v-model="endTime"
-              disabled
-              start="00:00"
-              step="00:30"
-              end="23:30"
-              placeholder="Select time"
-            />
+            <el-time-select v-model="endTime" disabled />
           </el-form-item>
         </el-form>
       </el-card>
@@ -171,8 +166,7 @@ const showShiftsDialog = ref<boolean>(false);
               width="120"
             >
               <template #default="{ row }">
-                <!-- TODO: convert to shift name -->
-                {{ row.team }}
+                {{ teamsStore.getTeamName(row.team) }}
               </template>
             </el-table-column>
             <el-table-column prop="soldiers" label="Soldiers">

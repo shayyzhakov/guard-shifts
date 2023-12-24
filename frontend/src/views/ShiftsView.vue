@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { getGuardLists, type GuardList, type GuardListPeriod } from '@/apis';
 import { GUARD_PERIODS_PER_DAY, guardTimeToDate, stringifyPeriod } from '@/helpers/periodHelpers';
+import { useTeamsStore } from '@/stores/teams.store';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const teamsStore = useTeamsStore();
 
 const now = new Date().toDateString();
 
@@ -147,8 +149,7 @@ const dateShortcuts = [
               width="120"
             >
               <template #default="{ row }">
-                <!-- TODO: convert to shift name -->
-                {{ row.team }}
+                {{ teamsStore.getTeamName(row.team) }}
               </template>
             </el-table-column>
             <el-table-column prop="soldiers" label="Soldiers">
