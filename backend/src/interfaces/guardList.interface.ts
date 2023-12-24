@@ -9,6 +9,6 @@ export interface GuardListPeriod {
 }
 
 export interface GuardList {
-  guardPostName: string;
+  guardPostId: string;
   guardList: GuardListPeriod[];
 }

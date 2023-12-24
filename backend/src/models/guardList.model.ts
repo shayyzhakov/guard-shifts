@@ -4,17 +4,13 @@ import { guardListHistory } from '../data/guardListHistory.data';
 import type { DbGuardList, DbGuardTime } from '../data/guardListHistory.data';
 import { Soldier } from '../interfaces/soldier.interface';
 
-export function isTeamBusy(
-  guardList: GuardList[],
-  guardTime: GuardTime,
-  teamName: string
-): boolean {
+export function isTeamBusy(guardList: GuardList[], guardTime: GuardTime, teamId: string): boolean {
   return guardList.some((guardPostList) => {
     const guardPeriod = guardPostList.guardList.find((gp) =>
       isGuardTimeEqual(gp.guardTime, guardTime)
     );
 
-    return guardPeriod && guardPeriod.team === teamName;
+    return guardPeriod && guardPeriod.team === teamId;
   });
 }
 
@@ -37,13 +33,13 @@ export function isSoldierBusy(
 
 export function saveGuardLists(guardLists: GuardList[], startingFromGuardTime: GuardTime): void {
   guardLists.forEach((gl) => {
-    const historyGl = guardListHistory.find((glh) => glh.guardPostName === gl.guardPostName);
+    const historyGl = guardListHistory.find((glh) => glh.guardPostId === gl.guardPostId);
     const serializedGuardList = serializeGuardList(gl);
     if (historyGl) {
       // guard list history exist for this guard post. merge lists
 
       // remove overlapping items from the history
-      removeHistoryGuardListPeriodsFromGuardTime(gl.guardPostName, startingFromGuardTime);
+      removeHistoryGuardListPeriodsFromGuardTime(gl.guardPostId, startingFromGuardTime);
 
       // add the new guard list to the history
       historyGl.guardList.push(...serializedGuardList.guardList);
@@ -55,10 +51,10 @@ export function saveGuardLists(guardLists: GuardList[], startingFromGuardTime: G
 }
 
 function removeHistoryGuardListPeriodsFromGuardTime(
-  guardPostName: string,
+  guardPostId: string,
   fromGuardTime: GuardTime
 ): void {
-  const guardList = guardListHistory.find((gl) => gl.guardPostName === guardPostName);
+  const guardList = guardListHistory.find((gl) => gl.guardPostId === guardPostId);
   if (!guardList) {
     return;
   }
@@ -98,7 +94,7 @@ export function mergeGuardLists(guardLists1: GuardList[], guardLists2: GuardList
   const mergedGuardLists = [...guardLists1];
 
   guardLists2.forEach((gl) => {
-    const mergedGuardList = mergedGuardLists.find((gl1) => gl1.guardPostName === gl.guardPostName);
+    const mergedGuardList = mergedGuardLists.find((gl1) => gl1.guardPostId === gl.guardPostId);
     if (mergedGuardList) {
       // TODO: delete overlapping periods
       mergedGuardList.guardList.push(...gl.guardList);

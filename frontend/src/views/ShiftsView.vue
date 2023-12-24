@@ -120,7 +120,7 @@ const dateShortcuts = [
           />
         </div>
 
-        <el-card v-for="guardPostShifts in filteredShifts" :key="guardPostShifts.guardPostName">
+        <el-card v-for="guardPostShifts in filteredShifts" :key="guardPostShifts.guardPostId">
           <template #header>
             <div class="card-header">
               <h3>{{ guardPostShifts.guardPostDisplayName }}</h3>
@@ -145,7 +145,12 @@ const dateShortcuts = [
               prop="team"
               label="Team"
               width="120"
-            />
+            >
+              <template #default="{ row }">
+                <!-- TODO: convert to shift name -->
+                {{ row.team }}
+              </template>
+            </el-table-column>
             <el-table-column prop="soldiers" label="Soldiers">
               <template #default="{ row }">
                 {{ row.soldiers.join(', ') }}

@@ -35,7 +35,7 @@ const guardPostsOptions = computed<{ value: string; label: string }[]>(() => {
   if (!guardPosts.value) return [];
 
   return guardPosts.value.map((guardPost) => ({
-    value: guardPost.name,
+    value: guardPost.id,
     label: guardPost.displayName,
   }));
 });
@@ -96,7 +96,7 @@ async function saveTeamChanges() {
     <h1>Soldiers Management</h1>
 
     <section v-if="teams" class="team-cards">
-      <el-card v-for="team in teams" :key="team.name">
+      <el-card v-for="team in teams" :key="team.id">
         <template #header>
           <div class="card-header">
             <h3>Team {{ team.name }}</h3>

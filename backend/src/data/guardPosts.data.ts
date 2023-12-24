@@ -6,7 +6,7 @@ const KONENUT_MORNING_PERIOD_END = 15;
 
 export const guardPosts = [
   {
-    name: 'taltal',
+    id: 'taltal',
     displayName: 'Taltal',
     strategy: 'roundrobin',
     numOfSoldiers: 2,
@@ -25,7 +25,7 @@ export const guardPosts = [
     constraints: [],
   },
   {
-    name: 'ofek',
+    id: 'ofek',
     displayName: 'Ofek',
     strategy: 'roundrobin',
     numOfSoldiers: 2,
@@ -44,7 +44,7 @@ export const guardPosts = [
     constraints: [],
   },
   {
-    name: 'konenut-morning',
+    id: 'konenut-morning',
     displayName: 'Konenut Morning',
     strategy: 'team-roundrobin',
     numOfSoldiers: 5,
@@ -58,7 +58,7 @@ export const guardPosts = [
     constraints: [],
   },
   {
-    name: 'konenut-evening',
+    id: 'konenut-evening',
     displayName: 'Konenut',
     strategy: 'team-roundrobin',
     numOfSoldiers: 5,

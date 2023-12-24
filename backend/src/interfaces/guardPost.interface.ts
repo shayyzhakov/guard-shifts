@@ -5,7 +5,7 @@ export interface GuardPostOccupation {
 }
 
 export interface GuardPost {
-  name: string;
+  id: string;
   displayName: string;
   strategy: string; // TODO: change to enum
   numOfSoldiers: number;

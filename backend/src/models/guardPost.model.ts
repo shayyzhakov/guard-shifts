@@ -14,12 +14,12 @@ export const strategies = [
   },
 ];
 
-export function getGuardPostOrder(guardPostName: string): number {
+export function getGuardPostOrder(guardPostId: string): number {
   const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.name === guardPostName
+    (guardPost) => guardPost.id === guardPostId
   );
   if (!relevantGuardPost) {
-    console.error(`could not find guard post named ${guardPostName}`);
+    console.error(`could not find guard post with id ${guardPostId}`);
     return 999;
   }
 
@@ -37,14 +37,14 @@ export function getAllGuardPosts(): GuardPost[] {
 }
 
 export function getUpcomingGuardTimeForGuardPost(
-  guardPostName: string,
+  guardPostId: string,
   fromGuardTime: GuardTime
 ): GuardTime {
   const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.name === guardPostName
+    (guardPost) => guardPost.id === guardPostId
   );
   if (!relevantGuardPost) {
-    console.error(`could not find guard post named ${guardPostName}`);
+    console.error(`could not find guard post with id ${guardPostId}`);
     return fromGuardTime;
   }
 
@@ -58,7 +58,7 @@ export function getUpcomingGuardTimeForGuardPost(
   };
 }
 
-export function getUpcomingPeriodForGuardPost(guardPost: GuardPost, fromPeriod: number): number {
+function getUpcomingPeriodForGuardPost(guardPost: GuardPost, fromPeriod: number): number {
   const occupation = occupationByPeriod(guardPost, fromPeriod);
   if (occupation) {
     let i = 0;
@@ -92,12 +92,12 @@ export function getUpcomingPeriodForGuardPost(guardPost: GuardPost, fromPeriod: 
   }
 }
 
-export function getGuardPostSoldiersAmount(guardPostName: string, period: number): number {
+export function getGuardPostSoldiersAmount(guardPostId: string, period: number): number {
   const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.name === guardPostName
+    (guardPost) => guardPost.id === guardPostId
   );
   if (!relevantGuardPost) {
-    console.error(`could not find guard post named ${guardPostName}`);
+    console.error(`could not find guard post with id ${guardPostId}`);
     return 0;
   }
 
@@ -105,12 +105,12 @@ export function getGuardPostSoldiersAmount(guardPostName: string, period: number
   return shouldGuardPostBeOccupied ? relevantGuardPost.numOfSoldiers : 0;
 }
 
-export function getGuardPostGuardPeriodDuration(guardPostName: string, period: number): number {
+export function getGuardPostGuardPeriodDuration(guardPostId: string, period: number): number {
   const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.name === guardPostName
+    (guardPost) => guardPost.id === guardPostId
   );
   if (!relevantGuardPost) {
-    console.error(`could not find guard post named ${guardPostName}`);
+    console.error(`could not find guard post with id ${guardPostId}`);
     return 1;
   }
 
@@ -118,10 +118,7 @@ export function getGuardPostGuardPeriodDuration(guardPostName: string, period: n
   return occupation?.duration ?? 1;
 }
 
-export function occupationByPeriod(
-  guardPost: GuardPost,
-  period: number
-): GuardPostOccupation | undefined {
+function occupationByPeriod(guardPost: GuardPost, period: number): GuardPostOccupation | undefined {
   return guardPost.occupation.find((occupation) => {
     if (occupation.from < occupation.to) {
       if (period >= occupation.from && period < occupation.to) return occupation;
@@ -131,12 +128,12 @@ export function occupationByPeriod(
   });
 }
 
-export function getGuardPostDisplayName(guardPostName: string): string {
+export function getGuardPostDisplayName(guardPostId: string): string {
   const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.name === guardPostName
+    (guardPost) => guardPost.id === guardPostId
   );
   if (!relevantGuardPost) {
-    console.error(`could not find guard post named ${guardPostName}`);
+    console.error(`could not find guard post with id ${guardPostId}`);
     return '';
   }
 

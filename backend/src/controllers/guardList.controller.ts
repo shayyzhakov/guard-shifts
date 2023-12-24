@@ -42,7 +42,7 @@ export function buildGuardList({ startPeriod, duration }: BuildGuardListParams):
 
   // handle higher priority strategies first
   guardPosts.sort((a, b) => {
-    return getGuardPostOrder(a.name) - getGuardPostOrder(b.name);
+    return getGuardPostOrder(a.id) - getGuardPostOrder(b.id);
   });
 
   // truncate history at the start of the upcoming guard time, since we are going to build the guard list from this point
@@ -63,7 +63,7 @@ export function buildGuardList({ startPeriod, duration }: BuildGuardListParams):
   const guardListResponse: GuardListResponse = fullGuardList.map((guardList) => {
     return {
       ...guardList,
-      guardPostDisplayName: getGuardPostDisplayName(guardList.guardPostName),
+      guardPostDisplayName: getGuardPostDisplayName(guardList.guardPostId),
     };
   });
 
@@ -78,7 +78,7 @@ function buildGuardListForGuardPost(
   startingGuardTime: GuardTime,
   endingGuardTime: GuardTime
 ): GuardList {
-  const upcomingGuardTime = getUpcomingGuardTimeForGuardPost(guardPost.name, startingGuardTime);
+  const upcomingGuardTime = getUpcomingGuardTimeForGuardPost(guardPost.id, startingGuardTime);
 
   let strategyHandler: StrategyHandler;
   switch (guardPost.strategy) {
@@ -105,7 +105,7 @@ function buildGuardListForGuardPost(
 
   const guardListForGuardPost = simplifyGuardList(guardListPerPeriod);
   return {
-    guardPostName: guardPost.name,
+    guardPostId: guardPost.id,
     guardList: guardListForGuardPost,
   };
 }
@@ -146,7 +146,7 @@ export function getGuardListHistory(): GuardListResponse {
   return getFullGuardListHistory().map((guardList) => {
     return {
       ...guardList,
-      guardPostDisplayName: getGuardPostDisplayName(guardList.guardPostName),
+      guardPostDisplayName: getGuardPostDisplayName(guardList.guardPostId),
     };
   });
 }

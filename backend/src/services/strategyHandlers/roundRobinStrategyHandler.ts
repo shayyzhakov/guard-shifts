@@ -25,18 +25,15 @@ export const roundRobinStrategyHandler: StrategyHandler = (
 
   const mergedGuardLists = mergeGuardLists(guardListHistory, guardList);
 
-  const relevantSoldiersQueue = new SoldiersQueue(guardPost.name, mergedGuardLists);
+  const relevantSoldiersQueue = new SoldiersQueue(guardPost.id, mergedGuardLists);
 
   // TODO: calculate 3 times the duration, then submit just the requested duration
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
     const numOfSoldiersForCurrentPeriod = getGuardPostSoldiersAmount(
-      guardPost.name,
+      guardPost.id,
       currentGuardTime.period
     );
-    const periodsPerGuard = getGuardPostGuardPeriodDuration(
-      guardPost.name,
-      currentGuardTime.period
-    );
+    const periodsPerGuard = getGuardPostGuardPeriodDuration(guardPost.id, currentGuardTime.period);
 
     // find the next soldiers to guard
     const soldiers = relevantSoldiersQueue.next(currentGuardTime, numOfSoldiersForCurrentPeriod);

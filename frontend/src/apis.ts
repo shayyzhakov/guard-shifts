@@ -22,7 +22,7 @@ export interface GuardListPeriod {
 }
 
 export interface GuardList {
-  guardPostName: string;
+  guardPostId: string;
   guardPostDisplayName: string;
   guardList: GuardListPeriod[];
 }
@@ -70,7 +70,7 @@ export interface GuardPostOccupation {
 }
 
 export interface GuardPost {
-  name: string;
+  id: string;
   displayName: string;
   strategy: string; // TODO: change to enum
   numOfSoldiers: number;

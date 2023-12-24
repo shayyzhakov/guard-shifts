@@ -6,7 +6,7 @@ export const guardPostConstraints = [
   //   description:
   //     "only people from the same team are allowed to guard in the desired post simultaneously",
   //   validator: (soldierA, soldierB) => {
-  //     return getSoldierTeam(soldierA).name === getSoldierTeam(soldierB).name;
+  //     return getSoldierTeam(soldierA).id === getSoldierTeam(soldierB).id;
   //   },
   // },
 ];

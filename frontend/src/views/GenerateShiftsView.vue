@@ -144,7 +144,7 @@ const showShiftsDialog = ref<boolean>(false);
 
     <el-dialog v-model="showShiftsDialog" title="Shifts Draft" align-center class="centered-modal">
       <section class="shifts-cards">
-        <el-card v-for="guardPostShifts in shiftsDraft" :key="guardPostShifts.guardPostName">
+        <el-card v-for="guardPostShifts in shiftsDraft" :key="guardPostShifts.guardPostId">
           <template #header>
             <div class="card-header">
               <h3>{{ guardPostShifts.guardPostDisplayName }}</h3>
@@ -169,7 +169,12 @@ const showShiftsDialog = ref<boolean>(false);
               prop="team"
               label="Team"
               width="120"
-            />
+            >
+              <template #default="{ row }">
+                <!-- TODO: convert to shift name -->
+                {{ row.team }}
+              </template>
+            </el-table-column>
             <el-table-column prop="soldiers" label="Soldiers">
               <template #default="{ row }">
                 {{ row.soldiers.join(', ') }}

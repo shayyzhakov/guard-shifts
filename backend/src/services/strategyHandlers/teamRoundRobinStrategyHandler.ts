@@ -28,23 +28,20 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
 
   // TODO: take and merge all guard posts that have team-roundrobin strategy
   const guardPostMergedGuardPeriods =
-    mergedGuardLists.find((gl) => gl.guardPostName === guardPost.name)?.guardList ?? [];
-  const relevantTeams = getNextTeamsQueue(guardPost.name, guardPostMergedGuardPeriods);
+    mergedGuardLists.find((gl) => gl.guardPostId === guardPost.id)?.guardList ?? [];
+  const relevantTeams = getNextTeamsQueue(guardPost.id, guardPostMergedGuardPeriods);
 
   const biggestTeamSize = Math.max(...relevantTeams.map((team) => team.people.length));
 
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
     const numOfSoldiersForCurrentPeriod = getGuardPostSoldiersAmount(
-      guardPost.name,
+      guardPost.id,
       currentGuardTime.period
     );
-    const periodsPerGuard = getGuardPostGuardPeriodDuration(
-      guardPost.name,
-      currentGuardTime.period
-    );
+    const periodsPerGuard = getGuardPostGuardPeriodDuration(guardPost.id, currentGuardTime.period);
 
     const currentTeam = relevantTeams[currentTeamIndex];
-    const isCurrentTeamBusy = isTeamBusy(guardList, currentGuardTime, currentTeam.name);
+    const isCurrentTeamBusy = isTeamBusy(guardList, currentGuardTime, currentTeam.id);
     const freeTeamMembers = currentTeam.people.filter(
       (soldier) => !isSoldierBusy(guardList, currentGuardTime, soldier)
     );
@@ -93,7 +90,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
       for (let i = 0; i < periodsPerGuard; i++) {
         guardListPerPeriod.push({
           soldiers,
-          team: currentTeam.name,
+          team: currentTeam.id,
           guardTime: currentGuardTime,
           duration: 1,
         });
@@ -114,19 +111,19 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
  * @returns sorted list of teams (lower index should be used first)
  */
 function getNextTeamsQueue(
-  guardPostName: string,
+  guardPostId: string,
   historyGuardListPeriods: GuardListPeriod[]
 ): Team[] {
   const teamsQueue: Team[] = [];
-  const relevantTeams = getTeamsForGuardPost(guardPostName);
+  const relevantTeams = getTeamsForGuardPost(guardPostId);
 
   // insert teams that already appeared in the guard list, from the older to the newer
   for (const guardListPeriod of historyGuardListPeriods.reverse()) {
     if (
       guardListPeriod.team &&
-      teamsQueue.every((team) => team.name !== guardListPeriod.team) // should be unique in the queue
+      teamsQueue.every((team) => team.id !== guardListPeriod.team) // should be unique in the queue
     ) {
-      const team = relevantTeams.find((team) => team.name === guardListPeriod.team);
+      const team = relevantTeams.find((team) => team.id === guardListPeriod.team);
       if (team) {
         teamsQueue.unshift(team);
       }
@@ -135,7 +132,7 @@ function getNextTeamsQueue(
 
   // insert teams that didnt appear beforehand
   const newTeams = relevantTeams.filter((team) =>
-    teamsQueue.every((team2) => team.name !== team2.name)
+    teamsQueue.every((team2) => team.id !== team2.id)
   );
   teamsQueue.unshift(...newTeams);
 

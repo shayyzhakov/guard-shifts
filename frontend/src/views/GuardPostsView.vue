@@ -15,7 +15,7 @@ onMounted(async () => {
     <h1>Guard Posts</h1>
 
     <section class="guard-post-cards">
-      <el-card v-for="guardPost in guardPosts" :key="guardPost.name">
+      <el-card v-for="guardPost in guardPosts" :key="guardPost.id">
         <template #header>
           <div class="card-header">
             <h3>{{ guardPost.displayName }}</h3>
@@ -37,7 +37,7 @@ onMounted(async () => {
             <h4>Guard Time</h4>
             <div
               v-for="occupation in guardPost.occupation"
-              :key="`${guardPost.name}-${occupation.from}`"
+              :key="`${guardPost.id}-${occupation.from}`"
             >
               {{ stringifyPeriod(occupation.from) }}-{{ stringifyPeriod(occupation.to) }}:
               {{ occupation.duration / 2 }}h

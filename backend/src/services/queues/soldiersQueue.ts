@@ -13,9 +13,9 @@ export class SoldiersQueue {
    */
   private soldiersForGuardPost: Soldier[] = [];
 
-  constructor(guardPostName: string, private guardLists: GuardList[]) {
+  constructor(guardPostId: string, private guardLists: GuardList[]) {
     const orderedSoldiers: Soldier[] = [];
-    const relevantSoldiers = getPeopleForGuardPost(guardPostName);
+    const relevantSoldiers = getPeopleForGuardPost(guardPostId);
     const orderedSoldiersFromGuardList = getSoldiersByLatestGuardOrder(this.guardLists).filter(
       (soldier) => relevantSoldiers.includes(soldier)
     );

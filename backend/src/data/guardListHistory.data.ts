@@ -12,13 +12,13 @@ export interface DbGuardListPeriod {
 }
 
 export interface DbGuardList {
-  guardPostName: string;
+  guardPostId: string;
   guardList: DbGuardListPeriod[];
 }
 
 export const guardListHistory: DbGuardList[] = [
   // {
-  //   guardPostName: 'konenut-morning',
+  //   guardPostId: 'konenut-morning',
   //   guardList: [
   //     {
   //       soldiers: ['1ba', '1bb', '1bc', '1bd', '1be'],

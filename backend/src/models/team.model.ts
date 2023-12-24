@@ -16,14 +16,14 @@ export function getAllTeams(): Team[] {
 //   team.people = newPeople;
 // }
 
-export function getPeopleForGuardPost(guardPostName: string): Soldier[] {
+export function getPeopleForGuardPost(guardPostId: string): Soldier[] {
   return teams
-    .filter((team) => team.guardPosts.includes(guardPostName))
+    .filter((team) => team.guardPosts.includes(guardPostId))
     .reduce((acc, team) => acc.concat(team.people), [] as Soldier[]);
 }
 
-export function getTeamsForGuardPost(guardPostName: string): Team[] {
-  return teams.filter((team) => team.guardPosts.includes(guardPostName));
+export function getTeamsForGuardPost(guardPostId: string): Team[] {
+  return teams.filter((team) => team.guardPosts.includes(guardPostId));
 }
 
 export function updateTeamById(teamId: string, updateParams: Partial<Team>): void {
