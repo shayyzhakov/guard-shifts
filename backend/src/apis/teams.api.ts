@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { getTeams } from '../controllers/teams.controller';
+import { getTeams, updateTeam } from '../controllers/teams.controller';
 
 const router = express.Router();
 
@@ -15,9 +15,10 @@ router.get('/', (req: Request, res: Response) => {
 
 router.put('/:team_id', (req: Request, res: Response) => {
   try {
-    const id = req.params.team_id;
+    const teamId = req.params.team_id;
+    const { name, people, guardPosts } = req.body;
 
-    // const teams = getTeams();
+    const teams = updateTeam(teamId, { name, people, guardPosts });
     return res.json({});
   } catch (e) {
     console.log('[server] error:', e);

@@ -5,8 +5,12 @@ import { ElNotification } from 'element-plus';
 
 const teams = ref<Team[]>();
 
-onMounted(async () => {
+async function refreshTeams() {
   teams.value = await getTeams();
+}
+
+onMounted(async () => {
+  await refreshTeams();
 });
 
 const showEditTeamModal = ref<boolean>(false);
@@ -62,19 +66,21 @@ async function saveTeamChanges() {
     });
 
     ElNotification({
-      title: 'Team Changed Successfully',
-      message: 'Team changes were saved successfully',
+      title: 'Team changed successfully',
+      message: 'Team changes were saved',
       type: 'success',
     });
   } catch (e) {
     ElNotification({
-      title: 'Action Failed',
+      title: 'Action failed',
       message: 'Failed to save team changes',
       type: 'error',
     });
   } finally {
     showEditTeamModal.value = false;
   }
+
+  refreshTeams();
 }
 </script>
 

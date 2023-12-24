@@ -53,7 +53,7 @@ async function submitShifts() {
     });
 
     ElNotification({
-      title: 'Commition Succeeded',
+      title: 'Commition succeeded',
       message: 'Shifts were commited successfully',
       type: 'success',
     });
@@ -61,7 +61,7 @@ async function submitShifts() {
     router.push('shifts');
   } catch (e) {
     ElNotification({
-      title: 'Action Failed',
+      title: 'Action failed',
       message: 'Failed to commit shifts',
       type: 'error',
     });

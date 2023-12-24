@@ -10,7 +10,7 @@ export function getUpcomingPeriod(): number {
   const totalMinutesInDay = 24 * 60; // 24 hours in a day, 60 minutes in an hour
   const minutesPerPeriod = totalMinutesInDay / GUARD_PERIODS_PER_DAY;
 
-  // Calculate the total minutes passed since midnight
+  // calculate the total minutes passed since midnight
   const totalMinutesPassed = now.getHours() * 60 + now.getMinutes();
   return Math.ceil(totalMinutesPassed / minutesPerPeriod);
 }

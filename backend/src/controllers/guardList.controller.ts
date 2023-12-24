@@ -23,7 +23,6 @@ import {
   saveGuardLists,
   truncateGuardListFromGuardTime,
 } from '../models/guardList.model';
-import { deserialize } from 'v8';
 import { DbGuardList } from '../data/guardListHistory.data';
 
 interface BuildGuardListParams {
