@@ -6,7 +6,7 @@ import {
   type GuardPost,
   type Team,
   type UpdateTeamParams,
-} from '../apis';
+} from '@/apis';
 import { ElNotification } from 'element-plus';
 import { useTeamsStore } from '@/stores/teams.store';
 
@@ -49,6 +49,7 @@ const soldiersOptions = computed<{ value: string; label: string }[]>(() => {
 });
 
 async function editTeam(team: Team) {
+  // TODO: move guard posts to a store
   guardPosts.value = await getGuardPosts();
 
   selectedTeamId.value = team.id;
@@ -86,38 +87,46 @@ async function saveTeamChanges() {
 
   teamsStore.refreshTeams();
 }
+
+const activeTab = ref('teams');
 </script>
 
 <template>
   <div>
     <h1>Soldiers Management</h1>
 
-    <section v-if="teamsStore.teams" class="team-cards">
-      <el-card v-for="team in teamsStore.teams" :key="team.id">
-        <template #header>
-          <div class="card-header">
-            <h3>Team {{ team.name }}</h3>
-            <el-tag
-              v-for="guardPost in team.guardPosts"
-              :key="guardPost"
-              class="mx-1"
-              effect="light"
-            >
-              {{ guardPost }}
-            </el-tag>
+    <el-tabs v-model="activeTab" type="card">
+      <el-tab-pane label="Teams" name="teams">
+        <section v-if="teamsStore.teams" class="team-cards">
+          <el-card v-for="team in teamsStore.teams" :key="team.id">
+            <template #header>
+              <div class="card-header">
+                <h3>Team {{ team.name }}</h3>
+                <el-tag
+                  v-for="guardPost in team.guardPosts"
+                  :key="guardPost"
+                  class="mx-1"
+                  effect="light"
+                >
+                  {{ guardPost }}
+                </el-tag>
 
-            <div class="card-actions">
-              <el-button circle text @click="() => editTeam(team)">
-                <i class="fa-solid fa-gear fa-lg" />
-              </el-button>
-            </div>
-          </div>
-        </template>
-        <div v-for="soldier in team.people" :key="soldier">{{ soldier }}</div>
-      </el-card>
-    </section>
+                <div class="card-actions">
+                  <el-button circle text @click="() => editTeam(team)">
+                    <i class="fa-solid fa-gear fa-lg" />
+                  </el-button>
+                </div>
+              </div>
+            </template>
+            <div v-for="soldier in team.people" :key="soldier">{{ soldier }}</div>
+          </el-card>
+        </section>
 
-    <div v-else>loading...</div>
+        <div v-else>loading...</div>
+      </el-tab-pane>
+
+      <el-tab-pane label="Soldiers" name="soldiers">Soldiers</el-tab-pane>
+    </el-tabs>
 
     <el-dialog v-model="showEditTeamModal" title="Edit Team">
       <el-form :model="selectedTeamParams" label-width="120px" label-position="left">
@@ -191,5 +200,9 @@ h3 {
 
 .form-select {
   flex: 1;
+}
+
+:deep(.el-tabs__content) {
+  overflow: inherit;
 }
 </style>
