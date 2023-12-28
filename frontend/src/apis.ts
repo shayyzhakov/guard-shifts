@@ -1,9 +1,23 @@
 import type { GuardTime } from './helpers/periodHelpers';
 
+export interface Soldier {
+  id: string;
+  first_name: string;
+  last_name: string;
+  personal_number: number;
+  capabilities: string[];
+}
+
+export async function getSoldiers(): Promise<Soldier[]> {
+  const response = await fetch('http://localhost:3000/soldiers');
+  const responseJson = await response.json();
+  return responseJson.soldiers;
+}
+
 export interface Team {
   id: string;
   name: string;
-  people: string[];
+  people: Soldier[];
   guardPosts: string[];
 }
 

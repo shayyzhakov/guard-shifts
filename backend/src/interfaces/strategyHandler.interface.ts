@@ -5,7 +5,7 @@ import type { GuardPost } from './guardPost.interface';
 export type StrategyHandler = (
   guardPost: GuardPost,
   guardList: GuardList[],
-  guardListHistory: any,
+  guardListHistory: GuardList[],
   startingGuardTime: GuardTime,
   endingGuardTime: GuardTime
 ) => GuardListPeriod[];

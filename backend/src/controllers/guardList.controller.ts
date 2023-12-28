@@ -16,7 +16,6 @@ import {
 import type { GuardList, GuardListPeriod } from '../interfaces/guardList.interface';
 import type { GuardPost } from '../interfaces/guardPost.interface';
 import type { StrategyHandler } from '../interfaces/strategyHandler.interface';
-import { isSoldiersEqual } from '../models/soldier.model';
 import {
   deserializeGuardList,
   getFullGuardListHistory,
@@ -137,7 +136,7 @@ function isGuardListPeriodsEqual(glp1: GuardListPeriod, glp2: GuardListPeriod): 
   const equalTeams = glp1.team === glp2.team;
 
   const equalSoldiers = glp1.soldiers.every((soldier1) =>
-    glp2.soldiers.some((soldier2) => isSoldiersEqual(soldier1, soldier2))
+    glp2.soldiers.some((soldier2) => soldier1 === soldier2)
   );
   return equalTeams && equalSoldiers;
 }

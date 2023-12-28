@@ -6,15 +6,19 @@ import {
   type GuardPost,
   type Team,
   type UpdateTeamParams,
+  type Soldier,
 } from '@/apis';
 import { ElNotification } from 'element-plus';
 import { useTeamsStore } from '@/stores/teams.store';
+import { useSoldiersStore } from '@/stores/soldiers.store';
 
 const teamsStore = useTeamsStore();
+const soldiersStore = useSoldiersStore();
 
 onMounted(async () => {
-  // ensures that the teams data is up to date
+  // ensures that the teams and soldiers data are up to date
   await teamsStore.refreshTeams();
+  await soldiersStore.refreshSoldiers();
 });
 
 const showEditTeamModal = ref<boolean>(false);
@@ -37,14 +41,14 @@ const guardPostsOptions = computed<{ value: string; label: string }[]>(() => {
   }));
 });
 
-const allSoldiers = computed<string[]>(() => [
+const allSoldiers = computed<Soldier[]>(() => [
   ...new Set(teamsStore.teams?.flatMap((team) => team.people) ?? []),
 ]);
 
 const soldiersOptions = computed<{ value: string; label: string }[]>(() => {
   return allSoldiers.value.map((soldier) => ({
-    value: soldier,
-    label: soldier,
+    value: soldier.id,
+    label: `${soldier.first_name} ${soldier.last_name}`,
   }));
 });
 
@@ -118,14 +122,34 @@ const activeTab = ref('teams');
                 </div>
               </div>
             </template>
-            <div v-for="soldier in team.people" :key="soldier">{{ soldier }}</div>
+            <div v-for="soldier in team.people" :key="soldier.id">
+              {{ soldier.first_name }} {{ soldier.last_name }}
+            </div>
+          </el-card>
+
+          <el-card v-if="teamsStore.unteamedSoldiers.length">
+            <template #header>
+              <div class="card-header">
+                <h3><i>No Team</i></h3>
+              </div>
+            </template>
+            <div v-for="soldier in teamsStore.unteamedSoldiers" :key="soldier.id">
+              {{ soldier.first_name }} {{ soldier.last_name }}
+            </div>
           </el-card>
         </section>
 
         <div v-else>loading...</div>
       </el-tab-pane>
 
-      <el-tab-pane label="Soldiers" name="soldiers">Soldiers</el-tab-pane>
+      <el-tab-pane label="Soldiers" name="soldiers">
+        <el-table :data="soldiersStore.soldiers" stripe style="width: 100%">
+          <el-table-column prop="name" label="Name">
+            <template #default="{ row }"> {{ row.first_name }} {{ row.last_name }} </template>
+          </el-table-column>
+          <el-table-column prop="personal_number" label="Personal Number" />
+        </el-table>
+      </el-tab-pane>
     </el-tabs>
 
     <el-dialog v-model="showEditTeamModal" title="Edit Team">

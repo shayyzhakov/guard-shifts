@@ -1,9 +1,8 @@
 import { teams } from '../data/teams.data';
-import type { Soldier } from '../interfaces/soldier.interface';
 import type { Team } from '../interfaces/team.interface';
 
 export function getAllTeams(): Team[] {
-  return teams;
+  return JSON.parse(JSON.stringify(teams));
 }
 
 // export function changeTeamById(teamId: string, newPeople: Soldier[]): void {
@@ -16,10 +15,10 @@ export function getAllTeams(): Team[] {
 //   team.people = newPeople;
 // }
 
-export function getPeopleForGuardPost(guardPostId: string): Soldier[] {
+export function getSoldierIdsForGuardPost(guardPostId: string): string[] {
   return teams
     .filter((team) => team.guardPosts.includes(guardPostId))
-    .reduce((acc, team) => acc.concat(team.people), [] as Soldier[]);
+    .reduce((acc, team) => acc.concat(team.people), [] as string[]);
 }
 
 export function getTeamsForGuardPost(guardPostId: string): Team[] {

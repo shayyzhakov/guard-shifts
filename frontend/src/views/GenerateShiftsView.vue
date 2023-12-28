@@ -171,7 +171,7 @@ const showShiftsDialog = ref<boolean>(false);
             </el-table-column>
             <el-table-column prop="soldiers" label="Soldiers">
               <template #default="{ row }">
-                {{ row.soldiers.join(', ') }}
+                {{ teamsStore.soldierNamesBySoldierIds(row.soldiers).join(', ') }}
               </template>
             </el-table-column>
             <!-- <el-table-column prop="error" label="Error" width="180" /> -->

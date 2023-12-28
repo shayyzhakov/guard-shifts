@@ -2,31 +2,31 @@ export const teams = [
   {
     id: '1b',
     name: '1B',
-    people: ['1ba', '1bb', '1bc', '1bd', '1be', '1bf', '1bg'],
+    people: ['1b-a', '1b-b', '1b-c', '1b-d', '1b-e', '1b-f', '1b-g'],
     guardPosts: ['taltal', 'konenut-morning', 'konenut-evening'],
   },
   {
     id: '1c',
     name: '1C',
-    people: ['1ca', '1cb', '1cc'],
+    people: ['1c-a', '1c-b', '1c-c'],
     guardPosts: ['taltal', 'konenut-morning', 'konenut-evening'],
   },
   {
     id: '1a',
     name: '2A',
-    people: ['2aa', '2ab', '2ac', '2ad', '2ae'],
+    people: ['2a-a', '2a-b', '2a-c'],
     guardPosts: ['ofek', 'konenut-morning', 'konenut-evening'],
   },
   {
     id: '2b',
     name: '2B',
-    people: ['2ba', '2bb', '2bc'],
+    people: ['2b-a', '2b-b'],
     guardPosts: ['ofek', 'konenut-morning', 'konenut-evening'],
   },
   {
     id: '2c',
     name: '2C',
-    people: ['2ca', '2cb', '2cc', '2cd', '2ce'],
+    people: ['2c-a', '2c-b', '2c-c', '2c-d', '2c-e'],
     guardPosts: ['ofek', 'konenut-morning', 'konenut-evening'],
   },
 ];
