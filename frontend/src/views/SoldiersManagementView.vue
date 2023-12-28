@@ -41,15 +41,13 @@ const guardPostsOptions = computed<{ value: string; label: string }[]>(() => {
   }));
 });
 
-const allSoldiers = computed<Soldier[]>(() => [
-  ...new Set(teamsStore.teams?.flatMap((team) => team.people) ?? []),
-]);
-
 const soldiersOptions = computed<{ value: string; label: string }[]>(() => {
-  return allSoldiers.value.map((soldier) => ({
-    value: soldier.id,
-    label: `${soldier.first_name} ${soldier.last_name}`,
-  }));
+  return (
+    soldiersStore.soldiers?.map((soldier) => ({
+      value: soldier.id,
+      label: `${soldier.first_name} ${soldier.last_name}`,
+    })) ?? []
+  );
 });
 
 async function editTeam(team: Team) {
@@ -58,7 +56,7 @@ async function editTeam(team: Team) {
 
   selectedTeamId.value = team.id;
   selectedTeamParams.name = team.name;
-  selectedTeamParams.people = JSON.parse(JSON.stringify(team.people));
+  selectedTeamParams.people = team.people.map((soldier) => soldier.id);
   selectedTeamParams.guardPosts = JSON.parse(JSON.stringify(team.guardPosts));
 
   showEditTeamModal.value = true;
@@ -152,6 +150,7 @@ const activeTab = ref('teams');
       </el-tab-pane>
     </el-tabs>
 
+    <!-- TODO: extract to component -->
     <el-dialog v-model="showEditTeamModal" title="Edit Team">
       <el-form :model="selectedTeamParams" label-width="120px" label-position="left">
         <el-form-item label="Team name">
