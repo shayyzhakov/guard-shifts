@@ -31,7 +31,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
     mergedGuardLists.find((gl) => gl.guardPostId === guardPost.id)?.guardList ?? [];
   const relevantTeams = getNextTeamsQueue(guardPost.id, guardPostMergedGuardPeriods);
 
-  const biggestTeamSize = Math.max(...relevantTeams.map((team) => team.people.length));
+  let firstFailingTryTeamIndex;
 
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
     const numOfSoldiersForCurrentPeriod = getGuardPostSoldiersAmount(
@@ -46,16 +46,10 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
       (soldier) => !isSoldierBusy(guardList, currentGuardTime, soldier)
     );
 
-    if (isCurrentTeamBusy) {
-      // current team is busy this day
-      console.info(`team ${currentTeam.name} is busy this day. moving on to the next team`);
-
-      // TODO: when a team is skipped, it should not be moved to the end of the queue
-      currentTeamIndex = (currentTeamIndex + 1) % relevantTeams.length;
-    } else if (biggestTeamSize < numOfSoldiersForCurrentPeriod) {
-      // all teams are too small for this guard post
+    if (firstFailingTryTeamIndex === currentTeamIndex) {
+      // we failed to use any of the teams for the current guard time
       console.error(
-        `no teams has enough members for guard post that requires ${numOfSoldiersForCurrentPeriod}`
+        `no teams was able to be used for guard post ${guardPost.displayName} at ${currentGuardTime.date} period ${currentGuardTime.period}`
       );
 
       guardListPerPeriod.push({
@@ -66,12 +60,15 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
         duration: 1,
       });
       currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
-    } else if (freeTeamMembers.length < numOfSoldiersForCurrentPeriod) {
-      // current team has too few members for this guard post
+      firstFailingTryTeamIndex = undefined;
+    } else if (isCurrentTeamBusy || freeTeamMembers.length < numOfSoldiersForCurrentPeriod) {
+      // current team is busy this day or has too few members for this guard post
       console.info(
-        `team ${currentTeam.name} has only ${freeTeamMembers.length} free members but guard post requires ${numOfSoldiersForCurrentPeriod}`
+        `team ${currentTeam.name} can't be used at this guard time. it is either busy or doesn't have enough members (${freeTeamMembers.length}/${numOfSoldiersForCurrentPeriod})`
       );
 
+      // TODO: when a team is skipped, it should not be moved to the end of the queue
+      firstFailingTryTeamIndex ||= currentTeamIndex;
       currentTeamIndex = (currentTeamIndex + 1) % relevantTeams.length;
     } else if (numOfSoldiersForCurrentPeriod === 0) {
       // skip this period
@@ -82,6 +79,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
         duration: 1,
       });
       currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
+      firstFailingTryTeamIndex = undefined;
     } else {
       // TODO: this method always selects the same team members
       const soldiers = freeTeamMembers.slice(0, numOfSoldiersForCurrentPeriod);
@@ -100,6 +98,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
       if (numOfSoldiersForCurrentPeriod > 0) {
         currentTeamIndex = (currentTeamIndex + 1) % relevantTeams.length;
       }
+      firstFailingTryTeamIndex = undefined;
     }
   }
 
