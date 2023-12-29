@@ -143,7 +143,7 @@ const dateShortcuts = [
               </template>
             </el-table-column>
             <el-table-column
-              v-if="guardPostShifts.guardList[0]?.team"
+              v-if="guardPostShifts.guardList.some((glp) => glp.team)"
               prop="team"
               label="Team"
               width="120"
@@ -154,10 +154,12 @@ const dateShortcuts = [
             </el-table-column>
             <el-table-column prop="soldiers" label="Soldiers">
               <template #default="{ row }">
-                {{ teamsStore.soldierNamesBySoldierIds(row.soldiers).join(', ') }}
+                <span v-if="teamsStore.soldierNamesBySoldierIds(row.soldiers).length > 0">{{
+                  teamsStore.soldierNamesBySoldierIds(row.soldiers).join(', ')
+                }}</span>
+                <span v-else class="no-soldiers">No soldiers assigned ({{ row.error }})</span>
               </template>
             </el-table-column>
-            <!-- <el-table-column prop="error" label="Error" width="180" /> -->
           </el-table>
         </el-card>
       </div>
@@ -203,5 +205,10 @@ const dateShortcuts = [
   justify-content: center;
   gap: 16px;
   height: 80%;
+}
+
+.no-soldiers {
+  color: #c0c4cc;
+  font-style: italic;
 }
 </style>

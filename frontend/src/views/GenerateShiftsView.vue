@@ -160,7 +160,7 @@ const showShiftsDialog = ref<boolean>(false);
               </template>
             </el-table-column>
             <el-table-column
-              v-if="guardPostShifts.guardList[0]?.team"
+              v-if="guardPostShifts.guardList.some((glp) => glp.team)"
               prop="team"
               label="Team"
               width="120"
@@ -171,10 +171,12 @@ const showShiftsDialog = ref<boolean>(false);
             </el-table-column>
             <el-table-column prop="soldiers" label="Soldiers">
               <template #default="{ row }">
-                {{ teamsStore.soldierNamesBySoldierIds(row.soldiers).join(', ') }}
+                <span v-if="teamsStore.soldierNamesBySoldierIds(row.soldiers).length > 0">{{
+                  teamsStore.soldierNamesBySoldierIds(row.soldiers).join(', ')
+                }}</span>
+                <span v-else class="no-soldiers">No soldiers assigned ({{ row.error }})</span>
               </template>
             </el-table-column>
-            <!-- <el-table-column prop="error" label="Error" width="180" /> -->
           </el-table>
         </el-card>
       </section>
@@ -226,5 +228,10 @@ const showShiftsDialog = ref<boolean>(false);
   display: flex;
   gap: 6px;
   align-items: center;
+}
+
+.no-soldiers {
+  color: #c0c4cc;
+  font-style: italic;
 }
 </style>

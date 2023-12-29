@@ -111,34 +111,11 @@ function buildGuardListForGuardPost(
 
 function simplifyGuardList(guardListForGuardPost: GuardListPeriod[]): GuardListPeriod[] {
   // remove empty periods
-  let simplifiedGuardListForGuardPost = guardListForGuardPost.filter(
-    (guardPeriod) => guardPeriod.soldiers.length > 0
+  const simplifiedGuardListForGuardPost = guardListForGuardPost.filter(
+    (guardPeriod) => guardPeriod.soldiers.length > 0 || guardPeriod.error
   );
 
-  // merge consequetive guard periods
-  simplifiedGuardListForGuardPost = simplifiedGuardListForGuardPost.reduce(
-    (acc, guardListPeriod) => {
-      if (acc.length > 0 && isGuardListPeriodsEqual(guardListPeriod, acc[acc.length - 1])) {
-        acc[acc.length - 1].error ||= guardListPeriod.error;
-        acc[acc.length - 1].duration += guardListPeriod.duration;
-      } else {
-        acc.push(guardListPeriod);
-      }
-
-      return acc;
-    },
-    [] as GuardListPeriod[]
-  );
   return simplifiedGuardListForGuardPost;
-}
-
-function isGuardListPeriodsEqual(glp1: GuardListPeriod, glp2: GuardListPeriod): boolean {
-  const equalTeams = glp1.team === glp2.team;
-
-  const equalSoldiers = glp1.soldiers.every((soldier1) =>
-    glp2.soldiers.some((soldier2) => soldier1 === soldier2)
-  );
-  return equalTeams && equalSoldiers;
 }
 
 export function getGuardListHistory(): GuardListResponse {

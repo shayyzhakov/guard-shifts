@@ -1,13 +1,27 @@
 import type { GuardList } from '../interfaces/guardList.interface';
-import { isGuardTimeEqual, type GuardTime, compareGuardTime } from '../helpers/periodHelpers';
+import {
+  type GuardTime,
+  compareGuardTime,
+  isGuardTimeGreaterThanOrEqual,
+  isGuardTimeBefore,
+  addDurationToGuardTime,
+} from '../helpers/periodHelpers';
 import { guardListHistory } from '../data/guardListHistory.data';
 import type { DbGuardList, DbGuardTime } from '../data/guardListHistory.data';
 
+/**
+ * Returns true if the team is busy in the specified guard time, given a guard list.
+ */
 export function isTeamBusy(guardList: GuardList[], guardTime: GuardTime, teamId: string): boolean {
   return guardList.some((guardPostList) => {
-    const guardPeriod = guardPostList.guardList.find((gp) =>
-      isGuardTimeEqual(gp.guardTime, guardTime)
-    );
+    const guardPeriod = guardPostList.guardList.find((gp) => {
+      const isLater = isGuardTimeGreaterThanOrEqual(guardTime, gp.guardTime);
+      const isBefore = isGuardTimeBefore(
+        guardTime,
+        addDurationToGuardTime(gp.guardTime, gp.duration)
+      );
+      return isLater && isBefore;
+    });
 
     return guardPeriod && guardPeriod.team === teamId;
   });
@@ -22,9 +36,14 @@ export function isSoldierBusy(
   soldierName: string
 ): boolean {
   return guardList.some((guardPostList) => {
-    const guardPeriod = guardPostList.guardList.find((glp) =>
-      isGuardTimeEqual(glp.guardTime, guardTime)
-    );
+    const guardPeriod = guardPostList.guardList.find((glp) => {
+      const isLater = isGuardTimeGreaterThanOrEqual(guardTime, glp.guardTime);
+      const isBefore = isGuardTimeBefore(
+        guardTime,
+        addDurationToGuardTime(glp.guardTime, glp.duration)
+      );
+      return isLater && isBefore;
+    });
 
     return guardPeriod?.soldiers.includes(soldierName);
   });

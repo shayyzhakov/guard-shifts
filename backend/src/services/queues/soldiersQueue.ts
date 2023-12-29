@@ -44,7 +44,8 @@ export class SoldiersQueue {
       const nextSoldier = this.soldiersForGuardPost.shift();
 
       if (!nextSoldier) {
-        throw new Error('no soldiers in queue');
+        console.error('no soldiers in queue');
+        throw new Error('no soldiers were found');
       }
 
       const isBusy = isSoldierBusy(this.guardLists, guardTime, nextSoldier);

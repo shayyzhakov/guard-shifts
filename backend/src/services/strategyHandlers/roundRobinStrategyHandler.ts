@@ -1,7 +1,7 @@
 import {
   type GuardTime,
-  getNextPeriodGuardTime,
   compareGuardTime,
+  addDurationToGuardTime,
 } from '../../helpers/periodHelpers';
 import { mergeGuardLists } from '../../models/guardList.model';
 import type { GuardList, GuardListPeriod } from '../../interfaces/guardList.interface';
@@ -36,17 +36,22 @@ export const roundRobinStrategyHandler: StrategyHandler = (
     const periodsPerGuard = getGuardPostGuardPeriodDuration(guardPost.id, currentGuardTime.period);
 
     // find the next soldiers to guard
-    const soldiers = relevantSoldiersQueue.next(currentGuardTime, numOfSoldiersForCurrentPeriod);
-
-    for (let i = 0; i < periodsPerGuard; i++) {
-      guardListPerPeriod.push({
-        soldiers,
-        guardTime: currentGuardTime,
-        duration: 1,
-      });
-
-      currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
+    let soldierIds: string[] = [];
+    let error: string | undefined;
+    try {
+      soldierIds = relevantSoldiersQueue.next(currentGuardTime, numOfSoldiersForCurrentPeriod);
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'unknown error';
     }
+
+    guardListPerPeriod.push({
+      soldiers: soldierIds,
+      guardTime: currentGuardTime,
+      duration: periodsPerGuard,
+      error,
+    });
+
+    currentGuardTime = addDurationToGuardTime(currentGuardTime, periodsPerGuard);
   }
 
   return guardListPerPeriod;

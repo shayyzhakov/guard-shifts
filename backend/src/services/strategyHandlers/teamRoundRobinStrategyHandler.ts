@@ -2,6 +2,7 @@ import {
   type GuardTime,
   getNextPeriodGuardTime,
   compareGuardTime,
+  addDurationToGuardTime,
 } from '../../helpers/periodHelpers';
 import { getTeamsForGuardPost } from '../../models/team.model';
 import { isTeamBusy, isSoldierBusy, mergeGuardLists } from '../../models/guardList.model';
@@ -85,15 +86,13 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
       const soldiers = freeTeamMembers.slice(0, numOfSoldiersForCurrentPeriod);
 
       // insert the final guard period to the list
-      for (let i = 0; i < periodsPerGuard; i++) {
-        guardListPerPeriod.push({
-          soldiers,
-          team: currentTeam.id,
-          guardTime: currentGuardTime,
-          duration: 1,
-        });
-        currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
-      }
+      guardListPerPeriod.push({
+        soldiers,
+        team: currentTeam.id,
+        guardTime: currentGuardTime,
+        duration: periodsPerGuard,
+      });
+      currentGuardTime = addDurationToGuardTime(currentGuardTime, periodsPerGuard);
 
       if (numOfSoldiersForCurrentPeriod > 0) {
         currentTeamIndex = (currentTeamIndex + 1) % relevantTeams.length;

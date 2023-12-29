@@ -53,6 +53,14 @@ export function isGuardTimeEqual(gt1: GuardTime, gt2: GuardTime): boolean {
   return gt1.period === gt2.period && gt1.date.toDateString() === gt2.date.toDateString();
 }
 
+export function isGuardTimeGreaterThanOrEqual(gt1: GuardTime, gt2: GuardTime): boolean {
+  return compareGuardTime(gt1, gt2) <= 0 ? true : false;
+}
+
+export function isGuardTimeBefore(gt1: GuardTime, gt2: GuardTime): boolean {
+  return compareGuardTime(gt1, gt2) > 0 ? true : false;
+}
+
 export function compareGuardTime(gt1: GuardTime, gt2: GuardTime): number {
   const date1 = new Date(gt1.date.toDateString());
   const date2 = new Date(gt2.date.toDateString());
