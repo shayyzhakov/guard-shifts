@@ -6,7 +6,6 @@ import {
   type GuardPost,
   type Team,
   type UpdateTeamParams,
-  type Soldier,
 } from '@/apis';
 import { ElNotification } from 'element-plus';
 import { useTeamsStore } from '@/stores/teams.store';

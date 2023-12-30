@@ -10,9 +10,11 @@ import {
 } from '@/helpers/periodHelpers';
 import { ElNotification } from 'element-plus';
 import { useTeamsStore } from '@/stores/teams.store';
+import { useSoldiersStore } from '@/stores/soldiers.store';
 
 const router = useRouter();
 const teamsStore = useTeamsStore();
+const soldiersStore = useSoldiersStore();
 
 const now = new Date().toDateString();
 
@@ -74,7 +76,24 @@ async function submitShifts() {
 
 const showShiftsDialog = ref<boolean>(false);
 
-('.el-main');
+const rowToEditId = ref<string>();
+
+function startEditRow(guardPostId: string, index: number) {
+  rowToEditId.value = `${guardPostId}-${index}`;
+}
+
+function endEditRow() {
+  rowToEditId.value = '';
+}
+
+const soldiersOptions = computed<{ value: string; label: string }[]>(() => {
+  return (
+    soldiersStore.soldiers?.map((soldier) => ({
+      value: soldier.id,
+      label: `${soldier.first_name} ${soldier.last_name}`,
+    })) ?? []
+  );
+});
 </script>
 
 <template>
@@ -137,6 +156,7 @@ const showShiftsDialog = ref<boolean>(false);
       </div>
     </section>
 
+    <!-- edit modal -->
     <el-dialog v-model="showShiftsDialog" title="Shifts Draft" align-center class="centered-modal">
       <section class="shifts-cards">
         <el-card v-for="guardPostShifts in shiftsDraft" :key="guardPostShifts.guardPostId">
@@ -170,11 +190,46 @@ const showShiftsDialog = ref<boolean>(false);
               </template>
             </el-table-column>
             <el-table-column prop="soldiers" label="Soldiers">
-              <template #default="{ row }">
-                <span v-if="teamsStore.soldierNamesBySoldierIds(row.soldiers).length > 0">{{
+              <template #default="{ row, $index }">
+                <el-select
+                  v-if="rowToEditId === `${guardPostShifts.guardPostId}-${$index}`"
+                  v-model="row.soldiers"
+                  multiple
+                  filterable
+                  placeholder="Select"
+                  class="table-select"
+                  default-first-option
+                >
+                  <el-option
+                    v-for="item in soldiersOptions"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  />
+                </el-select>
+
+                <span v-else-if="teamsStore.soldierNamesBySoldierIds(row.soldiers).length > 0">{{
                   teamsStore.soldierNamesBySoldierIds(row.soldiers).join(', ')
                 }}</span>
-                <span v-else class="no-soldiers">No soldiers assigned ({{ row.error }})</span>
+                <span v-else class="no-soldiers"
+                  >No soldiers assigned {{ row.error ? `(${row.error})` : '' }}</span
+                >
+              </template>
+            </el-table-column>
+            <el-table-column label="Actions" width="120">
+              <template #default="{ $index }">
+                <el-button
+                  v-if="rowToEditId !== `${guardPostShifts.guardPostId}-${$index}`"
+                  link
+                  type="primary"
+                  size="small"
+                  @click="() => startEditRow(guardPostShifts.guardPostId, $index)"
+                >
+                  Edit
+                </el-button>
+                <el-button v-else link type="primary" size="small" @click="() => endEditRow()">
+                  Close
+                </el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -233,5 +288,9 @@ const showShiftsDialog = ref<boolean>(false);
 .no-soldiers {
   color: #c0c4cc;
   font-style: italic;
+}
+
+.table-select {
+  width: 100%;
 }
 </style>

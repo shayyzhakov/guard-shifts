@@ -2,6 +2,7 @@
 import { onMounted, ref, watch } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
 import { useTeamsStore } from './stores/teams.store';
+import { useSoldiersStore } from './stores/soldiers.store';
 
 const route = useRoute();
 
@@ -18,9 +19,11 @@ watch(
 );
 
 const teamsStore = useTeamsStore();
+const soldiersStore = useSoldiersStore();
 
 onMounted(async () => {
   await teamsStore.refreshTeams();
+  await soldiersStore.refreshSoldiers();
 });
 </script>
 

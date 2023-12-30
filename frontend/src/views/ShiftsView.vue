@@ -157,7 +157,9 @@ const dateShortcuts = [
                 <span v-if="teamsStore.soldierNamesBySoldierIds(row.soldiers).length > 0">{{
                   teamsStore.soldierNamesBySoldierIds(row.soldiers).join(', ')
                 }}</span>
-                <span v-else class="no-soldiers">No soldiers assigned ({{ row.error }})</span>
+                <span v-else class="no-soldiers"
+                  >No soldiers assigned {{ row.error ? `(${row.error})` : '' }}</span
+                >
               </template>
             </el-table-column>
           </el-table>

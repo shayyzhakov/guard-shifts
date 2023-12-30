@@ -44,7 +44,7 @@ export class SoldiersQueue {
       const nextSoldier = this.soldiersForGuardPost.shift();
 
       if (!nextSoldier) {
-        console.error('no soldiers in queue');
+        console.info('no soldiers in queue');
         throw new Error('no soldiers were found');
       }
 
