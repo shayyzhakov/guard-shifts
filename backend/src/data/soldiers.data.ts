@@ -6,6 +6,7 @@ export const soldiers: Soldier[] = [
     first_name: 'b',
     last_name: '1',
     personal_number: 1,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -13,6 +14,7 @@ export const soldiers: Soldier[] = [
     first_name: 'b',
     last_name: '2',
     personal_number: 2,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -20,6 +22,7 @@ export const soldiers: Soldier[] = [
     first_name: 'b',
     last_name: '3',
     personal_number: 3,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -27,6 +30,7 @@ export const soldiers: Soldier[] = [
     first_name: 'b',
     last_name: '4',
     personal_number: 4,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -34,6 +38,7 @@ export const soldiers: Soldier[] = [
     first_name: 'b',
     last_name: '5',
     personal_number: 5,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -41,6 +46,7 @@ export const soldiers: Soldier[] = [
     first_name: 'b',
     last_name: '6',
     personal_number: 6,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -48,6 +54,7 @@ export const soldiers: Soldier[] = [
     first_name: 'b',
     last_name: '7',
     personal_number: 7,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -55,6 +62,7 @@ export const soldiers: Soldier[] = [
     first_name: 'c',
     last_name: '1',
     personal_number: 8,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -62,6 +70,7 @@ export const soldiers: Soldier[] = [
     first_name: 'c',
     last_name: '2',
     personal_number: 9,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -69,6 +78,7 @@ export const soldiers: Soldier[] = [
     first_name: 'c',
     last_name: '3',
     personal_number: 10,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -76,6 +86,7 @@ export const soldiers: Soldier[] = [
     first_name: 'aa',
     last_name: '1',
     personal_number: 11,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -83,6 +94,7 @@ export const soldiers: Soldier[] = [
     first_name: 'aa',
     last_name: '2',
     personal_number: 12,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -90,6 +102,7 @@ export const soldiers: Soldier[] = [
     first_name: 'aa',
     last_name: '3',
     personal_number: 13,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -97,6 +110,7 @@ export const soldiers: Soldier[] = [
     first_name: 'bb',
     last_name: '1',
     personal_number: 14,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -104,6 +118,7 @@ export const soldiers: Soldier[] = [
     first_name: 'bb',
     last_name: '2',
     personal_number: 15,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -111,6 +126,7 @@ export const soldiers: Soldier[] = [
     first_name: 'cc',
     last_name: '1',
     personal_number: 16,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -118,6 +134,7 @@ export const soldiers: Soldier[] = [
     first_name: 'cc',
     last_name: '2',
     personal_number: 17,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -125,6 +142,7 @@ export const soldiers: Soldier[] = [
     first_name: 'cc',
     last_name: '3',
     personal_number: 18,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -132,6 +150,7 @@ export const soldiers: Soldier[] = [
     first_name: 'cc',
     last_name: '4',
     personal_number: 19,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -139,6 +158,7 @@ export const soldiers: Soldier[] = [
     first_name: 'cc',
     last_name: '5',
     personal_number: 20,
+    phone_number: '054-9999999',
     capabilities: [],
   },
   {
@@ -146,6 +166,7 @@ export const soldiers: Soldier[] = [
     first_name: 'Shay',
     last_name: 'Yzhakov',
     personal_number: 5800211,
+    phone_number: '054-9982858',
     capabilities: [],
   },
 ];

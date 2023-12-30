@@ -145,6 +145,7 @@ const activeTab = ref('teams');
             <template #default="{ row }"> {{ row.first_name }} {{ row.last_name }} </template>
           </el-table-column>
           <el-table-column prop="personal_number" label="Personal Number" />
+          <el-table-column prop="phone_number" label="Phone Number" />
         </el-table>
       </el-tab-pane>
     </el-tabs>

@@ -35,6 +35,7 @@ export interface SoldierAddParams {
   first_name: string;
   last_name: string;
   personal_number: number;
+  phone_number: string;
   capabilities: string[];
 }
 
@@ -51,6 +52,7 @@ export interface SoldierUpdateParams {
   first_name: string;
   last_name: string;
   personal_number: number;
+  phone_number: string;
   capabilities: string[];
 }
 
