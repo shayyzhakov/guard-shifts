@@ -10,7 +10,7 @@ export interface Soldier {
 }
 
 export async function getSoldiers(): Promise<Soldier[]> {
-  const response = await fetch('http://localhost:3000/soldiers');
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/soldiers`);
   const responseJson = await response.json();
   return responseJson.soldiers;
 }
@@ -23,7 +23,7 @@ export interface Team {
 }
 
 export async function getTeams(): Promise<Team[]> {
-  const response = await fetch('http://localhost:3000/teams');
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/teams`);
   const responseJson = await response.json();
   return responseJson.teams;
 }
@@ -48,7 +48,7 @@ export interface GenerateGuardListParams {
 }
 
 export async function generateGuardList(params: GenerateGuardListParams): Promise<GuardList[]> {
-  const response = await fetch('http://localhost:3000/guard-list/generate', {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/guard-list/generate`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(params),
@@ -63,7 +63,7 @@ export interface CommitGuardListParams {
 }
 
 export async function commitGuardList(params: CommitGuardListParams): Promise<void> {
-  const response = await fetch('http://localhost:3000/guard-list/commit', {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/guard-list/commit`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(params),
@@ -73,7 +73,7 @@ export async function commitGuardList(params: CommitGuardListParams): Promise<vo
 }
 
 export async function getGuardLists(): Promise<GuardList[]> {
-  const response = await fetch('http://localhost:3000/guard-list');
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/guard-list`);
   const responseJson = await response.json();
   return responseJson.guardLists;
 }
@@ -94,7 +94,7 @@ export interface GuardPost {
 }
 
 export async function getGuardPosts(): Promise<GuardPost[]> {
-  const response = await fetch('http://localhost:3000/guard-posts');
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/guard-posts`);
   const responseJson = await response.json();
   return responseJson.guardPosts;
 }
@@ -106,7 +106,7 @@ export interface UpdateTeamParams {
 }
 
 export async function updateTeam(teamId: string, params: UpdateTeamParams): Promise<void> {
-  const response = await fetch('http://localhost:3000/teams/' + teamId, {
+  const response = await fetch(`${import.meta.env.VITE_API_URL}/teams/${teamId}`, {
     method: 'PUT',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(params),
