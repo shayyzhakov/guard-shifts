@@ -26,8 +26,8 @@ const soldiersStore = useSoldiersStore();
 const userInfo = ref<UserInfo>();
 
 onMounted(async () => {
-  await teamsStore.refreshTeams();
-  await soldiersStore.refreshSoldiers();
+  teamsStore.refreshTeams();
+  soldiersStore.refreshSoldiers();
 
   userInfo.value = await authService.getUserInfo();
 });
