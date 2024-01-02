@@ -11,37 +11,41 @@ import router from './router';
 import * as authService from './auth';
 import type { OAuth2Token } from '@badgateway/oauth2-client';
 
-try {
-  const authCode = new URLSearchParams(window.location.search).get('code');
-  const authTokenString = localStorage.getItem('oauth2_token');
-  let authToken: OAuth2Token | undefined;
+async function main() {
+  try {
+    const authCode = new URLSearchParams(window.location.search).get('code');
+    const authTokenString = localStorage.getItem('oauth2_token');
+    let authToken: OAuth2Token | undefined;
 
-  if (authTokenString) {
-    authToken = JSON.parse(authTokenString);
-  }
-
-  if (!authCode && !authToken) {
-    await authService.redirectToAuthServer();
-  } else {
-    if (authCode) {
-      authToken = await authService.exchangeCodeForToken();
+    if (authTokenString) {
+      authToken = JSON.parse(authTokenString);
     }
 
-    if (!authToken?.expiresAt || authToken.expiresAt < Date.now()) {
-      // TODO: refresh token instead?
+    if (!authCode && !authToken) {
       await authService.redirectToAuthServer();
     } else {
-      // mount Vue app
-      const app = createApp(App);
+      if (authCode) {
+        authToken = await authService.exchangeCodeForToken();
+      }
 
-      app.use(createPinia());
-      app.use(router);
-      app.use(ElementPlus);
+      if (!authToken?.expiresAt || authToken.expiresAt < Date.now()) {
+        // TODO: refresh token instead?
+        await authService.redirectToAuthServer();
+      } else {
+        // mount Vue app
+        const app = createApp(App);
 
-      app.mount('#app');
+        app.use(createPinia());
+        app.use(router);
+        app.use(ElementPlus);
+
+        app.mount('#app');
+      }
     }
+  } catch (err) {
+    console.log('FATAL ERROR: ', err);
+    authService.logout();
   }
-} catch (err) {
-  console.log('FATAL ERROR: ', err);
-  authService.logout();
 }
+
+main();
