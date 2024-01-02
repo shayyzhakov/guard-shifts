@@ -3,6 +3,9 @@ import { onMounted, ref, watch } from 'vue';
 import { RouterView, useRoute } from 'vue-router';
 import { useTeamsStore } from './stores/teams.store';
 import { useSoldiersStore } from './stores/soldiers.store';
+import * as authService from './auth';
+import UserInfoDropdown from './components/UserInfoDropdown.vue';
+import type { UserInfo } from './auth';
 
 const route = useRoute();
 
@@ -20,10 +23,13 @@ watch(
 
 const teamsStore = useTeamsStore();
 const soldiersStore = useSoldiersStore();
+const userInfo = ref<UserInfo>();
 
 onMounted(async () => {
   await teamsStore.refreshTeams();
   await soldiersStore.refreshSoldiers();
+
+  userInfo.value = await authService.getUserInfo();
 });
 </script>
 
@@ -38,6 +44,15 @@ onMounted(async () => {
         :default-active="activeRoute"
         text-color="#fff"
       >
+        <div v-if="userInfo" class="user-row">
+          <UserInfoDropdown :userInfo="userInfo" @logout="() => authService.logout()" />
+
+          <span class="user-name">
+            {{ userInfo.given_name }}
+            {{ userInfo.family_name }}
+          </span>
+        </div>
+
         <el-menu-item index="shifts">
           <template #title>Shifts</template>
         </el-menu-item>
@@ -73,5 +88,18 @@ onMounted(async () => {
 
 .el-menu-item.is-active {
   background: var(--el-color-info-dark-2);
+}
+
+.user-row {
+  display: flex;
+  align-items: center;
+  padding: 4px 10px 16px 10px;
+}
+
+.user-row .user-name {
+  margin-left: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
 }
 </style>

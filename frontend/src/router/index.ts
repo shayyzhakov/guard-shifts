@@ -22,13 +22,12 @@ const router = createRouter({
       name: 'guard-posts',
       component: GuardPostsView,
     },
-
     {
       path: '/generate-shifts',
       name: 'generate-shifts',
       component: GenerateShiftsView,
     },
-    // TODO: add empty route
+    { path: '/:pathMatch(.*)*', redirect: { path: '/shifts', query: {} } },
   ],
 });
 
