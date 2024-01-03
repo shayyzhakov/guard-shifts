@@ -1,16 +1,20 @@
-import express, { Express, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import guardListApis from './apis/guardList.api';
 import guardPostsApis from './apis/guardPosts.api';
 import teamsApis from './apis/teams.api';
 import soldiersApis from './apis/soldiers.api';
 import cors from 'cors';
+import helmet from 'helmet';
+import { authenticateUser } from './middlewares/auth.middleware';
 
 dotenv.config();
 
-const app: Express = express();
+const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(helmet());
+app.use(authenticateUser());
 
 const port = process.env.PORT || 3000;
 

@@ -10,6 +10,7 @@ import App from './App.vue';
 import router from './router';
 import * as authService from './auth';
 import type { OAuth2Token } from '@badgateway/oauth2-client';
+import { initFetcher } from './apis';
 
 async function main() {
   try {
@@ -32,6 +33,8 @@ async function main() {
         // TODO: refresh token instead?
         await authService.redirectToAuthServer();
       } else {
+        initFetcher(import.meta.env.VITE_API_URL, authToken);
+
         // mount Vue app
         const app = createApp(App);
 

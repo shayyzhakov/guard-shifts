@@ -1,3 +1,4 @@
+import type { OAuth2Token } from '@badgateway/oauth2-client';
 import type { GuardTime } from './helpers/periodHelpers';
 
 export interface Soldier {
@@ -9,10 +10,49 @@ export interface Soldier {
   capabilities: string[];
 }
 
+export class AuthorizedFetch {
+  private accessToken?: string;
+  private expiresAt?: number | null;
+  private refreshToken?: string | null;
+  private baseUrl?: string;
+
+  init(baseUrl: string, tokens: OAuth2Token) {
+    this.baseUrl = baseUrl;
+    this.accessToken = tokens.accessToken;
+    this.expiresAt = tokens.expiresAt;
+    this.refreshToken = tokens.refreshToken;
+  }
+
+  get isInitialized() {
+    return !!this.baseUrl;
+  }
+
+  async fetch(...args: Parameters<typeof fetch>): Promise<any> {
+    // add authorization header to request
+    args[1] = {
+      ...args[1],
+      headers: {
+        ...args[1]?.headers,
+        Authorization: `Bearer ${this.accessToken}`,
+      },
+    };
+
+    const url = `${this.baseUrl}${args[0]}`;
+
+    const response = await fetch(url, args[1]);
+    return await response.json();
+  }
+}
+
+const fetcher = new AuthorizedFetch();
+
+export function initFetcher(baseUrl: string, tokens: OAuth2Token): void {
+  fetcher.init(baseUrl, tokens);
+}
+
 export async function getSoldiers(): Promise<Soldier[]> {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/soldiers`);
-  const responseJson = await response.json();
-  return responseJson.soldiers;
+  const response = await fetcher.fetch('/soldiers');
+  return response.soldiers;
 }
 
 export interface Team {
@@ -23,9 +63,8 @@ export interface Team {
 }
 
 export async function getTeams(): Promise<Team[]> {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/teams`);
-  const responseJson = await response.json();
-  return responseJson.teams;
+  const response = await fetcher.fetch('/teams');
+  return response.teams;
 }
 
 export interface GuardListPeriod {
@@ -48,13 +87,12 @@ export interface GenerateGuardListParams {
 }
 
 export async function generateGuardList(params: GenerateGuardListParams): Promise<GuardList[]> {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/guard-list/generate`, {
+  const response = await fetcher.fetch('/guard-list/generate', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(params),
   });
-  const responseJson = await response.json();
-  return responseJson.guardLists;
+  return response.guardLists;
 }
 
 export interface CommitGuardListParams {
@@ -63,19 +101,17 @@ export interface CommitGuardListParams {
 }
 
 export async function commitGuardList(params: CommitGuardListParams): Promise<void> {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/guard-list/commit`, {
+  const response = await fetcher.fetch('/guard-list/commit', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(params),
   });
-  const responseJson = await response.json();
-  return responseJson.guardLists;
+  return response.guardLists;
 }
 
 export async function getGuardLists(): Promise<GuardList[]> {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/guard-list`);
-  const responseJson = await response.json();
-  return responseJson.guardLists;
+  const response = await fetcher.fetch('/guard-list');
+  return response.guardLists;
 }
 
 export interface GuardPostOccupation {
@@ -94,9 +130,8 @@ export interface GuardPost {
 }
 
 export async function getGuardPosts(): Promise<GuardPost[]> {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/guard-posts`);
-  const responseJson = await response.json();
-  return responseJson.guardPosts;
+  const response = await fetcher.fetch('/guard-posts');
+  return response.guardPosts;
 }
 
 export interface UpdateTeamParams {
@@ -106,11 +141,10 @@ export interface UpdateTeamParams {
 }
 
 export async function updateTeam(teamId: string, params: UpdateTeamParams): Promise<void> {
-  const response = await fetch(`${import.meta.env.VITE_API_URL}/teams/${teamId}`, {
+  const response = await fetcher.fetch(`/teams/${teamId}`, {
     method: 'PUT',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(params),
   });
-  const responseJson = await response.json();
-  return responseJson.guardLists;
+  return response.guardLists;
 }
