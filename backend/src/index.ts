@@ -1,4 +1,5 @@
 import express, { Request, Response } from 'express';
+import serverless from 'serverless-http';
 import dotenv from 'dotenv';
 import guardListApis from './apis/guardList.api';
 import guardPostsApis from './apis/guardPosts.api';
@@ -27,6 +28,10 @@ app.use('/guard-posts', guardPostsApis);
 app.use('/teams', teamsApis);
 app.use('/soldiers', soldiersApis);
 
-app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(port, () => {
+    console.log(`[server]: Server is running at http://localhost:${port}`);
+  });
+}
+
+export const handler = serverless(app);

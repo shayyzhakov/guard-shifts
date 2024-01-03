@@ -1,0 +1,13 @@
+service: guard-shifts-crud
+provider:
+  name: aws
+  runtime: nodejs20.x
+  iam:
+    role: arn:aws:iam::052694071526:role/GuardShiftsCrudLambda
+
+functions:
+  app:
+    handler: dist/index.handler
+    events:
+      - http: ANY /
+      - http: ANY /{proxy+}
