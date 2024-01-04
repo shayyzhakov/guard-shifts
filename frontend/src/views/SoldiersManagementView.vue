@@ -16,8 +16,7 @@ const soldiersStore = useSoldiersStore();
 
 onMounted(async () => {
   // ensures that the teams and soldiers data are up to date
-  await teamsStore.refreshTeams();
-  await soldiersStore.refreshSoldiers();
+  await Promise.all([teamsStore.refreshTeams(), soldiersStore.refreshSoldiers()]);
 });
 
 const showEditTeamModal = ref<boolean>(false);
