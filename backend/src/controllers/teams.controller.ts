@@ -1,16 +1,18 @@
 import { Soldier } from '../interfaces/soldier.interface';
 import type { Team } from '../interfaces/team.interface';
-import { getSoldierById } from '../models/soldier.model';
+import { getAllSoldiers } from '../models/soldier.model';
 import { getAllTeams, updateTeamById } from '../models/team.model';
 
 type TeamWithSoldiers = Omit<Team, 'people'> & { people: Soldier[] };
 
 export function getTeams(): TeamWithSoldiers[] {
   const teams = getAllTeams();
+  const soldiers = getAllSoldiers();
+
   const teamsWithSoldiers = teams.map((team) => ({
     ...team,
     people: team.people
-      .map(getSoldierById)
+      .map((soldierId) => soldiers.find((soldier) => soldier.id === soldierId))
       .filter((soldier): soldier is Soldier => soldier !== undefined),
   }));
 

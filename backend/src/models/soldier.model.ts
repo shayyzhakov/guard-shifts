@@ -14,11 +14,7 @@ export function getSoldierTeam(soldierId: string): Team | undefined {
 }
 
 export function getAllSoldiers(): Soldier[] {
-  return JSON.parse(JSON.stringify(soldiers));
-}
-
-export function getSoldierById(soldierId: string): Soldier | undefined {
-  return soldiers.find((soldier) => soldier.id === soldierId);
+  return soldiers;
 }
 
 export function removeSoldier(soldierId: string): void {
