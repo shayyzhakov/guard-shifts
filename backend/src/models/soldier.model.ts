@@ -1,30 +1,20 @@
+import { DeleteItemCommand, PutItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb';
 import { soldiers } from '../data/soldiers.data';
-import { teams } from '../data/teams.data';
+import { getDbClient } from '../helpers/dbClient';
 import { Soldier } from '../interfaces/soldier.interface';
-import type { Team } from '../interfaces/team.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 
-export function getSoldierTeam(soldierId: string): Team | undefined {
-  const soldierTeam = teams.find((team) => team.people.includes(soldierId));
-  if (!soldierTeam) {
-    console.error('soldier was not found in any of the teams');
-  }
+export async function getAllSoldiers(): Promise<Soldier[]> {
+  const res = await getDbClient().send(new ScanCommand({ TableName: 'Soldiers' }));
 
-  return soldierTeam;
+  return (res.Items?.map((item) => unmarshall(item)) ?? []) as Soldier[];
 }
 
-export function getAllSoldiers(): Soldier[] {
-  return soldiers;
-}
-
-export function removeSoldier(soldierId: string): void {
-  const soldierIndex = soldiers.findIndex((soldier) => soldier.id === soldierId);
-  if (soldierIndex === -1) {
-    console.error(`soldier ${soldierId} not found`);
-    return;
-  }
-
-  soldiers.splice(soldierIndex, 1);
+export async function deleteSoldier(soldierId: string): Promise<void> {
+  await getDbClient().send(
+    new DeleteItemCommand({ TableName: 'Soldiers', Key: marshall({ id: soldierId }) })
+  );
 }
 
 export interface SoldierAddParams {
@@ -35,13 +25,13 @@ export interface SoldierAddParams {
   capabilities: string[];
 }
 
-export function addNewSoldier(soldierParams: SoldierAddParams): void {
+export async function createNewSoldier(soldierParams: SoldierAddParams): Promise<void> {
   const soldier: Soldier = {
     id: uuidv4(),
     ...soldierParams,
   };
 
-  soldiers.push(soldier);
+  await getDbClient().send(new PutItemCommand({ TableName: 'Soldiers', Item: marshall(soldier) }));
 }
 
 export interface SoldierUpdateParams {

@@ -2,18 +2,8 @@ import { teams } from '../data/teams.data';
 import type { Team } from '../interfaces/team.interface';
 
 export function getAllTeams(): Team[] {
-  return JSON.parse(JSON.stringify(teams));
+  return teams;
 }
-
-// export function changeTeamById(teamId: string, newPeople: Soldier[]): void {
-//   const team = teams.find((team) => team.id === teamId);
-//   if (!team) {
-//     console.error(`team ${teamId} not found`);
-//     return;
-//   }
-
-//   team.people = newPeople;
-// }
 
 export function getSoldierIdsForGuardPost(guardPostId: string): string[] {
   return teams

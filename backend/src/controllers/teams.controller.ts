@@ -5,9 +5,9 @@ import { getAllTeams, updateTeamById } from '../models/team.model';
 
 type TeamWithSoldiers = Omit<Team, 'people'> & { people: Soldier[] };
 
-export function getTeams(): TeamWithSoldiers[] {
+export async function getTeams(): Promise<TeamWithSoldiers[]> {
   const teams = getAllTeams();
-  const soldiers = getAllSoldiers();
+  const soldiers = await getAllSoldiers();
 
   const teamsWithSoldiers = teams.map((team) => ({
     ...team,
