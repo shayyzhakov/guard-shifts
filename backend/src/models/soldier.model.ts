@@ -1,5 +1,4 @@
 import { DeleteItemCommand, PutItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb';
-import { soldiers } from '../data/soldiers.data';
 import { getDbClient } from '../helpers/dbClient';
 import { Soldier } from '../interfaces/soldier.interface';
 import { v4 as uuidv4 } from 'uuid';
@@ -34,21 +33,21 @@ export async function createNewSoldier(soldierParams: SoldierAddParams): Promise
   await getDbClient().send(new PutItemCommand({ TableName: 'Soldiers', Item: marshall(soldier) }));
 }
 
-export interface SoldierUpdateParams {
-  first_name: string;
-  last_name: string;
-  personal_number: number;
-  phone_number: string;
-  capabilities: string[];
-}
+// export interface SoldierUpdateParams {
+//   first_name: string;
+//   last_name: string;
+//   personal_number: number;
+//   phone_number: string;
+//   capabilities: string[];
+// }
 
-export function updateSoldier(soldierId: string, updateParams: SoldierUpdateParams): void {
-  const soldier = soldiers.find((soldier) => soldier.id === soldierId);
-  if (!soldier) {
-    console.error(`soldier ${soldierId} not found`);
-    return;
-  }
+// export function updateSoldier(soldierId: string, updateParams: SoldierUpdateParams): void {
+//   const soldier = soldiers.find((soldier) => soldier.id === soldierId);
+//   if (!soldier) {
+//     console.error(`soldier ${soldierId} not found`);
+//     return;
+//   }
 
-  // merge updateParams into soldier
-  Object.assign(soldier, updateParams);
-}
+//   // merge updateParams into soldier
+//   Object.assign(soldier, updateParams);
+// }
