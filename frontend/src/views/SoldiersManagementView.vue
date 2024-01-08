@@ -271,7 +271,7 @@ async function removeSoldierByIndex(index: number) {
 
     <!-- CREATE TEAM -->
     <!-- TODO: extract to component -->
-    <el-dialog v-model="showCreateTeamModal" title="New Team">
+    <el-dialog v-model="showCreateTeamModal" title="New Team" width="600px">
       <el-form :model="newTeamParams" label-width="120px" label-position="left">
         <el-form-item label="Team Name">
           <el-input v-model="newTeamParams.name" />
@@ -319,7 +319,7 @@ async function removeSoldierByIndex(index: number) {
 
     <!-- EDIT TEAM -->
     <!-- TODO: extract to component -->
-    <el-dialog v-model="showEditTeamModal" title="Edit Team">
+    <el-dialog v-model="showEditTeamModal" title="Edit Team" width="600px">
       <el-form :model="selectedTeamParams" label-width="120px" label-position="left">
         <el-form-item label="Team Name">
           <el-input v-model="selectedTeamParams.name" />
