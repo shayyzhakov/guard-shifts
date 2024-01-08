@@ -40,6 +40,9 @@ export class AuthorizedFetch {
     const url = `${this.baseUrl}${args[0]}`;
 
     const response = await fetch(url, args[1]);
+    if (response.status >= 400) {
+      throw new Error(`[client] error: ${response.status} ${response.statusText}`);
+    }
     return await response.json();
   }
 }
@@ -145,6 +148,21 @@ export async function updateTeam(teamId: string, params: UpdateTeamParams): Prom
     method: 'PUT',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(params),
+  });
+}
+
+export async function createTeam(params: UpdateTeamParams): Promise<void> {
+  await fetcher.fetch(`/teams`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+}
+
+export async function deleteTeam(teamId: string): Promise<void> {
+  await fetcher.fetch(`/teams/${teamId}`, {
+    method: 'DELETE',
+    headers: { 'content-type': 'application/json' },
   });
 }
 

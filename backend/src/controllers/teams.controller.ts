@@ -1,12 +1,13 @@
 import { Soldier } from '../interfaces/soldier.interface';
 import type { Team } from '../interfaces/team.interface';
 import { getAllSoldiers } from '../models/soldier.model';
-import { getAllTeams, updateTeamById } from '../models/team.model';
+import { createTeam, deleteTeamById, getAllTeams, updateTeamById } from '../models/team.model';
+import { v4 as uuidv4 } from 'uuid';
 
 type TeamWithSoldiers = Omit<Team, 'people'> & { people: Soldier[] };
 
 export async function getTeams(): Promise<TeamWithSoldiers[]> {
-  const teams = getAllTeams();
+  const teams = await getAllTeams();
   const soldiers = await getAllSoldiers();
 
   const teamsWithSoldiers = teams.map((team) => ({
@@ -25,6 +26,22 @@ interface UpdateTeamUpdatedParams {
   guardPosts: string[];
 }
 
-export function updateTeam(teamId: string, updateParams: UpdateTeamUpdatedParams): void {
-  return updateTeamById(teamId, updateParams);
+export async function updateTeam(
+  teamId: string,
+  updateParams: UpdateTeamUpdatedParams
+): Promise<void> {
+  await updateTeamById(teamId, updateParams);
+}
+
+export async function createNewTeam(createParams: UpdateTeamUpdatedParams): Promise<void> {
+  const id = uuidv4();
+
+  await createTeam({
+    id,
+    ...createParams,
+  });
+}
+
+export async function deleteTeam(teamId: string): Promise<void> {
+  await deleteTeamById(teamId);
 }

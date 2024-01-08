@@ -7,6 +7,8 @@ import {
   type Team,
   type UpdateTeamParams,
   deleteSoldier,
+  createTeam,
+  deleteTeam,
 } from '@/apis';
 import { ElNotification } from 'element-plus';
 import { useTeamsStore } from '@/stores/teams.store';
@@ -16,22 +18,33 @@ import AddSoldierModal from '@/components/modals/AddSoldierModal.vue';
 const teamsStore = useTeamsStore();
 const soldiersStore = useSoldiersStore();
 
+const guardPosts = ref<GuardPost[]>();
+
 onMounted(async () => {
   // ensures that the teams and soldiers data are up to date
   await Promise.all([teamsStore.refreshTeams(), soldiersStore.refreshSoldiers()]);
+
+  // TODO: move guard posts to a store
+  guardPosts.value = await getGuardPosts();
 });
 
+const showCreateTeamModal = ref<boolean>(false);
 const showEditTeamModal = ref<boolean>(false);
 const showCreateSoldierModal = ref<boolean>(false);
 
 const selectedTeamId = ref<string>();
-const selectedTeamParams = reactive<UpdateTeamParams>({
+
+const newTeamParams = reactive<UpdateTeamParams>({
   name: '',
   people: [],
   guardPosts: [],
 });
 
-const guardPosts = ref<GuardPost[]>();
+const selectedTeamParams = reactive<UpdateTeamParams>({
+  name: '',
+  people: [],
+  guardPosts: [],
+});
 
 const guardPostsOptions = computed<{ value: string; label: string }[]>(() => {
   if (!guardPosts.value) return [];
@@ -51,16 +64,45 @@ const soldiersOptions = computed<{ value: string; label: string }[]>(() => {
   );
 });
 
-async function editTeam(team: Team) {
-  // TODO: move guard posts to a store
-  guardPosts.value = await getGuardPosts();
+function addNewTeam() {
+  newTeamParams.name = '';
+  newTeamParams.people = [];
+  newTeamParams.guardPosts = [];
 
+  showCreateTeamModal.value = true;
+}
+
+function editTeam(team: Team) {
   selectedTeamId.value = team.id;
   selectedTeamParams.name = team.name;
   selectedTeamParams.people = team.people.map((soldier) => soldier.id);
   selectedTeamParams.guardPosts = JSON.parse(JSON.stringify(team.guardPosts));
 
   showEditTeamModal.value = true;
+}
+
+async function saveNewTeam() {
+  try {
+    await createTeam({
+      name: newTeamParams.name,
+      people: newTeamParams.people,
+      guardPosts: newTeamParams.guardPosts,
+    });
+
+    ElNotification({
+      message: 'Team created successfully',
+      type: 'success',
+    });
+  } catch (e) {
+    ElNotification({
+      title: 'Action failed',
+      message: 'Failed to create a new team',
+      type: 'error',
+    });
+  } finally {
+    showCreateTeamModal.value = false;
+    teamsStore.refreshTeams();
+  }
 }
 
 async function saveTeamChanges() {
@@ -82,6 +124,27 @@ async function saveTeamChanges() {
     ElNotification({
       title: 'Action failed',
       message: 'Failed to save team changes',
+      type: 'error',
+    });
+  } finally {
+    showEditTeamModal.value = false;
+    teamsStore.refreshTeams();
+  }
+}
+
+async function deleteExistingTeam() {
+  try {
+    if (!selectedTeamId.value) throw new Error('No team was selected');
+    await deleteTeam(selectedTeamId.value);
+
+    ElNotification({
+      message: 'Team deleted successfully',
+      type: 'success',
+    });
+  } catch (e) {
+    ElNotification({
+      title: 'Action failed',
+      message: 'Failed to delete team',
       type: 'error',
     });
   } finally {
@@ -126,7 +189,13 @@ async function removeSoldierByIndex(index: number) {
 
     <el-tabs v-model="activeTab" type="card">
       <el-tab-pane label="Teams" name="teams">
-        <section v-if="teamsStore.teams" class="team-cards">
+        <section v-if="teamsStore.teams" class="tab-section">
+          <div class="card-header">
+            <div class="card-actions">
+              <el-button type="primary" @click="addNewTeam">New Team</el-button>
+            </div>
+          </div>
+
           <el-card v-for="team in teamsStore.teams" :key="team.id">
             <template #header>
               <div class="card-header">
@@ -168,36 +237,86 @@ async function removeSoldierByIndex(index: number) {
       </el-tab-pane>
 
       <el-tab-pane label="Soldiers" name="soldiers">
-        <el-card>
+        <section v-if="teamsStore.teams" class="tab-section">
           <div class="card-header">
             <div class="card-actions">
               <el-button type="primary" @click="addNewSoldier">New Soldier</el-button>
             </div>
           </div>
 
-          <el-table :data="soldiersStore.soldiers" stripe style="width: 100%">
-            <el-table-column prop="name" label="Name">
-              <template #default="{ row }"> {{ row.first_name }} {{ row.last_name }} </template>
-            </el-table-column>
-            <el-table-column prop="personal_number" label="Personal Number" />
-            <el-table-column prop="phone_number" label="Phone Number" />
-            <el-table-column label="Actions" width="120">
-              <template #default="{ $index }">
-                <el-popconfirm
-                  title="Are you sure?"
-                  :hide-after="0"
-                  @confirm="() => removeSoldierByIndex($index)"
-                >
-                  <template #reference>
-                    <el-button link type="primary" size="small"> Remove </el-button>
-                  </template>
-                </el-popconfirm>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
+          <el-card>
+            <el-table :data="soldiersStore.soldiers" stripe style="width: 100%">
+              <el-table-column prop="name" label="Name">
+                <template #default="{ row }"> {{ row.first_name }} {{ row.last_name }} </template>
+              </el-table-column>
+              <el-table-column prop="personal_number" label="Personal Number" />
+              <el-table-column prop="phone_number" label="Phone Number" />
+              <el-table-column label="Actions" width="120">
+                <template #default="{ $index }">
+                  <el-popconfirm
+                    title="Are you sure?"
+                    :hide-after="0"
+                    @confirm="() => removeSoldierByIndex($index)"
+                  >
+                    <template #reference>
+                      <el-button link type="primary" size="small"> Remove </el-button>
+                    </template>
+                  </el-popconfirm>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-card>
+        </section>
       </el-tab-pane>
     </el-tabs>
+
+    <!-- CREATE TEAM -->
+    <!-- TODO: extract to component -->
+    <el-dialog v-model="showCreateTeamModal" title="New Team">
+      <el-form :model="newTeamParams" label-width="120px" label-position="left">
+        <el-form-item label="Team Name">
+          <el-input v-model="newTeamParams.name" />
+        </el-form-item>
+
+        <el-form-item label="Guard Posts">
+          <el-select
+            v-model="newTeamParams.guardPosts"
+            multiple
+            placeholder="Select"
+            class="form-select"
+          >
+            <el-option
+              v-for="item in guardPostsOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="Soldiers">
+          <el-select
+            v-model="newTeamParams.people"
+            multiple
+            placeholder="Select"
+            class="form-select"
+            default-first-option
+          >
+            <el-option
+              v-for="item in soldiersOptions"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+            />
+          </el-select>
+        </el-form-item>
+      </el-form>
+
+      <template #footer>
+        <el-button @click="showCreateTeamModal = false">Cancel</el-button>
+        <el-button type="primary" @click="saveNewTeam">Save</el-button>
+      </template>
+    </el-dialog>
 
     <!-- EDIT TEAM -->
     <!-- TODO: extract to component -->
@@ -242,6 +361,7 @@ async function removeSoldierByIndex(index: number) {
       </el-form>
 
       <template #footer>
+        <el-button type="danger" @click="deleteExistingTeam">Delete</el-button>
         <el-button @click="showEditTeamModal = false">Cancel</el-button>
         <el-button type="primary" @click="saveTeamChanges">Save</el-button>
       </template>
@@ -256,7 +376,7 @@ h3 {
   margin-right: 6px;
 }
 
-.team-cards {
+.tab-section {
   display: flex;
   flex-direction: column;
   gap: 16px;
