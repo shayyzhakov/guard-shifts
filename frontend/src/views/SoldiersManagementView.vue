@@ -129,9 +129,9 @@ async function removeSoldierByIndex(index: number) {
         <section v-if="soldiersStore.soldiers" class="tab-section">
           <div class="card-header">
             <div class="card-actions">
-              <el-button type="primary" @click="showCreateSoldierModal = true"
-                >New Soldier</el-button
-              >
+              <el-button type="primary" @click="showCreateSoldierModal = true">
+                New Soldier
+              </el-button>
             </div>
           </div>
 

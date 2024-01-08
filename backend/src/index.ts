@@ -9,18 +9,24 @@ import cors from 'cors';
 import helmet from 'helmet';
 import { authenticateUser } from './middlewares/auth.middleware';
 
-dotenv.config();
+dotenv.config({
+  path: process.env.NODE_ENV === 'development' ? '.env.development' : '.env.production',
+});
+
+console.log(process.env.IGNORE_AUTH);
 
 process.on('unhandledRejection', (reason, promise) => {
   console.log('Unhandled Rejection at:', promise, 'reason:', reason);
-  // Application specific logging, throwing an error, or other logic here
 });
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(helmet());
-app.use(authenticateUser());
+
+if (!process.env.IGNORE_AUTH) {
+  app.use(authenticateUser());
+}
 
 const port = process.env.PORT || 3000;
 
