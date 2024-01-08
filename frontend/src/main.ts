@@ -10,7 +10,7 @@ import App from './App.vue';
 import router from './router';
 import * as authService from './auth';
 import type { OAuth2Token } from '@badgateway/oauth2-client';
-import { initFetcher } from './apis';
+import { initFetcher } from './helpers/fetcherHelper';
 
 async function main() {
   try {

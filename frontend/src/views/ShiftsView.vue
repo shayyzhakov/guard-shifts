@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getGuardLists, type GuardList, type GuardListPeriod } from '@/apis';
+import { getGuardLists, type GuardList, type GuardListPeriod } from '@/apis/guardLists.api';
 import { GUARD_PERIODS_PER_DAY, guardTimeToDate, stringifyPeriod } from '@/helpers/periodHelpers';
 import { useTeamsStore } from '@/stores/teams.store';
 import { computed, onMounted, ref } from 'vue';
@@ -214,3 +214,4 @@ const dateShortcuts = [
   font-style: italic;
 }
 </style>
+@/apis/guardLists.api

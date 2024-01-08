@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
-import { commitGuardList, generateGuardList, type GuardList } from '../apis';
+import { commitGuardList, generateGuardList, type GuardList } from '@/apis/guardLists.api';
 import { useRouter } from 'vue-router';
 import {
   GUARD_PERIODS_PER_DAY,

@@ -4,15 +4,15 @@ import {
   updateTeam,
   type Team,
   type UpdateTeamParams,
-  deleteSoldier,
   createTeam,
   deleteTeam,
-} from '@/apis';
+} from '@/apis/teams.api';
 import { ElNotification } from 'element-plus';
 import { useTeamsStore } from '@/stores/teams.store';
 import { useSoldiersStore } from '@/stores/soldiers.store';
 import AddSoldierModal from '@/components/modals/AddSoldierModal.vue';
 import { useGuardPostsStore } from '@/stores/guardPosts.store';
+import { deleteSoldier } from '@/apis/soldiers.api';
 
 const teamsStore = useTeamsStore();
 const soldiersStore = useSoldiersStore();
@@ -400,3 +400,4 @@ h3 {
   overflow: inherit;
 }
 </style>
+@/apis/soldiers.api

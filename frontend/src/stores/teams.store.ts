@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
-import { getTeams, type Soldier, type Team } from '@/apis';
+import { type Soldier } from '@/apis/soldiers.api';
+import { getTeams, type Team } from '@/apis/teams.api';
 import { useSoldiersStore } from './soldiers.store';
 
 export const useTeamsStore = defineStore('teams', () => {

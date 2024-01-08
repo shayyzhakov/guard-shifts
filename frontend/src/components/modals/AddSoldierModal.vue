@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { reactive } from 'vue';
-import { type CreateSoldierParams, createSoldier } from '@/apis';
+import { type CreateSoldierParams, createSoldier } from '@/apis/soldiers.api';
 import { ElNotification } from 'element-plus';
 import { useSoldiersStore } from '@/stores/soldiers.store';
 
@@ -76,3 +76,4 @@ async function saveNewSoldier() {
 </template>
 
 <style scoped></style>
+@/apis/soldiers.api

@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
-import { getSoldiers, type Soldier } from '@/apis';
+import { getSoldiers, type Soldier } from '@/apis/soldiers.api';
 
 export const useSoldiersStore = defineStore('soldiers', () => {
   const soldiers = ref<Soldier[]>();
