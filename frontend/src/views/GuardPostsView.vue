@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { stringifyPeriod } from '@/helpers/periodHelpers';
-import { getGuardPosts, type GuardPost } from '../apis';
-import { onMounted, ref } from 'vue';
+import { onMounted } from 'vue';
+import { useGuardPostsStore } from '@/stores/guardPosts.store';
 
-const guardPosts = ref<GuardPost[]>();
+const guardPostsStore = useGuardPostsStore();
 
 onMounted(async () => {
-  guardPosts.value = await getGuardPosts();
+  guardPostsStore.refreshGuardPosts();
 });
 </script>
 
@@ -15,7 +15,7 @@ onMounted(async () => {
     <h1>Guard Posts</h1>
 
     <section class="guard-post-cards">
-      <el-card v-for="guardPost in guardPosts" :key="guardPost.id">
+      <el-card v-for="guardPost in guardPostsStore.guardPosts" :key="guardPost.id">
         <template #header>
           <div class="card-header">
             <h3>{{ guardPost.displayName }}</h3>

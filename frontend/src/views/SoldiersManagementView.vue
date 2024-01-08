@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue';
 import {
-  getGuardPosts,
   updateTeam,
-  type GuardPost,
   type Team,
   type UpdateTeamParams,
   deleteSoldier,
@@ -14,18 +12,19 @@ import { ElNotification } from 'element-plus';
 import { useTeamsStore } from '@/stores/teams.store';
 import { useSoldiersStore } from '@/stores/soldiers.store';
 import AddSoldierModal from '@/components/modals/AddSoldierModal.vue';
+import { useGuardPostsStore } from '@/stores/guardPosts.store';
 
 const teamsStore = useTeamsStore();
 const soldiersStore = useSoldiersStore();
-
-const guardPosts = ref<GuardPost[]>();
+const guardPostsStore = useGuardPostsStore();
 
 onMounted(async () => {
   // ensures that the teams and soldiers data are up to date
-  await Promise.all([teamsStore.refreshTeams(), soldiersStore.refreshSoldiers()]);
-
-  // TODO: move guard posts to a store
-  guardPosts.value = await getGuardPosts();
+  await Promise.all([
+    teamsStore.refreshTeams(),
+    soldiersStore.refreshSoldiers(),
+    guardPostsStore.refreshGuardPosts(),
+  ]);
 });
 
 const showCreateTeamModal = ref<boolean>(false);
@@ -47,9 +46,9 @@ const selectedTeamParams = reactive<UpdateTeamParams>({
 });
 
 const guardPostsOptions = computed<{ value: string; label: string }[]>(() => {
-  if (!guardPosts.value) return [];
+  if (!guardPostsStore.guardPosts) return [];
 
-  return guardPosts.value.map((guardPost) => ({
+  return guardPostsStore.guardPosts.map((guardPost) => ({
     value: guardPost.id,
     label: guardPost.displayName,
   }));
