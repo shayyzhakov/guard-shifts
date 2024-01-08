@@ -23,6 +23,8 @@ onMounted(async () => {
   ]);
 });
 
+const activeTab = ref('teams');
+
 const showCreateTeamModal = ref<boolean>(false);
 const showEditTeamModal = ref<boolean>(false);
 const showCreateSoldierModal = ref<boolean>(false);
@@ -35,10 +37,6 @@ const selectedTeamParams = reactive<UpdateTeamParams>({
   guardPosts: [],
 });
 
-function addNewTeam() {
-  showCreateTeamModal.value = true;
-}
-
 function editTeam(team: Team) {
   selectedTeamId.value = team.id;
   selectedTeamParams.name = team.name;
@@ -46,12 +44,6 @@ function editTeam(team: Team) {
   selectedTeamParams.guardPosts = JSON.parse(JSON.stringify(team.guardPosts));
 
   showEditTeamModal.value = true;
-}
-
-const activeTab = ref('teams');
-
-function addNewSoldier() {
-  showCreateSoldierModal.value = true;
 }
 
 async function removeSoldierByIndex(index: number) {
@@ -83,11 +75,12 @@ async function removeSoldierByIndex(index: number) {
     <h1>Soldiers Management</h1>
 
     <el-tabs v-model="activeTab" type="card">
+      <!-- TEAMS -->
       <el-tab-pane label="Teams" name="teams">
         <section v-if="teamsStore.teams" class="tab-section">
           <div class="card-header">
             <div class="card-actions">
-              <el-button type="primary" @click="addNewTeam">New Team</el-button>
+              <el-button type="primary" @click="showCreateTeamModal = true">New Team</el-button>
             </div>
           </div>
 
@@ -131,11 +124,14 @@ async function removeSoldierByIndex(index: number) {
         <div v-else>loading...</div>
       </el-tab-pane>
 
+      <!-- SOLDIERS -->
       <el-tab-pane label="Soldiers" name="soldiers">
-        <section v-if="teamsStore.teams" class="tab-section">
+        <section v-if="soldiersStore.soldiers" class="tab-section">
           <div class="card-header">
             <div class="card-actions">
-              <el-button type="primary" @click="addNewSoldier">New Soldier</el-button>
+              <el-button type="primary" @click="showCreateSoldierModal = true"
+                >New Soldier</el-button
+              >
             </div>
           </div>
 
@@ -162,6 +158,8 @@ async function removeSoldierByIndex(index: number) {
             </el-table>
           </el-card>
         </section>
+
+        <div v-else>loading...</div>
       </el-tab-pane>
     </el-tabs>
 
