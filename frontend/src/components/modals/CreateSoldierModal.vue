@@ -76,4 +76,3 @@ async function saveNewSoldier() {
 </template>
 
 <style scoped></style>
-@/apis/soldiers.api

@@ -1,18 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue';
-import {
-  updateTeam,
-  type Team,
-  type UpdateTeamParams,
-  createTeam,
-  deleteTeam,
-} from '@/apis/teams.api';
+import { onMounted, reactive, ref } from 'vue';
+import { type Team, type UpdateTeamParams } from '@/apis/teams.api';
 import { ElNotification } from 'element-plus';
 import { useTeamsStore } from '@/stores/teams.store';
 import { useSoldiersStore } from '@/stores/soldiers.store';
-import AddSoldierModal from '@/components/modals/AddSoldierModal.vue';
+import CreateSoldierModal from '@/components/modals/CreateSoldierModal.vue';
 import { useGuardPostsStore } from '@/stores/guardPosts.store';
 import { deleteSoldier } from '@/apis/soldiers.api';
+import EditTeamModal from '@/components/modals/EditTeamModal.vue';
+import CreateTeamModal from '@/components/modals/CreateTeamModal.vue';
 
 const teamsStore = useTeamsStore();
 const soldiersStore = useSoldiersStore();
@@ -33,41 +29,13 @@ const showCreateSoldierModal = ref<boolean>(false);
 
 const selectedTeamId = ref<string>();
 
-const newTeamParams = reactive<UpdateTeamParams>({
-  name: '',
-  people: [],
-  guardPosts: [],
-});
-
 const selectedTeamParams = reactive<UpdateTeamParams>({
   name: '',
   people: [],
   guardPosts: [],
 });
 
-const guardPostsOptions = computed<{ value: string; label: string }[]>(() => {
-  if (!guardPostsStore.guardPosts) return [];
-
-  return guardPostsStore.guardPosts.map((guardPost) => ({
-    value: guardPost.id,
-    label: guardPost.displayName,
-  }));
-});
-
-const soldiersOptions = computed<{ value: string; label: string }[]>(() => {
-  return (
-    soldiersStore.soldiers?.map((soldier) => ({
-      value: soldier.id,
-      label: `${soldier.first_name} ${soldier.last_name}`,
-    })) ?? []
-  );
-});
-
 function addNewTeam() {
-  newTeamParams.name = '';
-  newTeamParams.people = [];
-  newTeamParams.guardPosts = [];
-
   showCreateTeamModal.value = true;
 }
 
@@ -78,78 +46,6 @@ function editTeam(team: Team) {
   selectedTeamParams.guardPosts = JSON.parse(JSON.stringify(team.guardPosts));
 
   showEditTeamModal.value = true;
-}
-
-async function saveNewTeam() {
-  try {
-    await createTeam({
-      name: newTeamParams.name,
-      people: newTeamParams.people,
-      guardPosts: newTeamParams.guardPosts,
-    });
-
-    ElNotification({
-      message: 'Team created successfully',
-      type: 'success',
-    });
-  } catch (e) {
-    ElNotification({
-      title: 'Action failed',
-      message: 'Failed to create a new team',
-      type: 'error',
-    });
-  } finally {
-    showCreateTeamModal.value = false;
-    teamsStore.refreshTeams();
-  }
-}
-
-async function saveTeamChanges() {
-  try {
-    if (!selectedTeamId.value) throw new Error('No team was selected');
-
-    await updateTeam(selectedTeamId.value, {
-      name: selectedTeamParams.name,
-      people: selectedTeamParams.people,
-      guardPosts: selectedTeamParams.guardPosts,
-    });
-
-    ElNotification({
-      title: 'Team changed successfully',
-      message: 'Team changes were saved',
-      type: 'success',
-    });
-  } catch (e) {
-    ElNotification({
-      title: 'Action failed',
-      message: 'Failed to save team changes',
-      type: 'error',
-    });
-  } finally {
-    showEditTeamModal.value = false;
-    teamsStore.refreshTeams();
-  }
-}
-
-async function deleteExistingTeam() {
-  try {
-    if (!selectedTeamId.value) throw new Error('No team was selected');
-    await deleteTeam(selectedTeamId.value);
-
-    ElNotification({
-      message: 'Team deleted successfully',
-      type: 'success',
-    });
-  } catch (e) {
-    ElNotification({
-      title: 'Action failed',
-      message: 'Failed to delete team',
-      type: 'error',
-    });
-  } finally {
-    showEditTeamModal.value = false;
-    teamsStore.refreshTeams();
-  }
 }
 
 const activeTab = ref('teams');
@@ -269,104 +165,13 @@ async function removeSoldierByIndex(index: number) {
       </el-tab-pane>
     </el-tabs>
 
-    <!-- CREATE TEAM -->
-    <!-- TODO: extract to component -->
-    <el-dialog v-model="showCreateTeamModal" title="New Team" width="600px">
-      <el-form :model="newTeamParams" label-width="120px" label-position="left">
-        <el-form-item label="Team Name">
-          <el-input v-model="newTeamParams.name" />
-        </el-form-item>
-
-        <el-form-item label="Guard Posts">
-          <el-select
-            v-model="newTeamParams.guardPosts"
-            multiple
-            placeholder="Select"
-            class="form-select"
-          >
-            <el-option
-              v-for="item in guardPostsOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="Soldiers">
-          <el-select
-            v-model="newTeamParams.people"
-            multiple
-            placeholder="Select"
-            class="form-select"
-            default-first-option
-          >
-            <el-option
-              v-for="item in soldiersOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-      </el-form>
-
-      <template #footer>
-        <el-button @click="showCreateTeamModal = false">Cancel</el-button>
-        <el-button type="primary" @click="saveNewTeam">Save</el-button>
-      </template>
-    </el-dialog>
-
-    <!-- EDIT TEAM -->
-    <!-- TODO: extract to component -->
-    <el-dialog v-model="showEditTeamModal" title="Edit Team" width="600px">
-      <el-form :model="selectedTeamParams" label-width="120px" label-position="left">
-        <el-form-item label="Team Name">
-          <el-input v-model="selectedTeamParams.name" />
-        </el-form-item>
-
-        <el-form-item label="Guard Posts">
-          <el-select
-            v-model="selectedTeamParams.guardPosts"
-            multiple
-            placeholder="Select"
-            class="form-select"
-          >
-            <el-option
-              v-for="item in guardPostsOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="Soldiers">
-          <el-select
-            v-model="selectedTeamParams.people"
-            multiple
-            placeholder="Select"
-            class="form-select"
-            default-first-option
-          >
-            <el-option
-              v-for="item in soldiersOptions"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-      </el-form>
-
-      <template #footer>
-        <el-button type="danger" @click="deleteExistingTeam">Delete</el-button>
-        <el-button @click="showEditTeamModal = false">Cancel</el-button>
-        <el-button type="primary" @click="saveTeamChanges">Save</el-button>
-      </template>
-    </el-dialog>
-
-    <AddSoldierModal v-model:showModal="showCreateSoldierModal" />
+    <CreateTeamModal v-model:showModal="showCreateTeamModal" />
+    <EditTeamModal
+      v-model:showModal="showEditTeamModal"
+      :selectedTeamId="selectedTeamId"
+      :team="selectedTeamParams"
+    />
+    <CreateSoldierModal v-model:showModal="showCreateSoldierModal" />
   </div>
 </template>
 
@@ -392,12 +197,7 @@ h3 {
   margin-right: 8px;
 }
 
-.form-select {
-  flex: 1;
-}
-
 :deep(.el-tabs__content) {
   overflow: inherit;
 }
 </style>
-@/apis/soldiers.api
