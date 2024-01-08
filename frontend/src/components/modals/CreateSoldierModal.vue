@@ -3,6 +3,7 @@ import { reactive } from 'vue';
 import { type CreateSoldierParams, createSoldier } from '@/apis/soldiers.api';
 import { ElNotification } from 'element-plus';
 import { useSoldiersStore } from '@/stores/soldiers.store';
+import SoldierForm from '@/components/forms/SoldierForm.vue';
 
 const showCreateSoldierModal = defineModel('showModal');
 
@@ -48,25 +49,7 @@ async function saveNewSoldier() {
 
 <template>
   <el-dialog v-model="showCreateSoldierModal" title="New Soldier" width="500px">
-    <el-form :model="newSoldierParams" label-width="180px" label-position="left">
-      <el-form-item label="Soldier First Name">
-        <el-input v-model="newSoldierParams.first_name" />
-      </el-form-item>
-
-      <el-form-item label="Soldier Last Name">
-        <el-input v-model="newSoldierParams.last_name" />
-      </el-form-item>
-
-      <el-form-item label="Soldier Personal Number">
-        <el-input v-model="newSoldierParams.personal_number" />
-      </el-form-item>
-
-      <el-form-item label="Soldier Phone Number">
-        <el-input v-model="newSoldierParams.phone_number" />
-      </el-form-item>
-
-      <!-- TODO: capabilities -->
-    </el-form>
+    <SoldierForm v-model="newSoldierParams" />
 
     <template #footer>
       <el-button @click="showCreateSoldierModal = false">Cancel</el-button>
