@@ -6,8 +6,8 @@ import {
   isGuardTimeBefore,
   addDurationToGuardTime,
 } from '../helpers/periodHelpers';
-import { guardListHistory } from '../data/guardListHistory.data';
-import type { DbGuardList, DbGuardTime } from '../data/guardListHistory.data';
+import { guardListHistory } from '../mocks/guardListHistory.data';
+import type { DbGuardList, DbGuardTime } from '../mocks/guardListHistory.data';
 
 /**
  * Returns true if the team is busy in the specified guard time, given a guard list.

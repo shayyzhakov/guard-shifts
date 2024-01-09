@@ -13,8 +13,6 @@ dotenv.config({
   path: process.env.NODE_ENV === 'development' ? '.env.development' : '.env.production',
 });
 
-console.log(process.env.IGNORE_AUTH);
-
 process.on('unhandledRejection', (reason, promise) => {
   console.log('Unhandled Rejection at:', promise, 'reason:', reason);
 });

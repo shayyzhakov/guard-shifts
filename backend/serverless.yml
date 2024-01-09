@@ -44,3 +44,27 @@ resources:
             KeyType: HASH
         TableClass: STANDARD
         BillingMode: PAY_PER_REQUEST
+    GuardPostsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: GuardPosts
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        TableClass: STANDARD
+        BillingMode: PAY_PER_REQUEST
+    GuardShiftsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: GuardShifts
+        AttributeDefinitions:
+          - AttributeName: guardPostId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: guardPostId
+            KeyType: HASH
+        TableClass: STANDARD
+        BillingMode: PAY_PER_REQUEST

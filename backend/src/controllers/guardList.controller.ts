@@ -22,7 +22,7 @@ import {
   saveGuardLists,
   truncateGuardListFromGuardTime,
 } from '../models/guardList.model';
-import { DbGuardList } from '../data/guardListHistory.data';
+import { DbGuardList } from '../mocks/guardListHistory.data';
 
 interface BuildGuardListParams {
   startPeriod: number;
@@ -31,13 +31,16 @@ interface BuildGuardListParams {
 
 type GuardListResponse = Array<GuardList & { guardPostDisplayName: string }>;
 
-export function buildGuardList({ startPeriod, duration }: BuildGuardListParams): GuardListResponse {
+export async function buildGuardList({
+  startPeriod,
+  duration,
+}: BuildGuardListParams): Promise<GuardListResponse> {
   const fullGuardList: GuardList[] = [];
 
   const upcomingGuardTime = getUpcomingGuardTime(startPeriod);
   const endGuardTime = addDurationToGuardTime(upcomingGuardTime, duration);
 
-  const guardPosts = getAllGuardPosts();
+  const guardPosts = await getAllGuardPosts();
 
   // handle higher priority strategies first
   guardPosts.sort((a, b) => {
@@ -49,7 +52,7 @@ export function buildGuardList({ startPeriod, duration }: BuildGuardListParams):
   truncateGuardListFromGuardTime(guardListHistory, upcomingGuardTime);
 
   for (let i = 0; i < guardPosts.length; i++) {
-    const guardListForGuardPost = buildGuardListForGuardPost(
+    const guardListForGuardPost = await buildGuardListForGuardPost(
       guardPosts[i],
       fullGuardList,
       guardListHistory,
@@ -70,14 +73,14 @@ export function buildGuardList({ startPeriod, duration }: BuildGuardListParams):
 }
 
 // TODO: add input: history, currently built guard list
-function buildGuardListForGuardPost(
+async function buildGuardListForGuardPost(
   guardPost: GuardPost,
   guardList: GuardList[],
   guardListHistory: GuardList[],
   startingGuardTime: GuardTime,
   endingGuardTime: GuardTime
-): GuardList {
-  const upcomingGuardTime = getUpcomingGuardTimeForGuardPost(guardPost.id, startingGuardTime);
+): Promise<GuardList> {
+  const upcomingGuardTime = await getUpcomingGuardTimeForGuardPost(guardPost.id, startingGuardTime);
 
   let strategyHandler: StrategyHandler;
   switch (guardPost.strategy) {

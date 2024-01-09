@@ -1,6 +1,8 @@
+import { GetItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb';
 import { addDays, GUARD_PERIODS_PER_DAY, type GuardTime } from '../helpers/periodHelpers';
-import { guardPosts } from '../data/guardPosts.data';
 import type { GuardPost, GuardPostOccupation } from '../interfaces/guardPost.interface';
+import { getDbClient } from '../helpers/dbClient';
+import { unmarshall } from '@aws-sdk/util-dynamodb';
 
 // lower order is being handled first
 export const strategies = [
@@ -14,10 +16,33 @@ export const strategies = [
   },
 ];
 
-export function getGuardPostOrder(guardPostId: string): number {
-  const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.id === guardPostId
+export async function getAllGuardPosts(): Promise<GuardPost[]> {
+  const res = await getDbClient().send(new ScanCommand({ TableName: 'GuardPosts' }));
+
+  return (res.Items?.map((item) => unmarshall(item)) ?? []) as GuardPost[];
+}
+
+export async function getGuardPostById(guarPostId: string): Promise<GuardPost | undefined> {
+  const res = await getDbClient().send(
+    new GetItemCommand({
+      TableName: 'GuardPosts',
+      Key: {
+        primaryKey: { S: guarPostId },
+      },
+    })
   );
+
+  const resItem = res.Item;
+  if (!resItem) {
+    console.log(`could not find guard post with id ${guarPostId}`);
+    return;
+  }
+
+  return unmarshall(resItem) as GuardPost;
+}
+
+export async function getGuardPostOrder(guardPostId: string): Promise<number> {
+  const relevantGuardPost: GuardPost | undefined = await getGuardPostById(guardPostId);
   if (!relevantGuardPost) {
     console.error(`could not find guard post with id ${guardPostId}`);
     return 999;
@@ -32,17 +57,12 @@ export function getGuardPostOrder(guardPostId: string): number {
   return strategy.order;
 }
 
-export function getAllGuardPosts(): GuardPost[] {
-  return guardPosts;
-}
-
-export function getUpcomingGuardTimeForGuardPost(
+export async function getUpcomingGuardTimeForGuardPost(
   guardPostId: string,
   fromGuardTime: GuardTime
-): GuardTime {
-  const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.id === guardPostId
-  );
+): Promise<GuardTime> {
+  const relevantGuardPost = await getGuardPostById(guardPostId);
+
   if (!relevantGuardPost) {
     console.error(`could not find guard post with id ${guardPostId}`);
     return fromGuardTime;
@@ -92,10 +112,12 @@ function getUpcomingPeriodForGuardPost(guardPost: GuardPost, fromPeriod: number)
   }
 }
 
-export function getGuardPostSoldiersAmount(guardPostId: string, period: number): number {
-  const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.id === guardPostId
-  );
+export async function getGuardPostSoldiersAmount(
+  guardPostId: string,
+  period: number
+): Promise<number> {
+  const relevantGuardPost = await getGuardPostById(guardPostId);
+
   if (!relevantGuardPost) {
     console.error(`could not find guard post with id ${guardPostId}`);
     return 0;
@@ -105,10 +127,12 @@ export function getGuardPostSoldiersAmount(guardPostId: string, period: number):
   return shouldGuardPostBeOccupied ? relevantGuardPost.numOfSoldiers : 0;
 }
 
-export function getGuardPostGuardPeriodDuration(guardPostId: string, period: number): number {
-  const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.id === guardPostId
-  );
+export async function getGuardPostGuardPeriodDuration(
+  guardPostId: string,
+  period: number
+): Promise<number> {
+  const relevantGuardPost = await getGuardPostById(guardPostId);
+
   if (!relevantGuardPost) {
     console.error(`could not find guard post with id ${guardPostId}`);
     return 1;
@@ -128,10 +152,9 @@ function occupationByPeriod(guardPost: GuardPost, period: number): GuardPostOccu
   });
 }
 
-export function getGuardPostDisplayName(guardPostId: string): string {
-  const relevantGuardPost: GuardPost | undefined = guardPosts.find(
-    (guardPost) => guardPost.id === guardPostId
-  );
+export async function getGuardPostDisplayName(guardPostId: string): Promise<string> {
+  const relevantGuardPost = await getGuardPostById(guardPostId);
+
   if (!relevantGuardPost) {
     console.error(`could not find guard post with id ${guardPostId}`);
     return '';

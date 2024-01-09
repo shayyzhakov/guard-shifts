@@ -3,9 +3,9 @@ import { getGuardPosts } from '../controllers/guardPosts.controller';
 
 const router = express.Router();
 
-router.get('/', (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
-    const guardPosts = getGuardPosts();
+    const guardPosts = await getGuardPosts();
     return res.json({ guardPosts });
   } catch (e) {
     console.log('[server] error:', e);
