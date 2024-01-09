@@ -27,7 +27,6 @@ export async function getSoldierIdsForGuardPost(guardPostId: string): Promise<st
 }
 
 export async function updateTeamById(teamId: string, updateParams: Partial<Team>): Promise<void> {
-  // get relevant team
   const teams = await getAllTeams();
   const team = teams.find((team) => team.id === teamId);
   if (!team) {
@@ -35,16 +34,7 @@ export async function updateTeamById(teamId: string, updateParams: Partial<Team>
     return;
   }
 
-  // TODO:
-  // remove people that already appeared in a team from their old teams
-  if (updateParams.people) {
-    const newPeople = updateParams.people;
-
-    // remove people from their old teams
-    teams.forEach((team) => {
-      team.people = team.people.filter((person) => !newPeople.includes(person));
-    });
-  }
+  await removeSoldiersFromTeams(teams, updateParams.people ?? []);
 
   // update team
   await getDbClient().send(
@@ -69,6 +59,9 @@ export async function updateTeamById(teamId: string, updateParams: Partial<Team>
 }
 
 export async function createTeam(createParams: Team) {
+  const teams = await getAllTeams();
+  await removeSoldiersFromTeams(teams, createParams.people ?? []);
+
   await getDbClient().send(
     new PutItemCommand({
       TableName: 'Teams',
@@ -82,6 +75,51 @@ export async function deleteTeamById(teamId: string): Promise<void> {
     new DeleteItemCommand({
       TableName: 'Teams',
       Key: { id: { S: teamId } },
+    })
+  );
+}
+
+/**
+ * Remove soldiers that appear in an existing team
+ * @param teams Teams to remove soldiers from
+ * @param soldierIds Soldiers to remove from teams
+ */
+async function removeSoldiersFromTeams(teams: Team[], soldierIds: string[]): Promise<void> {
+  // new teams' people to replace the old teams' people
+  const modifiedTeamPeople = soldierIds.reduce((acc, soldier) => {
+    const teamContainingSoldier = teams.find((t) => t.people.includes(soldier));
+
+    // if the soldier exists in a team, this team's people should be updated
+    if (teamContainingSoldier) {
+      let accTeam = acc.find((soldierTeam) => soldierTeam.teamId === teamContainingSoldier.id);
+      if (!accTeam) {
+        accTeam = { soldiers: teamContainingSoldier.people, teamId: teamContainingSoldier.id };
+        acc.push(accTeam);
+      }
+
+      // remove the current soldier from the team
+      accTeam.soldiers = accTeam.soldiers.filter((p) => p !== soldier);
+    }
+
+    return acc;
+  }, [] as { soldiers: string[]; teamId: string }[]);
+
+  // update the teams
+  await Promise.all(
+    modifiedTeamPeople.map(async (soldierTeam) => {
+      return await getDbClient().send(
+        new UpdateItemCommand({
+          TableName: 'Teams',
+          Key: { id: { S: soldierTeam.teamId } },
+          UpdateExpression: 'SET #people = :people',
+          ExpressionAttributeNames: {
+            '#people': 'people',
+          },
+          ExpressionAttributeValues: {
+            ':people': { L: soldierTeam.soldiers.map((soldier) => ({ S: soldier })) },
+          },
+        })
+      );
     })
   );
 }
