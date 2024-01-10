@@ -77,7 +77,7 @@ export function mergeGuardLists(guardLists1: GuardList[], guardLists2: GuardList
   return mergedGuardLists;
 }
 /**
- * Removes all guard list periods that start after the specified guard time.
+ * Removes all guard list periods that start after the specified guard time. The changes are NOT committed to the database.
  */
 
 export function truncateGuardListFromGuardTime(

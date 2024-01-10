@@ -38,7 +38,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
 
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
     if (!relevantTeams.length) {
-      console.error(`no team was found for guard post ${guardPost.displayName}`);
+      console.info(`no team was found for guard post ${guardPost.displayName}`);
       guardListPerPeriod.push({
         soldiers: [],
         team: undefined,
@@ -66,7 +66,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
 
     if (firstFailingTryTeamIndex === currentTeamIndex) {
       // we failed to use any of the teams for the current guard time
-      console.error(
+      console.info(
         `no teams was able to be used for guard post ${guardPost.displayName} at ${currentGuardTime.date} period ${currentGuardTime.period}`
       );
 

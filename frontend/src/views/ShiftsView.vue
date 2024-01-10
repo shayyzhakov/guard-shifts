@@ -129,7 +129,10 @@ const dateShortcuts = [
           <el-card v-for="guardPostShifts in filteredShifts" :key="guardPostShifts.guardPostId">
             <template #header>
               <div class="card-header">
-                <h3>{{ guardPostShifts.guardPostDisplayName }}</h3>
+                <h3 v-if="guardPostShifts.guardPostDisplayName">
+                  {{ guardPostShifts.guardPostDisplayName }}
+                </h3>
+                <h3 v-else><i>Unknown</i></h3>
               </div>
             </template>
 
