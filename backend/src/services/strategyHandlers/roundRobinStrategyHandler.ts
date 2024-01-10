@@ -3,7 +3,7 @@ import {
   compareGuardTime,
   addDurationToGuardTime,
 } from '../../helpers/periodHelpers';
-import { mergeGuardLists } from '../../models/guardList.model';
+import { mergeGuardLists } from '../../helpers/guardListHelpers';
 import type { GuardList, GuardListPeriod } from '../../interfaces/guardList.interface';
 import {
   getGuardPostGuardPeriodDuration,

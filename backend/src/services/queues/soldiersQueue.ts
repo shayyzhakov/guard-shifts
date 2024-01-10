@@ -1,6 +1,7 @@
 import { GuardTime } from '../../helpers/periodHelpers';
 import { GuardList } from '../../interfaces/guardList.interface';
-import { getSoldierIdsByLatestGuardOrder, isSoldierBusy } from '../../models/guardList.model';
+import { isSoldierBusy } from '../../helpers/guardListHelpers';
+import { getSoldierIdsByLatestGuardOrder } from '../../helpers/guardListHelpers';
 import { getSoldierIdsForGuardPost } from '../../models/team.model';
 
 /**

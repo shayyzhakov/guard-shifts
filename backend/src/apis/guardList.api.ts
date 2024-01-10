@@ -8,9 +8,9 @@ import {
 
 const router = express.Router();
 
-router.get('/', (req: Request, res: Response) => {
+router.get('/', async (req: Request, res: Response) => {
   try {
-    const guardLists = getGuardListHistory();
+    const guardLists = await getGuardListHistory();
     return res.json({ guardLists });
   } catch (e) {
     console.log('[server] error:', e);
@@ -18,10 +18,11 @@ router.get('/', (req: Request, res: Response) => {
   }
 });
 
-router.post('/generate', (req: Request, res: Response) => {
+router.post('/generate', async (req: Request, res: Response) => {
   try {
     const { startPeriod, duration } = req.body;
-    const guardLists = buildGuardList({ startPeriod, duration });
+    const guardLists = await buildGuardList({ startPeriod, duration });
+
     return res.json({ guardLists });
   } catch (e) {
     console.log('[server] error:', e);
@@ -29,11 +30,13 @@ router.post('/generate', (req: Request, res: Response) => {
   }
 });
 
-router.post('/commit', (req: Request, res: Response) => {
+router.post('/commit', async (req: Request, res: Response) => {
   try {
     const { guardLists, startPeriod } = req.body;
+
     const parsedGuardLists = parseGuardLists(guardLists);
-    commitGuardLists({ guardLists: parsedGuardLists, startPeriod });
+    await commitGuardLists({ guardLists: parsedGuardLists, startPeriod });
+
     return res.json({ message: 'guard lists committed successfully' });
   } catch (e) {
     console.log('[server] error:', e);

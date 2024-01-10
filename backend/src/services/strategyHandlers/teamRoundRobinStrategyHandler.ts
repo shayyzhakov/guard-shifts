@@ -5,7 +5,8 @@ import {
   addDurationToGuardTime,
 } from '../../helpers/periodHelpers';
 import { getTeamsForGuardPost } from '../../models/team.model';
-import { isTeamBusy, isSoldierBusy, mergeGuardLists } from '../../models/guardList.model';
+import { isTeamBusy, isSoldierBusy } from '../../helpers/guardListHelpers';
+import { mergeGuardLists } from '../../helpers/guardListHelpers';
 import type { GuardList, GuardListPeriod } from '../../interfaces/guardList.interface';
 import {
   getGuardPostGuardPeriodDuration,

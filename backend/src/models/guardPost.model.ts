@@ -97,22 +97,6 @@ export async function updateGuardPostById(
   );
 }
 
-export async function getGuardPostOrder(guardPostId: string): Promise<number> {
-  const relevantGuardPost: GuardPost | undefined = await getGuardPostById(guardPostId);
-  if (!relevantGuardPost) {
-    console.error(`could not find guard post with id ${guardPostId}`);
-    return 999;
-  }
-
-  const strategy = strategies.find((s) => s.id === relevantGuardPost.strategy);
-  if (!strategy) {
-    console.error(`could not find strategy named ${relevantGuardPost.strategy}`);
-    return 999;
-  }
-
-  return strategy.order;
-}
-
 export async function getUpcomingGuardTimeForGuardPost(
   guardPostId: string,
   fromGuardTime: GuardTime
@@ -206,15 +190,4 @@ function occupationByPeriod(guardPost: GuardPost, period: number): GuardPostOccu
       return occupation;
     }
   });
-}
-
-export async function getGuardPostDisplayName(guardPostId: string): Promise<string> {
-  const relevantGuardPost = await getGuardPostById(guardPostId);
-
-  if (!relevantGuardPost) {
-    console.error(`could not find guard post with id ${guardPostId}`);
-    return '';
-  }
-
-  return relevantGuardPost.displayName;
 }
