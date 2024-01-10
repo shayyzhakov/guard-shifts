@@ -30,6 +30,14 @@ export async function createSoldier(params: CreateSoldierParams): Promise<void> 
   });
 }
 
+export async function updateSoldier(soldierId: string, params: CreateSoldierParams): Promise<void> {
+  await fetcher.fetch(`/soldiers/${soldierId}`, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+}
+
 export async function deleteSoldier(soldierId: string): Promise<void> {
   await fetcher.fetch(`/soldiers/${soldierId}`, {
     method: 'DELETE',

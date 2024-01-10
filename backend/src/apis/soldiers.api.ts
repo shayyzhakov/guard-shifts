@@ -1,5 +1,10 @@
 import express, { Request, Response } from 'express';
-import { createNewSoldier, deleteSoldier, getAllSoldiers } from '../models/soldier.model';
+import {
+  createNewSoldier,
+  deleteSoldier,
+  getAllSoldiers,
+  updateSoldier,
+} from '../models/soldier.model';
 
 const router = express.Router();
 
@@ -22,6 +27,25 @@ router.post('/', async (req: Request, res: Response) => {
   } catch (e) {
     console.log('[server] error:', e);
     return res.status(500).json({ message: 'unable to create soldier' });
+  }
+});
+
+router.put('/:soldier_id', async (req: Request, res: Response) => {
+  try {
+    const soldierId = req.params.soldier_id;
+    const { first_name, last_name, personal_number, phone_number, capabilities } = req.body;
+
+    await updateSoldier(soldierId, {
+      first_name,
+      last_name,
+      personal_number,
+      phone_number,
+      capabilities,
+    });
+    return res.json({});
+  } catch (e) {
+    console.log('[server] error:', e);
+    return res.status(500).json({ message: 'unable to remove soldier' });
   }
 });
 

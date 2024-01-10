@@ -4,11 +4,12 @@ import { type Team, type UpdateTeamParams } from '@/apis/teams.api';
 import { ElNotification } from 'element-plus';
 import { useTeamsStore } from '@/stores/teams.store';
 import { useSoldiersStore } from '@/stores/soldiers.store';
-import CreateSoldierModal from '@/components/modals/CreateSoldierModal.vue';
 import { useGuardPostsStore } from '@/stores/guardPosts.store';
-import { deleteSoldier } from '@/apis/soldiers.api';
+import { deleteSoldier, type CreateSoldierParams, type Soldier } from '@/apis/soldiers.api';
 import EditTeamModal from '@/components/modals/EditTeamModal.vue';
 import CreateTeamModal from '@/components/modals/CreateTeamModal.vue';
+import EditSoldierModal from '@/components/modals/EditSoldierModal.vue';
+import CreateSoldierModal from '@/components/modals/CreateSoldierModal.vue';
 
 const teamsStore = useTeamsStore();
 const soldiersStore = useSoldiersStore();
@@ -28,6 +29,7 @@ const activeTab = ref('teams');
 const showCreateTeamModal = ref<boolean>(false);
 const showEditTeamModal = ref<boolean>(false);
 const showCreateSoldierModal = ref<boolean>(false);
+const showEditSoldierModal = ref<boolean>(false);
 
 const selectedTeamId = ref<string>();
 
@@ -46,27 +48,25 @@ function editTeam(team: Team) {
   showEditTeamModal.value = true;
 }
 
-async function removeSoldierByIndex(index: number) {
-  const soldier = soldiersStore.soldiers?.[index];
+const selectedSoldierId = ref<string>();
 
-  if (!soldier) return;
+const selectedSoldierParams = reactive<CreateSoldierParams>({
+  first_name: '',
+  last_name: '',
+  personal_number: '',
+  phone_number: '',
+  capabilities: [],
+});
 
-  try {
-    await deleteSoldier(soldier.id);
+function editSoldier(soldier: Soldier) {
+  selectedSoldierId.value = soldier.id;
+  selectedSoldierParams.first_name = soldier.first_name;
+  selectedSoldierParams.last_name = soldier.last_name;
+  selectedSoldierParams.personal_number = soldier.personal_number;
+  selectedSoldierParams.phone_number = soldier.phone_number;
+  selectedSoldierParams.capabilities = JSON.parse(JSON.stringify(soldier.capabilities));
 
-    ElNotification({
-      message: 'Soldier removed successfully',
-      type: 'success',
-    });
-  } catch (e) {
-    ElNotification({
-      title: 'Action failed',
-      message: 'Failed to remove soldier',
-      type: 'error',
-    });
-  } finally {
-    soldiersStore.refreshSoldiers();
-  }
+  showEditSoldierModal.value = true;
 }
 </script>
 
@@ -143,16 +143,10 @@ async function removeSoldierByIndex(index: number) {
               <el-table-column prop="personal_number" label="Personal Number" />
               <el-table-column prop="phone_number" label="Phone Number" />
               <el-table-column label="Actions" width="120">
-                <template #default="{ $index }">
-                  <el-popconfirm
-                    title="Are you sure?"
-                    :hide-after="0"
-                    @confirm="() => removeSoldierByIndex($index)"
-                  >
-                    <template #reference>
-                      <el-button link type="primary" size="small"> Remove </el-button>
-                    </template>
-                  </el-popconfirm>
+                <template #default="{ row }">
+                  <el-button link type="primary" size="small" @click="() => editSoldier(row)">
+                    Edit
+                  </el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -170,6 +164,11 @@ async function removeSoldierByIndex(index: number) {
       :team="selectedTeamParams"
     />
     <CreateSoldierModal v-model:showModal="showCreateSoldierModal" />
+    <EditSoldierModal
+      v-model:showModal="showEditSoldierModal"
+      :selectedSoldierId="selectedSoldierId"
+      :soldier="selectedSoldierParams"
+    />
   </div>
 </template>
 
