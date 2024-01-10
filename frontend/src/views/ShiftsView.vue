@@ -16,6 +16,7 @@ const allShifts = ref<GuardList[]>();
 const noShifts = computed<boolean>(() => !!(allShifts.value && !allShifts.value.length));
 
 onMounted(async () => {
+  // TODO: move to store
   allShifts.value = await getGuardLists();
   loading.value = false;
 });
