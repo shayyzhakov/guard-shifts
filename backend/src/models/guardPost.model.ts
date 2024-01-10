@@ -1,8 +1,14 @@
-import { GetItemCommand, ScanCommand } from '@aws-sdk/client-dynamodb';
+import {
+  DeleteItemCommand,
+  GetItemCommand,
+  PutItemCommand,
+  ScanCommand,
+  UpdateItemCommand,
+} from '@aws-sdk/client-dynamodb';
 import { addDays, GUARD_PERIODS_PER_DAY, type GuardTime } from '../helpers/periodHelpers';
 import type { GuardPost, GuardPostOccupation } from '../interfaces/guardPost.interface';
 import { getDbClient } from '../helpers/dbClient';
-import { unmarshall } from '@aws-sdk/util-dynamodb';
+import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 
 // lower order is being handled first
 export const strategies = [
@@ -39,6 +45,56 @@ export async function getGuardPostById(guarPostId: string): Promise<GuardPost | 
   }
 
   return unmarshall(resItem) as GuardPost;
+}
+
+export async function createGuardPost(createParams: GuardPost) {
+  await getDbClient().send(
+    new PutItemCommand({ TableName: 'GuardPosts', Item: marshall(createParams) })
+  );
+}
+
+export async function deleteGuardPostById(guardPostId: string): Promise<void> {
+  await getDbClient().send(
+    new DeleteItemCommand({
+      TableName: 'GuardPosts',
+      Key: { id: { S: guardPostId } },
+    })
+  );
+}
+
+export async function updateGuardPostById(
+  guardPostId: string,
+  updateParams: Omit<GuardPost, 'id'>
+): Promise<void> {
+  await getDbClient().send(
+    new UpdateItemCommand({
+      TableName: 'GuardPosts',
+      Key: { id: { S: guardPostId } },
+      UpdateExpression:
+        'SET displayName = :displayName, strategy = :strategy, numOfSoldiers = :numOfSoldiers',
+      ExpressionAttributeValues: {
+        ':displayName': { S: updateParams.displayName },
+        ':strategy': { S: updateParams.strategy },
+        ':numOfSoldiers': { N: `${updateParams.numOfSoldiers}` },
+        ':occupation': {
+          L: updateParams.occupation.map((o) => ({
+            M: {
+              duration: {
+                N: `${o.duration}`,
+              },
+              from: {
+                N: `${o.from}`,
+              },
+              to: {
+                N: `${o.to}`,
+              },
+            },
+          })),
+        },
+        // TODO: constraints
+      },
+    })
+  );
 }
 
 export async function getGuardPostOrder(guardPostId: string): Promise<number> {

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 import { type CreateSoldierParams, createSoldier } from '@/apis/soldiers.api';
 import { ElNotification } from 'element-plus';
 import { useSoldiersStore } from '@/stores/soldiers.store';
 import SoldierForm from '@/components/forms/SoldierForm.vue';
 
-const showCreateSoldierModal = defineModel('showModal');
+const showModal = defineModel('showModal');
 
 const soldiersStore = useSoldiersStore();
 
@@ -40,19 +40,24 @@ async function saveNewSoldier() {
       type: 'error',
     });
   } finally {
-    showCreateSoldierModal.value = false;
-    resetNewSoldierParams();
+    showModal.value = false;
     soldiersStore.refreshSoldiers();
   }
 }
+
+watch(showModal, (newVal) => {
+  if (!newVal) {
+    resetNewSoldierParams();
+  }
+});
 </script>
 
 <template>
-  <el-dialog v-model="showCreateSoldierModal" title="New Soldier" width="500px">
+  <el-dialog v-model="showModal" title="New Soldier" width="500px">
     <SoldierForm v-model="newSoldierParams" />
 
     <template #footer>
-      <el-button @click="showCreateSoldierModal = false">Cancel</el-button>
+      <el-button @click="showModal = false">Cancel</el-button>
       <el-button type="primary" @click="saveNewSoldier">Save</el-button>
     </template>
   </el-dialog>

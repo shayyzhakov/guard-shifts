@@ -20,20 +20,17 @@ export async function getTeams(): Promise<TeamWithSoldiers[]> {
   return teamsWithSoldiers;
 }
 
-interface UpdateTeamUpdatedParams {
+interface UpdateTeamParams {
   name: string;
   people: string[];
   guardPosts: string[];
 }
 
-export async function updateTeam(
-  teamId: string,
-  updateParams: UpdateTeamUpdatedParams
-): Promise<void> {
+export async function updateTeam(teamId: string, updateParams: UpdateTeamParams): Promise<void> {
   await updateTeamById(teamId, updateParams);
 }
 
-export async function createNewTeam(createParams: UpdateTeamUpdatedParams): Promise<void> {
+export async function createNewTeam(createParams: UpdateTeamParams): Promise<void> {
   const id = uuidv4();
 
   await createTeam({
