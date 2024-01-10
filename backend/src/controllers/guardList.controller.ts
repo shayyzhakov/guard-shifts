@@ -21,6 +21,8 @@ import {
 import { truncateGuardListFromGuardTime } from '../helpers/guardListHelpers';
 import { DbGuardList } from '../mocks/guardListHistory.data';
 import { simplifyGuardList } from '../helpers/guardListHelpers';
+import { getAllTeams } from '../models/team.model';
+import { Team } from '../interfaces/team.interface';
 
 interface BuildGuardListParams {
   startPeriod: number;
@@ -39,6 +41,7 @@ export async function buildGuardList({
   const endGuardTime = addDurationToGuardTime(upcomingGuardTime, duration);
 
   const guardPosts = await getAllGuardPosts();
+  const teams = await getAllTeams();
 
   // handle higher priority strategies first
   guardPosts.sort((a, b) => {
@@ -55,7 +58,8 @@ export async function buildGuardList({
       fullGuardList,
       guardListHistory,
       upcomingGuardTime,
-      endGuardTime
+      endGuardTime,
+      teams
     );
     fullGuardList.push(guardListForGuardPost);
   }
@@ -63,22 +67,22 @@ export async function buildGuardList({
   const guardListResponse: GuardListResponse = fullGuardList.map((guardList) => {
     return {
       ...guardList,
-      guardPostDisplayName: getGuardPostDisplayName(guardPosts, guardList.guardPostId),
+      guardPostDisplayName: getGuardPostDisplayName(guardPosts, guardList.guardPostId), // TODO: not needed, the ui can get the name from the guard post id
     };
   });
 
   return guardListResponse;
 }
 
-// TODO: add input: history, currently built guard list
 async function buildGuardListForGuardPost(
   guardPost: GuardPost,
   guardList: GuardList[],
   guardListHistory: GuardList[],
   startingGuardTime: GuardTime,
-  endingGuardTime: GuardTime
+  endingGuardTime: GuardTime,
+  teams: Team[]
 ): Promise<GuardList> {
-  const upcomingGuardTime = await getUpcomingGuardTimeForGuardPost(guardPost.id, startingGuardTime);
+  const upcomingGuardTime = getUpcomingGuardTimeForGuardPost(guardPost, startingGuardTime);
 
   let strategyHandler: StrategyHandler;
   switch (guardPost.strategy) {
@@ -100,7 +104,8 @@ async function buildGuardListForGuardPost(
     guardList,
     guardListHistory,
     upcomingGuardTime,
-    endingGuardTime
+    endingGuardTime,
+    teams
   );
 
   const guardListForGuardPost = simplifyGuardList(guardListPerPeriod);
@@ -117,7 +122,7 @@ export async function getGuardListHistory(): Promise<GuardListResponse> {
   return guardListHistory.map((guardList) => {
     return {
       ...guardList,
-      guardPostDisplayName: getGuardPostDisplayName(guardPosts, guardList.guardPostId),
+      guardPostDisplayName: getGuardPostDisplayName(guardPosts, guardList.guardPostId), // TODO: not needed, the ui can get the name from the guard post id
     };
   });
 }

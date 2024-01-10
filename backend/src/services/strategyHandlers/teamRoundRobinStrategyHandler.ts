@@ -16,13 +16,14 @@ import type { GuardPost } from '../../interfaces/guardPost.interface';
 import type { StrategyHandler } from '../../interfaces/strategyHandler.interface';
 import { Team } from '../../interfaces/team.interface';
 
-export const teamRoundRobinStrategyHandler: StrategyHandler = async (
+export const teamRoundRobinStrategyHandler: StrategyHandler = (
   guardPost: GuardPost,
   guardList: GuardList[],
   guardListHistory: GuardList[],
   startingGuardTime: GuardTime,
-  endingGuardTime: GuardTime
-): Promise<GuardListPeriod[]> => {
+  endingGuardTime: GuardTime,
+  teams: Team[]
+): GuardListPeriod[] => {
   const guardListPerPeriod: GuardListPeriod[] = [];
   let currentGuardTime = startingGuardTime;
   let currentTeamIndex = 0;
@@ -31,16 +32,16 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = async (
   // TODO: take and merge all guard posts that have team-roundrobin strategy
   const guardPostMergedGuardPeriods =
     mergedGuardLists.find((gl) => gl.guardPostId === guardPost.id)?.guardList ?? [];
-  const relevantTeams = await getNextTeamsQueue(guardPost.id, guardPostMergedGuardPeriods);
+  const relevantTeams = getNextTeamsQueue(guardPost.id, teams, guardPostMergedGuardPeriods);
 
   let firstFailingTryTeamIndex;
 
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
     const numOfSoldiersForCurrentPeriod = getGuardPostSoldiersAmount(
-      guardPost.id,
+      guardPost,
       currentGuardTime.period
     );
-    const periodsPerGuard = getGuardPostGuardPeriodDuration(guardPost.id, currentGuardTime.period);
+    const periodsPerGuard = getGuardPostGuardPeriodDuration(guardPost, currentGuardTime.period);
 
     const currentTeam = relevantTeams[currentTeamIndex];
     const isCurrentTeamBusy = isTeamBusy(guardList, currentGuardTime, currentTeam.id);
@@ -109,12 +110,13 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = async (
  * based on the guard list history, get a sorted list of teams that should be used next
  * @returns sorted list of teams (lower index should be used first)
  */
-async function getNextTeamsQueue(
+function getNextTeamsQueue(
   guardPostId: string,
+  teams: Team[],
   historyGuardListPeriods: GuardListPeriod[]
-): Promise<Team[]> {
+): Team[] {
   const teamsQueue: Team[] = [];
-  const relevantTeams = await getTeamsForGuardPost(guardPostId);
+  const relevantTeams = getTeamsForGuardPost(guardPostId, teams);
 
   // insert teams that already appeared in the guard list, from the older to the newer
   for (const guardListPeriod of historyGuardListPeriods.reverse()) {

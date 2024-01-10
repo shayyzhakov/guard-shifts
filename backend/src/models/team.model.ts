@@ -14,13 +14,12 @@ export async function getAllTeams(): Promise<Team[]> {
   return (res.Items?.map((item) => unmarshall(item)) ?? []) as Team[];
 }
 
-export async function getTeamsForGuardPost(guardPostId: string): Promise<Team[]> {
-  // TODO: add filter expression instead of filtering in js
-  return (await getAllTeams()).filter((team) => team.guardPosts.includes(guardPostId));
+export function getTeamsForGuardPost(guardPostId: string, teams: Team[]): Team[] {
+  return teams.filter((team) => team.guardPosts.includes(guardPostId));
 }
 
-export async function getSoldierIdsForGuardPost(guardPostId: string): Promise<string[]> {
-  return (await getTeamsForGuardPost(guardPostId)).reduce(
+export function getSoldierIdsForGuardPost(guardPostId: string, teams: Team[]): string[] {
+  return getTeamsForGuardPost(guardPostId, teams).reduce(
     (acc, team) => acc.concat(team.people),
     [] as string[]
   );

@@ -97,18 +97,11 @@ export async function updateGuardPostById(
   );
 }
 
-export async function getUpcomingGuardTimeForGuardPost(
-  guardPostId: string,
+export function getUpcomingGuardTimeForGuardPost(
+  guardPost: GuardPost,
   fromGuardTime: GuardTime
-): Promise<GuardTime> {
-  const relevantGuardPost = await getGuardPostById(guardPostId);
-
-  if (!relevantGuardPost) {
-    console.error(`could not find guard post with id ${guardPostId}`);
-    return fromGuardTime;
-  }
-
-  const upcomingPeriod = getUpcomingPeriodForGuardPost(relevantGuardPost, fromGuardTime.period);
+): GuardTime {
+  const upcomingPeriod = getUpcomingPeriodForGuardPost(guardPost, fromGuardTime.period);
   const upcomingDate =
     fromGuardTime.period <= upcomingPeriod ? fromGuardTime.date : addDays(fromGuardTime.date, 1);
 
@@ -152,33 +145,13 @@ function getUpcomingPeriodForGuardPost(guardPost: GuardPost, fromPeriod: number)
   }
 }
 
-export async function getGuardPostSoldiersAmount(
-  guardPostId: string,
-  period: number
-): Promise<number> {
-  const relevantGuardPost = await getGuardPostById(guardPostId);
-
-  if (!relevantGuardPost) {
-    console.error(`could not find guard post with id ${guardPostId}`);
-    return 0;
-  }
-
-  const shouldGuardPostBeOccupied = !!occupationByPeriod(relevantGuardPost, period);
-  return shouldGuardPostBeOccupied ? relevantGuardPost.numOfSoldiers : 0;
+export function getGuardPostSoldiersAmount(guardPost: GuardPost, period: number): number {
+  const shouldGuardPostBeOccupied = !!occupationByPeriod(guardPost, period);
+  return shouldGuardPostBeOccupied ? guardPost.numOfSoldiers : 0;
 }
 
-export async function getGuardPostGuardPeriodDuration(
-  guardPostId: string,
-  period: number
-): Promise<number> {
-  const relevantGuardPost = await getGuardPostById(guardPostId);
-
-  if (!relevantGuardPost) {
-    console.error(`could not find guard post with id ${guardPostId}`);
-    return 1;
-  }
-
-  const occupation = occupationByPeriod(relevantGuardPost, period);
+export function getGuardPostGuardPeriodDuration(guardPost: GuardPost, period: number): number {
+  const occupation = occupationByPeriod(guardPost, period);
   return occupation?.duration ?? 1;
 }
 

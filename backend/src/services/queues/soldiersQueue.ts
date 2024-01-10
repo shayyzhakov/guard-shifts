@@ -3,6 +3,7 @@ import { GuardList } from '../../interfaces/guardList.interface';
 import { isSoldierBusy } from '../../helpers/guardListHelpers';
 import { getSoldierIdsByLatestGuardOrder } from '../../helpers/guardListHelpers';
 import { getSoldierIdsForGuardPost } from '../../models/team.model';
+import { Team } from '../../interfaces/team.interface';
 
 /**
  * A round robin queue of soldiers to be used, while chronological order is the top priority.
@@ -13,9 +14,9 @@ export class SoldiersQueue {
    */
   private soldiersForGuardPost: string[] = [];
 
-  constructor(guardPostId: string, private guardLists: GuardList[]) {
+  constructor(guardPostId: string, teams: Team[], private guardLists: GuardList[]) {
     const orderedSoldiers: string[] = [];
-    const relevantSoldiers = await getSoldierIdsForGuardPost(guardPostId);
+    const relevantSoldiers = getSoldierIdsForGuardPost(guardPostId, teams);
     const orderedSoldiersFromGuardList = getSoldierIdsByLatestGuardOrder(this.guardLists).filter(
       (soldier) => relevantSoldiers.includes(soldier)
     );
