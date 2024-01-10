@@ -78,17 +78,7 @@ export async function updateGuardPostById(
         ':numOfSoldiers': { N: `${updateParams.numOfSoldiers}` },
         ':occupation': {
           L: updateParams.occupation.map((o) => ({
-            M: {
-              duration: {
-                N: `${o.duration}`,
-              },
-              from: {
-                N: `${o.from}`,
-              },
-              to: {
-                N: `${o.to}`,
-              },
-            },
+            M: marshall(o),
           })),
         },
         // TODO: constraints
