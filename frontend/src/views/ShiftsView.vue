@@ -202,6 +202,8 @@ const dateShortcuts = [
   flex: 1;
   min-height: 0;
   overflow: auto;
+  margin: -10px;
+  padding: 10px;
 }
 
 .cards-container .el-card {

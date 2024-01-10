@@ -1,11 +1,10 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import { type Team, type UpdateTeamParams } from '@/apis/teams.api';
-import { ElNotification } from 'element-plus';
 import { useTeamsStore } from '@/stores/teams.store';
 import { useSoldiersStore } from '@/stores/soldiers.store';
 import { useGuardPostsStore } from '@/stores/guardPosts.store';
-import { deleteSoldier, type CreateSoldierParams, type Soldier } from '@/apis/soldiers.api';
+import { type CreateSoldierParams, type Soldier } from '@/apis/soldiers.api';
 import EditTeamModal from '@/components/modals/EditTeamModal.vue';
 import CreateTeamModal from '@/components/modals/CreateTeamModal.vue';
 import EditSoldierModal from '@/components/modals/EditSoldierModal.vue';

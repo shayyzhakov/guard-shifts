@@ -9,7 +9,8 @@ import type { CreateGuardPostParams, GuardPost } from '@/apis/guardPosts.api';
 const guardPostsStore = useGuardPostsStore();
 
 onMounted(async () => {
-  guardPostsStore.refreshGuardPosts();
+  await guardPostsStore.refreshGuardPosts();
+  loading.value = false;
 });
 
 const showCreateGuardPostModal = ref<boolean>(false);
@@ -35,17 +36,19 @@ function editGuardPost(guardPost: GuardPost) {
 
   showEditGuardPostModal.value = true;
 }
+
+const loading = ref<boolean>(true);
 </script>
 
 <template>
-  <div>
+  <div class="content">
     <h1>Guard Posts</h1>
 
     <div class="action-buttons">
       <el-button type="primary" @click="showCreateGuardPostModal = true">New Guard Post</el-button>
     </div>
 
-    <section class="guard-post-cards">
+    <section v-loading="loading" class="guard-post-cards">
       <el-card v-for="guardPost in guardPostsStore.guardPosts" :key="guardPost.id">
         <template #header>
           <div class="card-header">
@@ -94,6 +97,12 @@ function editGuardPost(guardPost: GuardPost) {
 </template>
 
 <style scoped>
+.content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 h3 {
   margin-right: 6px;
 }
@@ -102,6 +111,7 @@ h3 {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  flex: 1;
 }
 
 .card-header {
