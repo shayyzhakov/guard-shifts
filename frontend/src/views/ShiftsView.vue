@@ -9,6 +9,7 @@ const router = useRouter();
 const teamsStore = useTeamsStore();
 
 const now = new Date().toDateString();
+const loading = ref<boolean>(true);
 
 const allShifts = ref<GuardList[]>();
 
@@ -16,6 +17,7 @@ const noShifts = computed<boolean>(() => !!(allShifts.value && !allShifts.value.
 
 onMounted(async () => {
   allShifts.value = await getGuardLists();
+  loading.value = false;
 });
 
 const filteredShifts = computed<GuardList[]>(() => {
@@ -108,7 +110,7 @@ const dateShortcuts = [
         </el-empty>
       </div>
 
-      <div v-else class="shifts-cards">
+      <div v-else class="shifts-content">
         <div class="actions">
           <span>Show shifts from:</span>
           <el-date-picker
@@ -122,48 +124,50 @@ const dateShortcuts = [
           />
         </div>
 
-        <el-card v-for="guardPostShifts in filteredShifts" :key="guardPostShifts.guardPostId">
-          <template #header>
-            <div class="card-header">
-              <h3>{{ guardPostShifts.guardPostDisplayName }}</h3>
-            </div>
-          </template>
+        <div v-loading="loading" class="cards-container">
+          <el-card v-for="guardPostShifts in filteredShifts" :key="guardPostShifts.guardPostId">
+            <template #header>
+              <div class="card-header">
+                <h3>{{ guardPostShifts.guardPostDisplayName }}</h3>
+              </div>
+            </template>
 
-          <el-table :data="guardPostShifts.guardList" stripe style="width: 100%">
-            <el-table-column prop="guardTime" label="Time" width="220">
-              <template #default="{ row }">
-                {{ stringifyPeriod(row.guardTime.period) }}-{{
-                  stringifyPeriod((row.guardTime.period + row.duration) % GUARD_PERIODS_PER_DAY)
-                }}
-                {{
-                  new Date(row.guardTime.date).toDateString() === now
-                    ? ''
-                    : `(${new Date(row.guardTime.date).toLocaleDateString('en-GB')})`
-                }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              v-if="guardPostShifts.guardList.some((glp) => glp.team)"
-              prop="team"
-              label="Team"
-              width="120"
-            >
-              <template #default="{ row }">
-                {{ teamsStore.getTeamName(row.team) }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="soldiers" label="Soldiers">
-              <template #default="{ row }">
-                <span v-if="teamsStore.soldierNamesBySoldierIds(row.soldiers).length > 0">{{
-                  teamsStore.soldierNamesBySoldierIds(row.soldiers).join(', ')
-                }}</span>
-                <span v-else class="no-soldiers"
-                  >No soldiers assigned {{ row.error ? `(${row.error})` : '' }}</span
-                >
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
+            <el-table :data="guardPostShifts.guardList" stripe style="width: 100%">
+              <el-table-column prop="guardTime" label="Time" width="220">
+                <template #default="{ row }">
+                  {{ stringifyPeriod(row.guardTime.period) }}-{{
+                    stringifyPeriod((row.guardTime.period + row.duration) % GUARD_PERIODS_PER_DAY)
+                  }}
+                  {{
+                    new Date(row.guardTime.date).toDateString() === now
+                      ? ''
+                      : `(${new Date(row.guardTime.date).toLocaleDateString('en-GB')})`
+                  }}
+                </template>
+              </el-table-column>
+              <el-table-column
+                v-if="guardPostShifts.guardList.some((glp) => glp.team)"
+                prop="team"
+                label="Team"
+                width="120"
+              >
+                <template #default="{ row }">
+                  {{ teamsStore.getTeamName(row.team) }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="soldiers" label="Soldiers">
+                <template #default="{ row }">
+                  <span v-if="teamsStore.soldierNamesBySoldierIds(row.soldiers).length > 0">{{
+                    teamsStore.soldierNamesBySoldierIds(row.soldiers).join(', ')
+                  }}</span>
+                  <span v-else class="no-soldiers"
+                    >No soldiers assigned {{ row.error ? `(${row.error})` : '' }}</span
+                  >
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-card>
+        </div>
       </div>
     </section>
   </div>
@@ -178,13 +182,31 @@ const dateShortcuts = [
 
 .main-content {
   flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-.shifts-cards {
+.shifts-content {
   display: flex;
   flex-direction: column;
   gap: 16px;
   flex: 1;
+  min-height: 0;
+}
+
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
+.cards-container .el-card {
+  flex: 1;
+  overflow: visible;
 }
 
 .actions {
@@ -214,4 +236,3 @@ const dateShortcuts = [
   font-style: italic;
 }
 </style>
-@/apis/guardLists.api
