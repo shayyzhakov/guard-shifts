@@ -31,7 +31,7 @@ export const useTeamsStore = defineStore('teams', () => {
     () => (soldierIds: string[]) =>
       soldierIds.map((id) => {
         const soldier = soldierByIdMap.value.get(id);
-        return soldier ? `${soldier?.first_name} ${soldier?.last_name}` : 'unknown';
+        return soldier ? `${soldier?.first_name} ${soldier?.last_name}` : 'Unknown';
       }),
   );
 

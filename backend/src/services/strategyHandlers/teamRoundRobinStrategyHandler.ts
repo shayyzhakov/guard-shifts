@@ -37,6 +37,20 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
   let firstFailingTryTeamIndex;
 
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
+    if (!relevantTeams.length) {
+      console.error(`no team was found for guard post ${guardPost.displayName}`);
+      guardListPerPeriod.push({
+        soldiers: [],
+        team: undefined,
+        error: 'relevant team not found',
+        guardTime: currentGuardTime,
+        duration: 1,
+      });
+      currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
+      firstFailingTryTeamIndex = undefined;
+      continue;
+    }
+
     const numOfSoldiersForCurrentPeriod = getGuardPostSoldiersAmount(
       guardPost,
       currentGuardTime.period
@@ -44,6 +58,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
     const periodsPerGuard = getGuardPostGuardPeriodDuration(guardPost, currentGuardTime.period);
 
     const currentTeam = relevantTeams[currentTeamIndex];
+
     const isCurrentTeamBusy = isTeamBusy(guardList, currentGuardTime, currentTeam.id);
     const freeTeamMembers = currentTeam.people.filter(
       (soldier) => !isSoldierBusy(guardList, currentGuardTime, soldier)
