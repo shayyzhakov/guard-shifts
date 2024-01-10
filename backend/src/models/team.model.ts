@@ -83,7 +83,7 @@ export async function deleteTeamById(teamId: string): Promise<void> {
  * @param teams Teams to remove soldiers from
  * @param soldierIds Soldiers to remove from teams
  */
-async function removeSoldiersFromTeams(teams: Team[], soldierIds: string[]): Promise<void> {
+export async function removeSoldiersFromTeams(teams: Team[], soldierIds: string[]): Promise<void> {
   // new teams' people to replace the old teams' people
   const modifiedTeamPeople = soldierIds.reduce((acc, soldier) => {
     const teamContainingSoldier = teams.find((t) => t.people.includes(soldier));

@@ -8,6 +8,7 @@ import { getDbClient } from '../helpers/dbClient';
 import { Soldier } from '../interfaces/soldier.interface';
 import { v4 as uuidv4 } from 'uuid';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
+import { getAllTeams, removeSoldiersFromTeams } from './team.model';
 
 export async function getAllSoldiers(): Promise<Soldier[]> {
   const res = await getDbClient().send(new ScanCommand({ TableName: 'Soldiers' }));
@@ -16,6 +17,10 @@ export async function getAllSoldiers(): Promise<Soldier[]> {
 }
 
 export async function deleteSoldier(soldierId: string): Promise<void> {
+  // remove soldier from team
+  const teams = await getAllTeams();
+  await removeSoldiersFromTeams(teams, [soldierId]);
+
   await getDbClient().send(
     new DeleteItemCommand({ TableName: 'Soldiers', Key: marshall({ id: soldierId }) })
   );

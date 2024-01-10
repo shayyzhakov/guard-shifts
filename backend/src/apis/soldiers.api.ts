@@ -53,7 +53,7 @@ router.delete('/:soldier_id', async (req: Request, res: Response) => {
   try {
     const soldierId = req.params.soldier_id;
 
-    // TODO: what if soldier is in a team? what if soldier has future guard shifts?
+    // TODO: what if soldier has future guard shifts?
     await deleteSoldier(soldierId);
     return res.json({});
   } catch (e) {
