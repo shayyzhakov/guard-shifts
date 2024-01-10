@@ -35,3 +35,21 @@ export async function createGuardPost(params: CreateGuardPostParams): Promise<vo
     body: JSON.stringify(params),
   });
 }
+
+export async function updateGuardPost(
+  guardPostId: string,
+  params: CreateGuardPostParams,
+): Promise<void> {
+  await fetcher.fetch(`/guard-posts/${guardPostId}`, {
+    method: 'PUT',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify(params),
+  });
+}
+
+export async function deleteGuardPost(guardPostId: string): Promise<void> {
+  await fetcher.fetch(`/guard-posts/${guardPostId}`, {
+    method: 'DELETE',
+    headers: { 'content-type': 'application/json' },
+  });
+}

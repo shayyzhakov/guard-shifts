@@ -27,6 +27,8 @@ async function saveNewTeam() {
       message: 'Team created successfully',
       type: 'success',
     });
+
+    teamsStore.refreshTeams();
   } catch (e) {
     ElNotification({
       title: 'Action failed',
@@ -40,8 +42,6 @@ async function saveNewTeam() {
     newTeamParams.name = '';
     newTeamParams.people = [];
     newTeamParams.guardPosts = [];
-
-    teamsStore.refreshTeams();
   }
 }
 </script>

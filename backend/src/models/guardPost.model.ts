@@ -71,7 +71,7 @@ export async function updateGuardPostById(
       TableName: 'GuardPosts',
       Key: { id: { S: guardPostId } },
       UpdateExpression:
-        'SET displayName = :displayName, strategy = :strategy, numOfSoldiers = :numOfSoldiers',
+        'SET displayName = :displayName, strategy = :strategy, numOfSoldiers = :numOfSoldiers, occupation = :occupation',
       ExpressionAttributeValues: {
         ':displayName': { S: updateParams.displayName },
         ':strategy': { S: updateParams.strategy },

@@ -30,7 +30,7 @@ router.post('/', async (req: Request, res: Response) => {
   }
 });
 
-router.put('/:team_id', async (req: Request, res: Response) => {
+router.put('/:guard_post_id', async (req: Request, res: Response) => {
   try {
     const guardPostId = req.params.guard_post_id;
     const { displayName, strategy, numOfSoldiers, occupation, constraints } = req.body;

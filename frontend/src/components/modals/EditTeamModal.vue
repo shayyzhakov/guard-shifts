@@ -30,17 +30,15 @@ async function saveTeamChanges() {
   try {
     if (!props.selectedTeamId) throw new Error('No team was selected');
 
-    await updateTeam(props.selectedTeamId, {
-      name: selectedTeamParams.name,
-      people: selectedTeamParams.people,
-      guardPosts: selectedTeamParams.guardPosts,
-    });
+    await updateTeam(props.selectedTeamId, selectedTeamParams);
 
     ElNotification({
       title: 'Team changed successfully',
       message: 'Team changes were saved',
       type: 'success',
     });
+
+    teamsStore.refreshTeams();
   } catch (e) {
     ElNotification({
       title: 'Action failed',
@@ -49,7 +47,6 @@ async function saveTeamChanges() {
     });
   } finally {
     showModal.value = false;
-    teamsStore.refreshTeams();
   }
 }
 
@@ -63,6 +60,8 @@ async function deleteExistingTeam() {
       message: 'Team deleted successfully',
       type: 'success',
     });
+
+    teamsStore.refreshTeams();
   } catch (e) {
     ElNotification({
       title: 'Action failed',
@@ -71,7 +70,6 @@ async function deleteExistingTeam() {
     });
   } finally {
     showModal.value = false;
-    teamsStore.refreshTeams();
   }
 }
 </script>

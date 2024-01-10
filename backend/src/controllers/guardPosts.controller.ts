@@ -25,6 +25,8 @@ interface CreateGuardPostParams {
 }
 
 export async function createNewGuardPost(params: CreateGuardPostParams): Promise<void> {
+  validateGuardPostOccupations(params.occupation);
+
   const id = uuidv4();
 
   await createGuardPost({
@@ -37,9 +39,20 @@ export async function updateGuardPost(
   guardPostId: string,
   updateParams: CreateGuardPostParams
 ): Promise<void> {
+  validateGuardPostOccupations(updateParams.occupation);
+
   await updateGuardPostById(guardPostId, updateParams);
 }
 
 export async function deleteGuardPost(guardPostId: string): Promise<void> {
   await deleteGuardPostById(guardPostId);
+}
+
+function validateGuardPostOccupations(occupation: GuardPostOccupation[]): void {
+  // TODO: implement
+  if (occupation.length === 0) {
+    throw new Error('occupation must not be empty');
+  }
+
+  // check if occupations are not overlapping
 }

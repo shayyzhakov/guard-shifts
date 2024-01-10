@@ -33,6 +33,8 @@ async function saveNewSoldier() {
       message: 'Soldier created successfully',
       type: 'success',
     });
+
+    soldiersStore.refreshSoldiers();
   } catch (e) {
     ElNotification({
       title: 'Action failed',
@@ -41,7 +43,6 @@ async function saveNewSoldier() {
     });
   } finally {
     showModal.value = false;
-    soldiersStore.refreshSoldiers();
   }
 }
 

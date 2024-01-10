@@ -33,6 +33,8 @@ async function saveNewGuardPost() {
       message: 'Guard post created successfully',
       type: 'success',
     });
+
+    guardPostsStore.refreshGuardPosts();
   } catch (e) {
     ElNotification({
       title: 'Action failed',
@@ -41,7 +43,6 @@ async function saveNewGuardPost() {
     });
   } finally {
     showModal.value = false;
-    guardPostsStore.refreshGuardPosts();
   }
 }
 

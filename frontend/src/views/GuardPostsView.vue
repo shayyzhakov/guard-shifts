@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { stringifyPeriod } from '@/helpers/periodHelpers';
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { useGuardPostsStore } from '@/stores/guardPosts.store';
 import CreateGuardPostModal from '@/components/modals/CreateGuardPostModal.vue';
+import EditGuardPostModal from '@/components/modals/EditGuardPostModal.vue';
+import type { CreateGuardPostParams, GuardPost } from '@/apis/guardPosts.api';
 
 const guardPostsStore = useGuardPostsStore();
 
@@ -11,6 +13,28 @@ onMounted(async () => {
 });
 
 const showCreateGuardPostModal = ref<boolean>(false);
+const showEditGuardPostModal = ref<boolean>(false);
+
+const selectedGuardPostId = ref<string>();
+
+const selectedGuardPostParams = reactive<CreateGuardPostParams>({
+  displayName: '',
+  strategy: '',
+  numOfSoldiers: 1,
+  occupation: [],
+  constraints: [],
+});
+
+function editGuardPost(guardPost: GuardPost) {
+  selectedGuardPostId.value = guardPost.id;
+  selectedGuardPostParams.displayName = guardPost.displayName;
+  selectedGuardPostParams.strategy = guardPost.strategy;
+  selectedGuardPostParams.numOfSoldiers = guardPost.numOfSoldiers;
+  selectedGuardPostParams.occupation = JSON.parse(JSON.stringify(guardPost.occupation));
+  selectedGuardPostParams.constraints = JSON.parse(JSON.stringify(guardPost.constraints));
+
+  showEditGuardPostModal.value = true;
+}
 </script>
 
 <template>
@@ -26,6 +50,12 @@ const showCreateGuardPostModal = ref<boolean>(false);
         <template #header>
           <div class="card-header">
             <h3>{{ guardPost.displayName }}</h3>
+
+            <div class="card-actions">
+              <el-button circle text @click="() => editGuardPost(guardPost)">
+                <i class="fa-solid fa-gear fa-lg" />
+              </el-button>
+            </div>
           </div>
         </template>
 
@@ -55,6 +85,11 @@ const showCreateGuardPostModal = ref<boolean>(false);
     </section>
 
     <CreateGuardPostModal v-model:showModal="showCreateGuardPostModal" />
+    <EditGuardPostModal
+      v-model:showModal="showEditGuardPostModal"
+      :selectedGuardPostId="selectedGuardPostId"
+      :guardPost="selectedGuardPostParams"
+    />
   </div>
 </template>
 
@@ -73,6 +108,10 @@ h3 {
   display: flex;
   gap: 6px;
   align-items: center;
+}
+
+.card-actions {
+  margin-left: auto;
 }
 
 .card-body {
