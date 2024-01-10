@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { defineStore } from 'pinia';
 import { getGuardPosts, type GuardPost } from '@/apis/guardPosts.api';
 
@@ -9,5 +9,9 @@ export const useGuardPostsStore = defineStore('guardPosts', () => {
     guardPosts.value = await getGuardPosts();
   }
 
-  return { guardPosts, refreshGuardPosts };
+  const guardPostNameById = computed(() => (guardPostId: string) => {
+    return guardPosts.value?.find((guardPost) => guardPost.id === guardPostId)?.displayName;
+  });
+
+  return { guardPosts, refreshGuardPosts, guardPostNameById };
 });

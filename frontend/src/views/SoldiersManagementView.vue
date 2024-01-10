@@ -93,7 +93,7 @@ function editSoldier(soldier: Soldier) {
                   class="mx-1"
                   effect="light"
                 >
-                  {{ guardPost }}
+                  {{ guardPostsStore.guardPostNameById(guardPost) }}
                 </el-tag>
 
                 <div class="card-actions">
