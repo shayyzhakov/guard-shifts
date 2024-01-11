@@ -45,6 +45,8 @@ export class SoldiersQueue {
       const nextSoldier = this.orderedSoldiers.shift();
 
       if (!nextSoldier) {
+        this.orderedSoldiers.unshift(...busySoldierIds); // add all the busy soldiers back to the queue
+
         throw new Error('no soldiers were found');
       }
 
