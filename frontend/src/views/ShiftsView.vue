@@ -1,33 +1,26 @@
 <script setup lang="ts">
-import { getGuardLists, type GuardList, type GuardListPeriod } from '@/apis/guardLists.api';
+import { type GuardList, type GuardListPeriod } from '@/apis/guardLists.api';
 import { GUARD_PERIODS_PER_DAY, guardTimeToDate, stringifyPeriod } from '@/helpers/periodHelpers';
 import { useGuardPostsStore } from '@/stores/guardPosts.store';
+import { useShiftsStore } from '@/stores/shifts.store';
 import { useTeamsStore } from '@/stores/teams.store';
-import { computed, onMounted, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const shiftsStore = useShiftsStore();
 const teamsStore = useTeamsStore();
 const guardPostsStore = useGuardPostsStore();
 
 const now = new Date().toDateString();
-const loading = ref<boolean>(true);
+const loading = computed<boolean>(() => !shiftsStore.shifts);
 
-const allShifts = ref<GuardList[]>();
-
-const noShifts = computed<boolean>(() => !!(allShifts.value && !allShifts.value.length));
-
-onMounted(async () => {
-  // TODO: move to store
-  allShifts.value = await getGuardLists();
-  loading.value = false;
-});
+const noShifts = computed<boolean>(() => !!(shiftsStore.shifts && !shiftsStore.shifts.length));
 
 const filteredShifts = computed<GuardList[]>(() => {
-  if (!allShifts.value) return [];
+  if (!shiftsStore.shifts) return [];
 
-  return allShifts.value
-
+  return shiftsStore.shifts
     .map((guardPostShifts) => {
       const firstIndex = guardPostShifts.guardList.findIndex(
         (guardPeriod) => guardTimeToDate(guardPeriod.guardTime) > filterFromDate.value,
@@ -120,8 +113,8 @@ const dateShortcuts = [
         </el-empty>
       </div>
 
-      <div v-else class="shifts-content">
-        <div class="actions">
+      <div v-else v-loading="loading" class="shifts-content">
+        <div v-if="shiftsStore.shifts?.length" class="actions">
           <span>Show shifts from:</span>
           <el-date-picker
             v-model="filterFromDate"
@@ -134,7 +127,7 @@ const dateShortcuts = [
           />
         </div>
 
-        <div v-loading="loading" class="cards-container">
+        <div class="cards-container">
           <el-card v-for="guardPostShifts in filteredShifts" :key="guardPostShifts.guardPostId">
             <template #header>
               <div class="card-header">

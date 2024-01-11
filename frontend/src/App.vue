@@ -7,6 +7,7 @@ import * as authService from './auth';
 import UserInfoDropdown from './components/UserInfoDropdown.vue';
 import type { UserInfo } from './auth';
 import { useGuardPostsStore } from './stores/guardPosts.store';
+import { useShiftsStore } from './stores/shifts.store';
 
 const route = useRoute();
 
@@ -25,10 +26,13 @@ watch(
 const teamsStore = useTeamsStore();
 const soldiersStore = useSoldiersStore();
 const guardPostsStore = useGuardPostsStore();
+const shiftsStore = useShiftsStore();
 const userInfo = ref<UserInfo>();
 
 onMounted(async () => {
   // ensures that all data is up to date
+  shiftsStore.refreshShifts();
+
   await Promise.all([
     teamsStore.refreshTeams(),
     soldiersStore.refreshSoldiers(),
@@ -40,7 +44,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <el-container class="main">
+  <el-container class="main" v-if="userInfo">
     <el-aside width="200px">
       <el-menu
         router
@@ -78,6 +82,8 @@ onMounted(async () => {
       <RouterView />
     </el-main>
   </el-container>
+
+  <div v-else v-loading.lock.fullscreen="true" />
 </template>
 
 <style scoped>

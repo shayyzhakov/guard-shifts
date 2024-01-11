@@ -11,10 +11,14 @@ import {
 import { ElNotification } from 'element-plus';
 import { useTeamsStore } from '@/stores/teams.store';
 import { useSoldiersStore } from '@/stores/soldiers.store';
+import { useShiftsStore } from '@/stores/shifts.store';
+import { useGuardPostsStore } from '@/stores/guardPosts.store';
 
 const router = useRouter();
 const teamsStore = useTeamsStore();
 const soldiersStore = useSoldiersStore();
+const guardPostsStore = useGuardPostsStore();
+const shiftsStore = useShiftsStore();
 
 const now = new Date().toDateString();
 
@@ -62,6 +66,7 @@ async function submitShifts() {
       type: 'success',
     });
 
+    await shiftsStore.refreshShifts();
     router.push('shifts');
   } catch (e) {
     ElNotification({
@@ -94,6 +99,20 @@ const soldiersOptions = computed<{ value: string; label: string }[]>(() => {
     })) ?? []
   );
 });
+
+const warningText = computed(() => {
+  if (!soldiersStore.soldiers?.length) {
+    return 'No soldiers were found. Please create soldiers before generating shifts.';
+  }
+  if (!teamsStore.teams?.length) {
+    return 'No teams were found. Please create teams before generating shifts.';
+  }
+  if (!guardPostsStore.guardPosts?.length) {
+    return 'No guard posts were found. Please create guard posts before generating shifts.';
+  }
+
+  return undefined;
+});
 </script>
 
 <template>
@@ -101,6 +120,14 @@ const soldiersOptions = computed<{ value: string; label: string }[]>(() => {
     <h1>Generate Shifts</h1>
 
     <section v-loading.fullscreen.lock="isLoading" class="config-cards">
+      <el-alert
+        v-if="warningText"
+        :title="warningText"
+        type="warning"
+        show-icon
+        :closable="false"
+      />
+
       <el-card>
         <template #header>
           <div class="card-header">
@@ -152,7 +179,9 @@ const soldiersOptions = computed<{ value: string; label: string }[]>(() => {
       </el-card>
 
       <div class="buttons">
-        <el-button type="primary" @click="generateShifts">Generate Shifts</el-button>
+        <el-button type="primary" @click="generateShifts" :disabled="warningText"
+          >Generate Shifts</el-button
+        >
       </div>
     </section>
 
