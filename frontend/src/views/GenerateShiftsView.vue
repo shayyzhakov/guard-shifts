@@ -91,11 +91,22 @@ function endEditRow() {
   rowToEditId.value = '';
 }
 
-const soldiersOptions = computed<{ value: string; label: string }[]>(() => {
+const teamSoldiersOptions = computed<
+  {
+    label: string;
+    options: {
+      value: string;
+      label: string;
+    }[];
+  }[]
+>(() => {
   return (
-    soldiersStore.soldiers?.map((soldier) => ({
-      value: soldier.id,
-      label: `${soldier.first_name} ${soldier.last_name}`,
+    teamsStore.teams?.map((team) => ({
+      label: team.name,
+      options: team.people.map((soldier) => ({
+        value: soldier.id,
+        label: `${soldier.first_name} ${soldier.last_name}`,
+      })),
     })) ?? []
   );
 });
@@ -229,12 +240,18 @@ const warningText = computed(() => {
                   class="table-select"
                   default-first-option
                 >
-                  <el-option
-                    v-for="item in soldiersOptions"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  />
+                  <el-option-group
+                    v-for="team in teamSoldiersOptions"
+                    :key="team.label"
+                    :label="team.label"
+                  >
+                    <el-option
+                      v-for="soldier in team.options"
+                      :key="soldier.value"
+                      :label="soldier.label"
+                      :value="soldier.value"
+                    />
+                  </el-option-group>
                 </el-select>
 
                 <span v-else-if="teamsStore.soldierNamesBySoldierIds(row.soldiers).length > 0">{{
