@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { type Team, type UpdateTeamParams } from '@/apis/teams.api';
 import { useTeamsStore } from '@/stores/teams.store';
 import { useSoldiersStore } from '@/stores/soldiers.store';
@@ -58,25 +58,38 @@ function editSoldier(soldier: Soldier) {
 
   showEditSoldierModal.value = true;
 }
+
+const noTeams = computed<boolean>(() => !!(teamsStore.teams && !teamsStore.teams.length));
+const noSoldiers = computed<boolean>(
+  () => !!(soldiersStore.soldiers && !soldiersStore.soldiers.length),
+);
 </script>
 
 <template>
-  <div>
+  <div class="content">
     <h1>Soldiers Management</h1>
 
     <el-tabs v-model="activeTab" type="card">
       <!-- TEAMS -->
       <el-tab-pane label="Teams" name="teams">
         <section v-if="teamsStore.teams" class="tab-section">
-          <div class="card-header">
+          <div class="header-container">
             <div class="card-actions">
-              <el-button type="primary" @click="showCreateTeamModal = true">New Team</el-button>
+              <el-button v-if="!noTeams" type="primary" @click="showCreateTeamModal = true"
+                >New Team</el-button
+              >
             </div>
           </div>
 
-          <el-card v-for="team in teamsStore.teams" :key="team.id">
+          <div v-if="noTeams" class="empty-state-container">
+            <el-empty description="Create your first team">
+              <el-button type="primary" @click="showCreateTeamModal = true"> New Team </el-button>
+            </el-empty>
+          </div>
+
+          <el-card v-else v-for="team in teamsStore.teams" :key="team.id">
             <template #header>
-              <div class="card-header">
+              <div class="header-container">
                 <h3>Team {{ team.name }}</h3>
                 <el-tag
                   v-for="guardPost in team.guardPosts"
@@ -101,7 +114,7 @@ function editSoldier(soldier: Soldier) {
 
           <el-card v-if="teamsStore.unteamedSoldiers.length">
             <template #header>
-              <div class="card-header">
+              <div class="header-container">
                 <h3><i>No Team</i></h3>
               </div>
             </template>
@@ -111,21 +124,29 @@ function editSoldier(soldier: Soldier) {
           </el-card>
         </section>
 
-        <div v-else>loading...</div>
+        <div v-else v-loading="true" style="height: 200px" />
       </el-tab-pane>
 
       <!-- SOLDIERS -->
       <el-tab-pane label="Soldiers" name="soldiers">
         <section v-if="soldiersStore.soldiers" class="tab-section">
-          <div class="card-header">
+          <div class="header-container">
             <div class="card-actions">
-              <el-button type="primary" @click="showCreateSoldierModal = true">
+              <el-button v-if="!noSoldiers" type="primary" @click="showCreateSoldierModal = true">
                 New Soldier
               </el-button>
             </div>
           </div>
 
-          <el-card>
+          <div v-if="noSoldiers" class="empty-state-container">
+            <el-empty description="Create your first soldier">
+              <el-button type="primary" @click="showCreateSoldierModal = true">
+                New Soldier
+              </el-button>
+            </el-empty>
+          </div>
+
+          <el-card v-else>
             <el-table :data="soldiersStore.soldiers" stripe style="width: 100%">
               <el-table-column prop="name" label="Name">
                 <template #default="{ row }"> {{ row.first_name }} {{ row.last_name }} </template>
@@ -143,7 +164,7 @@ function editSoldier(soldier: Soldier) {
           </el-card>
         </section>
 
-        <div v-else>loading...</div>
+        <div v-else v-loading="true" style="height: 200px" />
       </el-tab-pane>
     </el-tabs>
 
@@ -163,6 +184,12 @@ function editSoldier(soldier: Soldier) {
 </template>
 
 <style scoped>
+.content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
 h3 {
   margin-right: 6px;
 }
@@ -173,7 +200,7 @@ h3 {
   gap: 16px;
 }
 
-.card-header {
+.header-container {
   display: flex;
   gap: 6px;
   align-items: center;
@@ -186,5 +213,15 @@ h3 {
 
 :deep(.el-tabs__content) {
   overflow: inherit;
+}
+
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 80%;
+  margin-top: 60px;
 }
 </style>

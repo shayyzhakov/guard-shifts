@@ -33,17 +33,28 @@ function editGuardPost(guardPost: GuardPost) {
 }
 
 const loading = computed<boolean>(() => !guardPostsStore.guardPosts);
+const noGuardPosts = computed<boolean>(
+  () => !!(guardPostsStore.guardPosts && !guardPostsStore.guardPosts.length),
+);
 </script>
 
 <template>
   <div class="content">
     <h1>Guard Posts</h1>
 
-    <div class="action-buttons">
+    <div v-if="!noGuardPosts" class="action-buttons">
       <el-button type="primary" @click="showCreateGuardPostModal = true">New Guard Post</el-button>
     </div>
 
     <section v-loading="loading" class="guard-post-cards">
+      <div v-if="noGuardPosts" class="empty-state-container">
+        <el-empty description="Create your first guard post">
+          <el-button type="primary" @click="showCreateGuardPostModal = true"
+            >New Guard Post</el-button
+          >
+        </el-empty>
+      </div>
+
       <el-card v-for="guardPost in guardPostsStore.guardPosts" :key="guardPost.id">
         <template #header>
           <div class="card-header">
@@ -134,5 +145,14 @@ h3 {
 .action-buttons {
   margin-bottom: 16px;
   text-align: right;
+}
+
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  height: 80%;
 }
 </style>
