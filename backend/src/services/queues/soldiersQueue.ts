@@ -12,24 +12,23 @@ export class SoldiersQueue {
   /**
    * Soldiers queue, from the oldest to the newest (such that the first element is the next one to be used).
    */
-  private soldiersForGuardPost: string[] = [];
+  private orderedSoldiers: string[] = [];
 
   constructor(guardPostId: string, teams: Team[], private guardLists: GuardList[]) {
-    const orderedSoldiers: string[] = [];
     const relevantSoldiers = getSoldierIdsForGuardPost(guardPostId, teams);
-    const orderedSoldiersFromGuardList = getSoldierIdsByLatestGuardOrder(this.guardLists).filter(
-      (soldier) => relevantSoldiers.includes(soldier)
+
+    // insert soldiers that already appeared in the guard list, from the older to the newer
+    this.orderedSoldiers.push(
+      ...getSoldierIdsByLatestGuardOrder(this.guardLists).filter((soldier) =>
+        relevantSoldiers.includes(soldier)
+      )
     );
 
-    // TODO: sort soldiers by their last guard time
-    // insert soldiers that already appeared in the guard list, from the older to the newer
-    orderedSoldiers.unshift(...orderedSoldiersFromGuardList);
-
     // insert soldiers that didnt appear beforehand
-    const unusedSoldiers = relevantSoldiers.filter((soldier) => !orderedSoldiers.includes(soldier));
-    orderedSoldiers.unshift(...unusedSoldiers);
-
-    this.soldiersForGuardPost = orderedSoldiers;
+    const unusedSoldiers = relevantSoldiers.filter(
+      (soldier) => !this.orderedSoldiers.includes(soldier)
+    );
+    this.orderedSoldiers.unshift(...unusedSoldiers);
   }
 
   /**
@@ -43,7 +42,7 @@ export class SoldiersQueue {
     const busySoldierIds: string[] = [];
 
     while (soldierIds.length < amount) {
-      const nextSoldier = this.soldiersForGuardPost.shift();
+      const nextSoldier = this.orderedSoldiers.shift();
 
       if (!nextSoldier) {
         throw new Error('no soldiers were found');
@@ -57,8 +56,8 @@ export class SoldiersQueue {
       }
     }
 
-    this.soldiersForGuardPost.push(...soldierIds); // add the soldiers to the end of the queue
-    this.soldiersForGuardPost.unshift(...busySoldierIds); // add the busy soldiers to the top of the queue so they will be the ones to use next
+    this.orderedSoldiers.push(...soldierIds); // add the soldiers to the end of the queue
+    this.orderedSoldiers.unshift(...busySoldierIds); // add the busy soldiers to the top of the queue so they will be the ones to use next
 
     return soldierIds;
   }

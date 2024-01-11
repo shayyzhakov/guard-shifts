@@ -1,6 +1,5 @@
 import {
   type GuardTime,
-  getNextPeriodGuardTime,
   compareGuardTime,
   addDurationToGuardTime,
 } from '../../helpers/periodHelpers';
@@ -37,6 +36,8 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
   let firstFailingTryTeamIndex;
 
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
+    const periodsPerGuard = getGuardPostGuardPeriodDuration(guardPost, currentGuardTime.period);
+
     if (!relevantTeams.length) {
       console.info(`no team was found for guard post ${guardPost.displayName}`);
       guardListPerPeriod.push({
@@ -44,77 +45,80 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
         team: undefined,
         error: 'relevant team not found',
         guardTime: currentGuardTime,
-        duration: 1,
-      });
-      currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
-      firstFailingTryTeamIndex = undefined;
-      continue;
-    }
-
-    const numOfSoldiersForCurrentPeriod = getGuardPostSoldiersAmount(
-      guardPost,
-      currentGuardTime.period
-    );
-    const periodsPerGuard = getGuardPostGuardPeriodDuration(guardPost, currentGuardTime.period);
-
-    const currentTeam = relevantTeams[currentTeamIndex];
-
-    const isCurrentTeamBusy = isTeamBusy(guardList, currentGuardTime, currentTeam.id);
-    const freeTeamMembers = currentTeam.people.filter(
-      (soldier) => !isSoldierBusy(guardList, currentGuardTime, soldier)
-    );
-
-    if (firstFailingTryTeamIndex === currentTeamIndex) {
-      // we failed to use any of the teams for the current guard time
-      console.info(
-        `no teams was able to be used for guard post ${guardPost.displayName} at ${currentGuardTime.date} period ${currentGuardTime.period}`
-      );
-
-      guardListPerPeriod.push({
-        soldiers: [],
-        team: undefined,
-        error: 'relevant team not found',
-        guardTime: currentGuardTime,
-        duration: 1,
-      });
-      currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
-      firstFailingTryTeamIndex = undefined;
-    } else if (isCurrentTeamBusy || freeTeamMembers.length < numOfSoldiersForCurrentPeriod) {
-      // current team is busy this day or has too few members for this guard post
-      console.info(
-        `team ${currentTeam.name} can't be used at this guard time. it is either busy or doesn't have enough members (${freeTeamMembers.length}/${numOfSoldiersForCurrentPeriod})`
-      );
-
-      // TODO: when a team is skipped, it should not be moved to the end of the queue
-      firstFailingTryTeamIndex ||= currentTeamIndex;
-      currentTeamIndex = (currentTeamIndex + 1) % relevantTeams.length;
-    } else if (numOfSoldiersForCurrentPeriod === 0) {
-      // skip this period
-      guardListPerPeriod.push({
-        soldiers: [],
-        team: undefined,
-        guardTime: currentGuardTime,
-        duration: 1,
-      });
-      currentGuardTime = getNextPeriodGuardTime(currentGuardTime);
-      firstFailingTryTeamIndex = undefined;
-    } else {
-      // TODO: this method always selects the same team members
-      const soldiers = freeTeamMembers.slice(0, numOfSoldiersForCurrentPeriod);
-
-      // insert the final guard period to the list
-      guardListPerPeriod.push({
-        soldiers,
-        team: currentTeam.id,
-        guardTime: currentGuardTime,
         duration: periodsPerGuard,
       });
-      currentGuardTime = addDurationToGuardTime(currentGuardTime, periodsPerGuard);
-
-      if (numOfSoldiersForCurrentPeriod > 0) {
-        currentTeamIndex = (currentTeamIndex + 1) % relevantTeams.length;
-      }
       firstFailingTryTeamIndex = undefined;
+    } else {
+      const numOfSoldiersForCurrentPeriod = getGuardPostSoldiersAmount(
+        guardPost,
+        currentGuardTime.period
+      );
+
+      const currentTeam = relevantTeams[currentTeamIndex];
+
+      const isCurrentTeamBusy = isTeamBusy(guardList, currentGuardTime, currentTeam.id);
+      const freeTeamMembers = currentTeam.people.filter(
+        (soldier) => !isSoldierBusy(guardList, currentGuardTime, soldier)
+      );
+
+      if (firstFailingTryTeamIndex === currentTeamIndex) {
+        // we failed to use any of the teams for the current guard time
+        console.info(
+          `no teams was able to be used for guard post ${guardPost.displayName} at ${currentGuardTime.date} period ${currentGuardTime.period}`
+        );
+
+        guardListPerPeriod.push({
+          soldiers: [],
+          team: undefined,
+          error: 'relevant team not found',
+          guardTime: currentGuardTime,
+          duration: periodsPerGuard,
+        });
+        firstFailingTryTeamIndex = undefined;
+      } else if (isCurrentTeamBusy || freeTeamMembers.length < numOfSoldiersForCurrentPeriod) {
+        // current team is busy this day or has too few members for this guard post
+        console.info(
+          `team ${currentTeam.name} can't be used at this guard time. it is either busy or doesn't have enough members (${freeTeamMembers.length}/${numOfSoldiersForCurrentPeriod})`
+        );
+
+        // TODO: when a team is skipped, it should not be moved to the end of the queue
+        firstFailingTryTeamIndex ||= currentTeamIndex;
+        currentTeamIndex = (currentTeamIndex + 1) % relevantTeams.length;
+      } else if (numOfSoldiersForCurrentPeriod === 0) {
+        // skip this period
+        guardListPerPeriod.push({
+          soldiers: [],
+          team: undefined,
+          guardTime: currentGuardTime,
+          duration: periodsPerGuard,
+        });
+        firstFailingTryTeamIndex = undefined;
+      } else {
+        // TODO: this method always selects the same team members
+        const soldiers = freeTeamMembers.slice(0, numOfSoldiersForCurrentPeriod);
+
+        // insert the final guard period to the list
+        guardListPerPeriod.push({
+          soldiers,
+          team: currentTeam.id,
+          guardTime: currentGuardTime,
+          duration: periodsPerGuard,
+        });
+
+        if (numOfSoldiersForCurrentPeriod > 0) {
+          currentTeamIndex = (currentTeamIndex + 1) % relevantTeams.length;
+        }
+        firstFailingTryTeamIndex = undefined;
+      }
+    }
+
+    // proceed to the next guard time
+    if (guardListPerPeriod.length > 0) {
+      const lastGuardListPeriod = guardListPerPeriod[guardListPerPeriod.length - 1];
+      currentGuardTime = addDurationToGuardTime(
+        lastGuardListPeriod.guardTime,
+        lastGuardListPeriod.duration
+      );
     }
   }
 

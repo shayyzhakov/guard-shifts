@@ -105,7 +105,7 @@ export function isTeamBusy(guardList: GuardList[], guardTime: GuardTime, teamId:
 export function isSoldierBusy(
   guardList: GuardList[],
   guardTime: GuardTime,
-  soldierName: string
+  soldierId: string
 ): boolean {
   return guardList.some((guardPostList) => {
     const guardPeriod = guardPostList.guardList.find((glp) => {
@@ -117,9 +117,10 @@ export function isSoldierBusy(
       return isLater && isBefore;
     });
 
-    return guardPeriod?.soldiers.includes(soldierName);
+    return guardPeriod?.soldiers.includes(soldierId);
   });
 }
+
 export function simplifyGuardList(guardListForGuardPost: GuardListPeriod[]): GuardListPeriod[] {
   // remove empty periods
   const simplifiedGuardListForGuardPost = guardListForGuardPost.filter(

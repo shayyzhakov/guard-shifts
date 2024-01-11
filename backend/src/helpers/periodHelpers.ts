@@ -39,10 +39,6 @@ export function addDurationToGuardTime(guardTime: GuardTime, duration: number): 
   };
 }
 
-export function getNextPeriodGuardTime(guardTime: GuardTime): GuardTime {
-  return addDurationToGuardTime(guardTime, 1);
-}
-
 export function addDays(date: Date, days: number): Date {
   const newDate = new Date(date);
   newDate.setDate(date.getDate() + days);
