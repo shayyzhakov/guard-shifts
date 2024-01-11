@@ -49,9 +49,9 @@ const noGuardPosts = computed<boolean>(
     <section v-loading="loading" class="guard-post-cards">
       <div v-if="noGuardPosts" class="empty-state-container">
         <el-empty description="Create your first guard post">
-          <el-button type="primary" @click="showCreateGuardPostModal = true"
-            >New Guard Post</el-button
-          >
+          <el-button type="primary" @click="showCreateGuardPostModal = true">
+            New Guard Post
+          </el-button>
         </el-empty>
       </div>
 

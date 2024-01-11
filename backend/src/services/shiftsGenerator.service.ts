@@ -76,6 +76,7 @@ function buildGuardListForGuardPost(
       break;
 
     default:
+      console.error(`Unknown strategy ${guardPost.strategy} for guard post ${guardPost.id}`);
       strategyHandler = roundRobinStrategyHandler;
       break;
   }
@@ -89,10 +90,10 @@ function buildGuardListForGuardPost(
     teams
   );
 
-  const guardListForGuardPost = simplifyGuardList(guardListPerPeriod);
+  const guardListPeriods = simplifyGuardList(guardListPerPeriod);
   return {
     guardPostId: guardPost.id,
     guardPostDisplayName: guardPost.displayName,
-    guardList: guardListForGuardPost,
+    guardList: guardListPeriods,
   };
 }

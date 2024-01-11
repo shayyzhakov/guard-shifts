@@ -17,6 +17,7 @@ const occupations = reactive(
   }),
 );
 
+// when occupations change, update parent component
 watch(occupations, (newVal) => {
   const adaptedOccupations = newVal.map((occupation) => {
     return {
@@ -28,14 +29,26 @@ watch(occupations, (newVal) => {
   formData.value.occupation = adaptedOccupations;
 });
 
-// reset occupations when it is reset in the father component
+// when parent component changes occupations, update form occupations
 watch(
   () => formData.value.occupation,
-  (o) => {
-    if (o.length === 0) {
-      occupations.splice(0, occupations.length);
-    }
+  (newOccupations, oldOccupations) => {
+    // a hack to prevent infinite loop when updating occupations
+    if (JSON.stringify(newOccupations) === JSON.stringify(oldOccupations)) return;
+
+    // clear the array and replace it with the new occupations (keep reactivity intact)
+    occupations.splice(0, occupations.length);
+    occupations.push(
+      ...newOccupations.map((occupation) => {
+        return {
+          from: stringifyPeriod(occupation.from),
+          to: stringifyPeriod(occupation.to),
+          duration: occupation.duration / 2,
+        };
+      }),
+    );
   },
+  {},
 );
 
 const strategyOptions = [

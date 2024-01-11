@@ -21,12 +21,12 @@ export async function buildGuardList({
 }: BuildGuardListParams): Promise<GuardList[]> {
   const guardPosts = await getAllGuardPosts();
   const teams = await getAllTeams();
-  const guardListHistory = await getFullGuardListHistory();
+  const shiftsHistory = await getFullGuardListHistory();
 
   return generateShifts({
     guardPosts,
     teams,
-    shiftsHistory: guardListHistory,
+    shiftsHistory,
     startPeriod,
     duration,
   });
