@@ -8,7 +8,7 @@ import type { GuardList, GuardListPeriod } from '../../interfaces/guardList.inte
 import {
   getGuardPostGuardPeriodDuration,
   getGuardPostSoldiersAmount,
-} from '../../models/guardPost.model';
+} from '../../helpers/guardPostHelpers';
 import type { GuardPost } from '../../interfaces/guardPost.interface';
 import type { StrategyHandler } from '../../interfaces/strategyHandler.interface';
 import { SoldiersQueue } from '../queues/soldiersQueue';

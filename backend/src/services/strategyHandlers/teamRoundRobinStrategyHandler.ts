@@ -4,14 +4,14 @@ import {
   compareGuardTime,
   addDurationToGuardTime,
 } from '../../helpers/periodHelpers';
-import { getTeamsForGuardPost } from '../../models/team.model';
+import { getTeamsForGuardPost } from '../../helpers/guardPostHelpers';
 import { isTeamBusy, isSoldierBusy } from '../../helpers/guardListHelpers';
 import { mergeGuardLists } from '../../helpers/guardListHelpers';
 import type { GuardList, GuardListPeriod } from '../../interfaces/guardList.interface';
 import {
   getGuardPostGuardPeriodDuration,
   getGuardPostSoldiersAmount,
-} from '../../models/guardPost.model';
+} from '../../helpers/guardPostHelpers';
 import type { GuardPost } from '../../interfaces/guardPost.interface';
 import type { StrategyHandler } from '../../interfaces/strategyHandler.interface';
 import { Team } from '../../interfaces/team.interface';

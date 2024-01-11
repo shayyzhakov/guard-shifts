@@ -8,7 +8,6 @@ import {
 import type { GuardPost } from '../interfaces/guardPost.interface';
 import { getDbClient } from '../helpers/dbClient';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
-import { occupationByPeriod } from '../helpers/guardPostHelpers';
 
 export async function getAllGuardPosts(): Promise<GuardPost[]> {
   const res = await getDbClient().send(new ScanCommand({ TableName: 'GuardPosts' }));
@@ -73,14 +72,4 @@ export async function updateGuardPostById(
       },
     })
   );
-}
-
-export function getGuardPostSoldiersAmount(guardPost: GuardPost, period: number): number {
-  const shouldGuardPostBeOccupied = !!occupationByPeriod(guardPost, period);
-  return shouldGuardPostBeOccupied ? guardPost.numOfSoldiers : 0;
-}
-
-export function getGuardPostGuardPeriodDuration(guardPost: GuardPost, period: number): number {
-  const occupation = occupationByPeriod(guardPost, period);
-  return occupation?.duration ?? 1;
 }

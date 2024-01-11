@@ -1,11 +1,8 @@
 import { strategies } from '../consts';
 import { GuardList, GuardListPeriod } from '../interfaces/guardList.interface';
 import { GuardPost } from '../interfaces/guardPost.interface';
-import { occupationByPeriod } from './guardPostHelpers';
 import {
-  GUARD_PERIODS_PER_DAY,
   GuardTime,
-  addDays,
   addDurationToGuardTime,
   compareGuardTime,
   isGuardTimeBefore,
@@ -130,52 +127,4 @@ export function simplifyGuardList(guardListForGuardPost: GuardListPeriod[]): Gua
   );
 
   return simplifiedGuardListForGuardPost;
-}
-
-export function getUpcomingGuardTimeForGuardPost(
-  guardPost: GuardPost,
-  fromGuardTime: GuardTime
-): GuardTime {
-  const upcomingPeriod = getUpcomingPeriodForGuardPost(guardPost, fromGuardTime.period);
-  const upcomingDate =
-    fromGuardTime.period <= upcomingPeriod ? fromGuardTime.date : addDays(fromGuardTime.date, 1);
-
-  return {
-    period: upcomingPeriod,
-    date: upcomingDate,
-  };
-}
-
-function getUpcomingPeriodForGuardPost(guardPost: GuardPost, fromPeriod: number): number {
-  const occupation = occupationByPeriod(guardPost, fromPeriod);
-  if (occupation) {
-    let i = 0;
-    if (fromPeriod >= occupation.from) {
-      while (occupation.from + occupation.duration * i < fromPeriod) {
-        i++;
-      }
-    } else {
-      // fromPeriod < occupation.from
-      // iterate until modulu applies
-      while (
-        (occupation.from + occupation.duration * i) % GUARD_PERIODS_PER_DAY >=
-        occupation.from
-      ) {
-        i++;
-      }
-
-      while ((occupation.from + occupation.duration * i) % GUARD_PERIODS_PER_DAY < fromPeriod) {
-        i++;
-      }
-    }
-    return (occupation.from + occupation.duration * i) % GUARD_PERIODS_PER_DAY;
-  } else {
-    let currentPeriod = fromPeriod;
-    const occupationsStartingTimes = guardPost.occupation.map((o) => o.from);
-    while (!occupationsStartingTimes.includes(currentPeriod)) {
-      currentPeriod = (currentPeriod + 1) % GUARD_PERIODS_PER_DAY;
-    }
-
-    return currentPeriod;
-  }
 }

@@ -14,17 +14,6 @@ export async function getAllTeams(): Promise<Team[]> {
   return (res.Items?.map((item) => unmarshall(item)) ?? []) as Team[];
 }
 
-export function getTeamsForGuardPost(guardPostId: string, teams: Team[]): Team[] {
-  return teams.filter((team) => team.guardPosts.includes(guardPostId));
-}
-
-export function getSoldierIdsForGuardPost(guardPostId: string, teams: Team[]): string[] {
-  return getTeamsForGuardPost(guardPostId, teams).reduce(
-    (acc, team) => acc.concat(team.people),
-    [] as string[]
-  );
-}
-
 export async function updateTeamById(teamId: string, updateParams: Partial<Team>): Promise<void> {
   const teams = await getAllTeams();
   const team = teams.find((team) => team.id === teamId);

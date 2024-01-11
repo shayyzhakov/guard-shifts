@@ -6,8 +6,8 @@ import {
   truncateGuardListFromGuardTime,
   getGuardPostOrder,
   simplifyGuardList,
-  getUpcomingGuardTimeForGuardPost,
 } from '../helpers/guardListHelpers';
+import { getUpcomingGuardTimeForGuardPost } from '../helpers/guardPostHelpers';
 import { getUpcomingGuardTime, addDurationToGuardTime, GuardTime } from '../helpers/periodHelpers';
 import { roundRobinStrategyHandler, teamRoundRobinStrategyHandler } from './strategyHandlers';
 
