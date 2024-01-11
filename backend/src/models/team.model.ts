@@ -122,3 +122,51 @@ export async function removeSoldiersFromTeams(teams: Team[], soldierIds: string[
     })
   );
 }
+
+/**
+ * Remove guard posts that are assigned to existing teams
+ * @param teams Teams to remove guard posts from
+ * @param guardPostIds Guard posts to remove from teams
+ */
+export async function removeGuardPostsFromTeams(
+  teams: Team[],
+  guardPostIds: string[]
+): Promise<void> {
+  // new teams' guard posts to replace the old teams' guard posts
+  const modifiedTeamGuardPosts = guardPostIds.reduce((acc, guardPostId) => {
+    const teamsContainingGuardPost = teams.filter((t) => t.guardPosts.includes(guardPostId));
+
+    // if the guard post exists in some teams, this teams' guard posts should be updated
+    teamsContainingGuardPost.forEach((team) => {
+      let accTeam = acc.find((guardPostTeam) => guardPostTeam.teamId === team.id);
+      if (!accTeam) {
+        accTeam = { guardPosts: team.guardPosts, teamId: team.id };
+        acc.push(accTeam);
+      }
+
+      // remove the current guard post from the team
+      accTeam.guardPosts = accTeam.guardPosts.filter((p) => p !== guardPostId);
+    });
+
+    return acc;
+  }, [] as { guardPosts: string[]; teamId: string }[]);
+
+  // update the teams
+  await Promise.all(
+    modifiedTeamGuardPosts.map(async (soldierTeam) => {
+      return await getDbClient().send(
+        new UpdateItemCommand({
+          TableName: 'Teams',
+          Key: { id: { S: soldierTeam.teamId } },
+          UpdateExpression: 'SET #guardPosts = :guardPosts',
+          ExpressionAttributeNames: {
+            '#guardPosts': 'guardPosts',
+          },
+          ExpressionAttributeValues: {
+            ':guardPosts': { L: soldierTeam.guardPosts.map((guardPost) => ({ S: guardPost })) },
+          },
+        })
+      );
+    })
+  );
+}

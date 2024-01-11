@@ -6,6 +6,7 @@ import {
   updateGuardPostById,
 } from '../models/guardPost.model';
 import { v4 as uuidv4 } from 'uuid';
+import { getAllTeams, removeGuardPostsFromTeams } from '../models/team.model';
 
 export async function getGuardPosts(): Promise<GuardPost[]> {
   return await getAllGuardPosts();
@@ -45,6 +46,12 @@ export async function updateGuardPost(
 }
 
 export async function deleteGuardPost(guardPostId: string): Promise<void> {
+  // TODO: delete future guard shifts for this guard post
+
+  // delete guard post usages of teams
+  const teams = await getAllTeams();
+  await removeGuardPostsFromTeams(teams, [guardPostId]);
+
   await deleteGuardPostById(guardPostId);
 }
 
