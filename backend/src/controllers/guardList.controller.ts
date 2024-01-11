@@ -1,27 +1,14 @@
-import {
-  addDurationToGuardTime,
-  getUpcomingGuardTime,
-  type GuardTime,
-} from '../helpers/periodHelpers';
-import { getAllGuardPosts, getUpcomingGuardTimeForGuardPost } from '../models/guardPost.model';
-import { getGuardPostOrder } from '../helpers/guardListHelpers';
-import {
-  roundRobinStrategyHandler,
-  teamRoundRobinStrategyHandler,
-} from '../services/strategyHandlers';
+import { getUpcomingGuardTime } from '../helpers/periodHelpers';
+import { getAllGuardPosts } from '../models/guardPost.model';
 import type { GuardList } from '../interfaces/guardList.interface';
-import type { GuardPost } from '../interfaces/guardPost.interface';
-import type { StrategyHandler } from '../interfaces/strategyHandler.interface';
 import {
   deserializeGuardList,
   getFullGuardListHistory,
   saveGuardLists,
 } from '../models/guardList.model';
-import { truncateGuardListFromGuardTime } from '../helpers/guardListHelpers';
 import { DbGuardList } from '../interfaces/db.types';
-import { simplifyGuardList } from '../helpers/guardListHelpers';
 import { getAllTeams } from '../models/team.model';
-import { Team } from '../interfaces/team.interface';
+import { generateShifts } from '../services/shiftsGenerator.service';
 
 interface BuildGuardListParams {
   startPeriod: number;
@@ -32,78 +19,17 @@ export async function buildGuardList({
   startPeriod,
   duration,
 }: BuildGuardListParams): Promise<GuardList[]> {
-  const fullGuardList: GuardList[] = [];
-
-  const upcomingGuardTime = getUpcomingGuardTime(startPeriod);
-  const endGuardTime = addDurationToGuardTime(upcomingGuardTime, duration);
-
   const guardPosts = await getAllGuardPosts();
   const teams = await getAllTeams();
-
-  // handle higher priority strategies first
-  guardPosts.sort((a, b) => {
-    return getGuardPostOrder(guardPosts, a.id) - getGuardPostOrder(guardPosts, b.id);
-  });
-
-  // truncate history at the start of the upcoming guard time, since we are going to build the guard list from this point
   const guardListHistory = await getFullGuardListHistory();
-  truncateGuardListFromGuardTime(guardListHistory, upcomingGuardTime);
 
-  for (let i = 0; i < guardPosts.length; i++) {
-    const guardListForGuardPost = await buildGuardListForGuardPost(
-      guardPosts[i],
-      fullGuardList,
-      guardListHistory,
-      upcomingGuardTime,
-      endGuardTime,
-      teams
-    );
-    fullGuardList.push(guardListForGuardPost);
-  }
-
-  return fullGuardList;
-}
-
-async function buildGuardListForGuardPost(
-  guardPost: GuardPost,
-  guardList: GuardList[],
-  guardListHistory: GuardList[],
-  startingGuardTime: GuardTime,
-  endingGuardTime: GuardTime,
-  teams: Team[]
-): Promise<GuardList> {
-  const upcomingGuardTime = getUpcomingGuardTimeForGuardPost(guardPost, startingGuardTime);
-
-  let strategyHandler: StrategyHandler;
-  switch (guardPost.strategy) {
-    case 'roundrobin':
-      strategyHandler = roundRobinStrategyHandler;
-      break;
-
-    case 'team-roundrobin':
-      strategyHandler = teamRoundRobinStrategyHandler;
-      break;
-
-    default:
-      strategyHandler = roundRobinStrategyHandler;
-      break;
-  }
-
-  const guardListPerPeriod = strategyHandler(
-    guardPost,
-    guardList,
-    guardListHistory,
-    upcomingGuardTime,
-    endingGuardTime,
-    teams
-  );
-
-  const guardListForGuardPost = simplifyGuardList(guardListPerPeriod);
-  return {
-    guardPostId: guardPost.id,
-    guardPostDisplayName: guardPost.displayName,
-    guardList: guardListForGuardPost,
-  };
+  return generateShifts({
+    guardPosts,
+    teams,
+    shiftsHistory: guardListHistory,
+    startPeriod,
+    duration,
+  });
 }
 
 export async function getGuardListHistory(): Promise<GuardList[]> {
