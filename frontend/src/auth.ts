@@ -7,30 +7,6 @@ const client = new OAuth2Client({
   authorizationEndpoint: '/login',
 });
 
-// export const fetchWrapper = new OAuth2Fetch({
-//   client,
-
-//   getNewToken: async () => {
-//     const codeVerifier = localStorage.getItem('oauth2_code_verifier') ?? '';
-
-//     return await client.authorizationCode.getToken({
-//       redirectUri: window.location.origin + '/',
-//       codeVerifier,
-//       code: 'abc',
-//     });
-//   },
-
-//   storeToken: (token) => {
-//     localStorage.setItem('oauth2_token', JSON.stringify(token));
-//   },
-
-//   getStoredToken: () => {
-//     const token = localStorage.getItem('oauth2_token');
-//     if (token) return JSON.parse(token);
-//     return null;
-//   },
-// });
-
 export async function redirectToAuthServer(): Promise<void> {
   const codeVerifier = await generateCodeVerifier();
   localStorage.setItem('oauth2_code_verifier', codeVerifier);
@@ -43,7 +19,7 @@ export async function redirectToAuthServer(): Promise<void> {
   document.location = authServerUrl;
 }
 
-export async function exchangeCodeForToken(): Promise<OAuth2Token> {
+export async function exchangeCodeForToken(): Promise<void> {
   const codeVerifier = localStorage.getItem('oauth2_code_verifier') ?? '';
   localStorage.removeItem('oauth2_code_verifier');
 
@@ -55,8 +31,21 @@ export async function exchangeCodeForToken(): Promise<OAuth2Token> {
     },
   );
   localStorage.setItem('oauth2_token', JSON.stringify(oauth2Token));
+}
 
-  return oauth2Token;
+export async function refreshAccessToken(): Promise<string | undefined> {
+  const oauth2Token = getStoredOauth2Token();
+  if (!oauth2Token) {
+    return;
+  }
+  const newOauth2TokenWithoutRefreshToken = await client.refreshToken(oauth2Token);
+  const newOauth2Token = {
+    ...newOauth2TokenWithoutRefreshToken,
+    refreshToken: oauth2Token.refreshToken,
+  };
+
+  localStorage.setItem('oauth2_token', JSON.stringify(newOauth2Token));
+  return newOauth2Token.accessToken ?? undefined;
 }
 
 export async function logout() {
@@ -82,7 +71,7 @@ export interface UserInfo {
 }
 
 export async function getUserInfo(): Promise<UserInfo | undefined> {
-  const accessToken = getAccessToken();
+  const accessToken = getStoredOauth2Token()?.accessToken;
   if (!accessToken) {
     return;
   }
@@ -100,7 +89,15 @@ export async function getUserInfo(): Promise<UserInfo | undefined> {
   }
 }
 
-export function getAccessToken(): string | undefined {
-  const token = localStorage.getItem('oauth2_token') ?? '{}';
-  return JSON.parse(token).accessToken;
+export function getStoredOauth2Token(): OAuth2Token | undefined {
+  const oauth2Token = JSON.parse(localStorage.getItem('oauth2_token') ?? '{}');
+  if (
+    !oauth2Token ||
+    !oauth2Token.refreshToken ||
+    !oauth2Token.accessToken ||
+    !oauth2Token.expiresAt
+  ) {
+    return;
+  }
+  return oauth2Token;
 }

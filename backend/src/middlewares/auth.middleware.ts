@@ -33,7 +33,7 @@ export function authenticateUser() {
 
       next();
     } catch (err) {
-      console.log('Token not valid:', err);
+      console.log('Token not valid:', err instanceof Error ? err.message : err);
       res.status(401).json({ message: 'Unauthorized' });
     }
   };

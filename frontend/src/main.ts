@@ -9,42 +9,41 @@ import './assets/fontawesome/css/all.css';
 import App from './App.vue';
 import router from './router';
 import * as authService from './auth';
-import type { OAuth2Token } from '@badgateway/oauth2-client';
 import { initFetcher } from './helpers/fetcherHelper';
+import { getStoredOauth2Token } from './auth';
 
 async function main() {
   try {
     const authCode = new URLSearchParams(window.location.search).get('code');
-    const authTokenString = localStorage.getItem('oauth2_token');
-    let authToken: OAuth2Token | undefined;
-
-    if (authTokenString) {
-      authToken = JSON.parse(authTokenString);
+    if (authCode) {
+      await authService.exchangeCodeForToken();
     }
 
-    if (!authCode && !authToken) {
+    let authToken = getStoredOauth2Token();
+    if (authToken && (!authToken.expiresAt || authToken.expiresAt < Date.now())) {
+      await authService.refreshAccessToken();
+      authToken = getStoredOauth2Token();
+    }
+
+    if (!authToken?.expiresAt || authToken.expiresAt < Date.now()) {
       await authService.redirectToAuthServer();
-    } else {
-      if (authCode) {
-        authToken = await authService.exchangeCodeForToken();
-      }
-
-      if (!authToken?.expiresAt || authToken.expiresAt < Date.now()) {
-        // TODO: refresh token instead?
-        await authService.redirectToAuthServer();
-      } else {
-        initFetcher(import.meta.env.VITE_API_URL, authToken);
-
-        // mount Vue app
-        const app = createApp(App);
-
-        app.use(createPinia());
-        app.use(router);
-        app.use(ElementPlus);
-
-        app.mount('#app');
-      }
+      return;
     }
+
+    initFetcher(
+      import.meta.env.VITE_API_URL,
+      authToken.accessToken,
+      authService.refreshAccessToken,
+    );
+
+    // mount Vue app
+    const app = createApp(App);
+
+    app.use(createPinia());
+    app.use(router);
+    app.use(ElementPlus);
+
+    app.mount('#app');
   } catch (err) {
     console.log('FATAL ERROR: ', err);
     authService.logout();
