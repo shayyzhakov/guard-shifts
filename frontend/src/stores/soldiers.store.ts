@@ -7,6 +7,11 @@ export const useSoldiersStore = defineStore('soldiers', () => {
 
   async function refreshSoldiers() {
     soldiers.value = await getSoldiers();
+
+    // lexical order of soldiers by their full name
+    soldiers.value = soldiers.value.sort((a, b) =>
+      (a.first_name + ' ' + a.last_name).localeCompare(b.first_name + ' ' + b.last_name),
+    );
   }
 
   return { soldiers, refreshSoldiers };

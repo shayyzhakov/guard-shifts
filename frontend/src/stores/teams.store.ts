@@ -11,6 +11,9 @@ export const useTeamsStore = defineStore('teams', () => {
 
   async function refreshTeams() {
     teams.value = await getTeams();
+
+    // lexical order of teams by their name
+    teams.value = teams.value.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   function getTeamName(teamId: string) {

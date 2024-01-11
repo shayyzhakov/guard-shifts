@@ -75,9 +75,9 @@ const noSoldiers = computed<boolean>(
         <section v-if="teamsStore.teams" class="tab-section">
           <div class="header-container">
             <div class="card-actions">
-              <el-button v-if="!noTeams" type="primary" @click="showCreateTeamModal = true"
-                >New Team</el-button
-              >
+              <el-button v-if="!noTeams" type="primary" @click="showCreateTeamModal = true">
+                New Team
+              </el-button>
             </div>
           </div>
 
@@ -87,41 +87,43 @@ const noSoldiers = computed<boolean>(
             </el-empty>
           </div>
 
-          <el-card v-else v-for="team in teamsStore.teams" :key="team.id">
-            <template #header>
-              <div class="header-container">
-                <h3>Team {{ team.name }}</h3>
-                <el-tag
-                  v-for="guardPost in team.guardPosts"
-                  :key="guardPost"
-                  class="mx-1"
-                  effect="light"
-                >
-                  {{ guardPostsStore.guardPostNameById(guardPost) }}
-                </el-tag>
+          <template v-else>
+            <el-card v-for="team in teamsStore.teams" :key="team.id">
+              <template #header>
+                <div class="header-container">
+                  <h3>Team {{ team.name }}</h3>
+                  <el-tag
+                    v-for="guardPost in team.guardPosts"
+                    :key="guardPost"
+                    class="mx-1"
+                    effect="light"
+                  >
+                    {{ guardPostsStore.guardPostNameById(guardPost) }}
+                  </el-tag>
 
-                <div class="card-actions">
-                  <el-button circle text @click="() => editTeam(team)">
-                    <i class="fa-solid fa-gear fa-lg" />
-                  </el-button>
+                  <div class="card-actions">
+                    <el-button circle text @click="() => editTeam(team)">
+                      <i class="fa-solid fa-gear fa-lg" />
+                    </el-button>
+                  </div>
                 </div>
+              </template>
+              <div v-for="soldier in team.people" :key="soldier.id">
+                {{ soldier.first_name }} {{ soldier.last_name }}
               </div>
-            </template>
-            <div v-for="soldier in team.people" :key="soldier.id">
-              {{ soldier.first_name }} {{ soldier.last_name }}
-            </div>
-          </el-card>
+            </el-card>
 
-          <el-card v-if="teamsStore.unteamedSoldiers.length">
-            <template #header>
-              <div class="header-container">
-                <h3><i>No Team</i></h3>
+            <el-card v-if="teamsStore.unteamedSoldiers.length">
+              <template #header>
+                <div class="header-container">
+                  <h3><i>No Team</i></h3>
+                </div>
+              </template>
+              <div v-for="soldier in teamsStore.unteamedSoldiers" :key="soldier.id">
+                {{ soldier.first_name }} {{ soldier.last_name }}
               </div>
-            </template>
-            <div v-for="soldier in teamsStore.unteamedSoldiers" :key="soldier.id">
-              {{ soldier.first_name }} {{ soldier.last_name }}
-            </div>
-          </el-card>
+            </el-card>
+          </template>
         </section>
 
         <div v-else v-loading="true" style="height: 200px" />
@@ -213,6 +215,7 @@ h3 {
 
 :deep(.el-tabs__content) {
   overflow: inherit;
+  margin-bottom: 30px;
 }
 
 .empty-state-container {

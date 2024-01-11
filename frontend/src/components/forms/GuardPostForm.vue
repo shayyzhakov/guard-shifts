@@ -28,6 +28,16 @@ watch(occupations, (newVal) => {
   formData.value.occupation = adaptedOccupations;
 });
 
+// reset occupations when it is reset in the father component
+watch(
+  () => formData.value.occupation,
+  (o) => {
+    if (o.length === 0) {
+      occupations.splice(0, occupations.length);
+    }
+  },
+);
+
 const strategyOptions = [
   {
     value: 'roundrobin',
