@@ -2,15 +2,15 @@ import express, { Request, Response } from 'express';
 import {
   createNewSoldier,
   deleteSoldier,
-  getAllSoldiers,
+  getSoldiers,
   updateSoldier,
-} from '../models/soldier.model';
+} from '../controllers/soldiers.controller';
 
 const router = express.Router();
 
 router.get('/', async (req: Request, res: Response) => {
   try {
-    const soldiers = await getAllSoldiers();
+    const soldiers = await getSoldiers();
     return res.json({ soldiers });
   } catch (e) {
     console.log('[server] error:', e);

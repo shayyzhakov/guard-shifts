@@ -6,9 +6,7 @@ import {
 } from '@aws-sdk/client-dynamodb';
 import { getDbClient } from '../helpers/dbClient';
 import { Soldier } from '../interfaces/soldier.interface';
-import { v4 as uuidv4 } from 'uuid';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
-import { getAllTeams, removeSoldiersFromTeams } from './team.model';
 
 export async function getAllSoldiers(): Promise<Soldier[]> {
   const res = await getDbClient().send(new ScanCommand({ TableName: 'Soldiers' }));
@@ -16,26 +14,19 @@ export async function getAllSoldiers(): Promise<Soldier[]> {
   return (res.Items?.map((item) => unmarshall(item)) ?? []) as Soldier[];
 }
 
-export async function deleteSoldier(soldierId: string): Promise<void> {
-  // remove soldier from team
-  const teams = await getAllTeams();
-  await removeSoldiersFromTeams(teams, [soldierId]);
-
+export async function deleteSoldierById(soldierId: string): Promise<void> {
   await getDbClient().send(
     new DeleteItemCommand({ TableName: 'Soldiers', Key: marshall({ id: soldierId }) })
   );
 }
 
-export async function createNewSoldier(soldierParams: Omit<Soldier, 'id'>): Promise<void> {
-  const soldier: Soldier = {
-    id: uuidv4(),
-    ...soldierParams,
-  };
-
-  await getDbClient().send(new PutItemCommand({ TableName: 'Soldiers', Item: marshall(soldier) }));
+export async function createSoldier(createParams: Soldier): Promise<void> {
+  await getDbClient().send(
+    new PutItemCommand({ TableName: 'Soldiers', Item: marshall(createParams) })
+  );
 }
 
-export async function updateSoldier(
+export async function updateSoldierById(
   soldierId: string,
   soldierParams: Omit<Soldier, 'id'>
 ): Promise<void> {
