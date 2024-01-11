@@ -1,6 +1,6 @@
 import type { GuardList, GuardListPeriod } from '../interfaces/guardList.interface';
 import { type GuardTime, compareGuardTime } from '../helpers/periodHelpers';
-import type { DbGuardList, DbGuardListPeriod, DbGuardTime } from '../mocks/guardListHistory.data';
+import type { DbGuardList, DbGuardListPeriod, DbGuardTime } from '../interfaces/db.types';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { PutItemCommand, ScanCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { getDbClient } from '../helpers/dbClient';
@@ -21,7 +21,6 @@ export async function saveGuardLists(
 
       // add the new guard list to the history
       addGuardPostShifts(historyGl.guardPostId, serializedGuardList.guardList);
-      historyGl.guardList.push(...serializedGuardList.guardList);
     } else {
       // guard list history does not exist for this guard post
       await createGuardList(serializedGuardList);

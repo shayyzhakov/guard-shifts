@@ -10,5 +10,6 @@ export interface GuardListPeriod {
 
 export interface GuardList {
   guardPostId: string;
+  guardPostDisplayName: string;
   guardList: GuardListPeriod[];
 }

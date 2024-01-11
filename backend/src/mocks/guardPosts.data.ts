@@ -1,10 +1,12 @@
+import { GuardPost } from '../interfaces/guardPost.interface';
+
 const NIGHT_PERIOD_START = 42;
 const NIGHT_PERIOD_END = 14;
 
 const KONENUT_MORNING_PERIOD_START = 11;
 const KONENUT_MORNING_PERIOD_END = 15;
 
-export const guardPosts = [
+export const guardPosts: GuardPost[] = [
   {
     id: 'taltal',
     displayName: 'Taltal',

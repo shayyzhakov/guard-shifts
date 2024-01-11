@@ -1,4 +1,6 @@
-export const teams = [
+import { Team } from '../interfaces/team.interface';
+
+export const teams: Team[] = [
   {
     id: '1b',
     name: '1B',

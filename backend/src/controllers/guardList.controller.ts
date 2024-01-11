@@ -19,7 +19,7 @@ import {
   saveGuardLists,
 } from '../models/guardList.model';
 import { truncateGuardListFromGuardTime } from '../helpers/guardListHelpers';
-import { DbGuardList } from '../mocks/guardListHistory.data';
+import { DbGuardList } from '../interfaces/db.types';
 import { simplifyGuardList } from '../helpers/guardListHelpers';
 import { getAllTeams } from '../models/team.model';
 import { Team } from '../interfaces/team.interface';
@@ -111,6 +111,7 @@ async function buildGuardListForGuardPost(
   const guardListForGuardPost = simplifyGuardList(guardListPerPeriod);
   return {
     guardPostId: guardPost.id,
+    guardPostDisplayName: guardPost.displayName,
     guardList: guardListForGuardPost,
   };
 }

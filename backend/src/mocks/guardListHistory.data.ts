@@ -1,20 +1,4 @@
-export interface DbGuardTime {
-  period: number;
-  date: string;
-}
-
-export interface DbGuardListPeriod {
-  soldiers: string[];
-  guardTime: DbGuardTime;
-  duration: number;
-  team?: string;
-  error?: string;
-}
-
-export interface DbGuardList {
-  guardPostId: string;
-  guardList: DbGuardListPeriod[];
-}
+import { DbGuardList } from '../interfaces/db.types';
 
 export const guardListHistory: DbGuardList[] = [
   // {
