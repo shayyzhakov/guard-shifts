@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { getGuardLists, type GuardList, type GuardListPeriod } from '@/apis/guardLists.api';
 import { GUARD_PERIODS_PER_DAY, guardTimeToDate, stringifyPeriod } from '@/helpers/periodHelpers';
+import { useGuardPostsStore } from '@/stores/guardPosts.store';
 import { useTeamsStore } from '@/stores/teams.store';
 import { computed, onMounted, ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 const teamsStore = useTeamsStore();
+const guardPostsStore = useGuardPostsStore();
 
 const now = new Date().toDateString();
 const loading = ref<boolean>(true);
@@ -24,24 +26,31 @@ onMounted(async () => {
 const filteredShifts = computed<GuardList[]>(() => {
   if (!allShifts.value) return [];
 
-  return allShifts.value.map((guardPostShifts) => {
-    const firstIndex = guardPostShifts.guardList.findIndex(
-      (guardPeriod) => guardTimeToDate(guardPeriod.guardTime) > filterFromDate.value,
-    );
+  return allShifts.value
 
-    let guardList: GuardListPeriod[] = [];
-    if (firstIndex === 0) {
-      guardList = guardPostShifts.guardList;
-    } else if (firstIndex > 0) {
-      guardList = guardPostShifts.guardList.slice(firstIndex ? firstIndex - 1 : 0);
-    }
-    // for firstIndex === -1, leave guardList empty
+    .map((guardPostShifts) => {
+      const firstIndex = guardPostShifts.guardList.findIndex(
+        (guardPeriod) => guardTimeToDate(guardPeriod.guardTime) > filterFromDate.value,
+      );
 
-    return {
-      ...guardPostShifts,
-      guardList,
-    };
-  });
+      let guardList: GuardListPeriod[] = [];
+      if (firstIndex === 0) {
+        guardList = guardPostShifts.guardList;
+      } else if (firstIndex > 0) {
+        guardList = guardPostShifts.guardList.slice(firstIndex ? firstIndex - 1 : 0);
+      }
+      // for firstIndex === -1, leave guardList empty
+
+      return {
+        ...guardPostShifts,
+        guardList,
+      };
+    })
+    .filter((guardPostShifts) => {
+      // filter out deleted guard posts with no shifts to show (in the selected time range)
+      const isGuardPostDeleted = guardPostsStore.isGuardPostDeleted(guardPostShifts.guardPostId);
+      return !isGuardPostDeleted || guardPostShifts.guardList.length > 0;
+    });
 });
 
 async function goToGenerateShifts() {
@@ -129,10 +138,12 @@ const dateShortcuts = [
           <el-card v-for="guardPostShifts in filteredShifts" :key="guardPostShifts.guardPostId">
             <template #header>
               <div class="card-header">
-                <h3 v-if="guardPostShifts.guardPostDisplayName">
-                  {{ guardPostShifts.guardPostDisplayName }}
+                <h3 v-if="!guardPostsStore.isGuardPostDeleted(guardPostShifts.guardPostId)">
+                  {{ guardPostsStore.guardPostNameById(guardPostShifts.guardPostId) }}
                 </h3>
-                <h3 v-else><i>Unknown</i></h3>
+                <h3 v-else>
+                  <i>{{ guardPostShifts.guardPostDisplayName }} (Deleted)</i>
+                </h3>
               </div>
             </template>
 

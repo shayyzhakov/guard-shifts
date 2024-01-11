@@ -5,7 +5,6 @@ import {
 } from '../helpers/periodHelpers';
 import { getAllGuardPosts, getUpcomingGuardTimeForGuardPost } from '../models/guardPost.model';
 import { getGuardPostOrder } from '../helpers/guardListHelpers';
-import { getGuardPostDisplayName } from '../helpers/guardListHelpers';
 import {
   roundRobinStrategyHandler,
   teamRoundRobinStrategyHandler,
@@ -29,12 +28,10 @@ interface BuildGuardListParams {
   duration: number;
 }
 
-type GuardListResponse = Array<GuardList & { guardPostDisplayName: string }>;
-
 export async function buildGuardList({
   startPeriod,
   duration,
-}: BuildGuardListParams): Promise<GuardListResponse> {
+}: BuildGuardListParams): Promise<GuardList[]> {
   const fullGuardList: GuardList[] = [];
 
   const upcomingGuardTime = getUpcomingGuardTime(startPeriod);
@@ -64,14 +61,7 @@ export async function buildGuardList({
     fullGuardList.push(guardListForGuardPost);
   }
 
-  const guardListResponse: GuardListResponse = fullGuardList.map((guardList) => {
-    return {
-      ...guardList,
-      guardPostDisplayName: getGuardPostDisplayName(guardPosts, guardList.guardPostId), // TODO: not needed, the ui can get the name from the guard post id
-    };
-  });
-
-  return guardListResponse;
+  return fullGuardList;
 }
 
 async function buildGuardListForGuardPost(
@@ -116,16 +106,8 @@ async function buildGuardListForGuardPost(
   };
 }
 
-export async function getGuardListHistory(): Promise<GuardListResponse> {
-  const guardPosts = await getAllGuardPosts();
-  const guardListHistory = await getFullGuardListHistory();
-
-  return guardListHistory.map((guardList) => {
-    return {
-      ...guardList,
-      guardPostDisplayName: getGuardPostDisplayName(guardPosts, guardList.guardPostId), // TODO: not needed, the ui can get the name from the guard post id
-    };
-  });
+export async function getGuardListHistory(): Promise<GuardList[]> {
+  return await getFullGuardListHistory();
 }
 
 interface CommitGuardListParams {

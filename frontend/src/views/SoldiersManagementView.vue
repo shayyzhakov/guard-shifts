@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { type Team, type UpdateTeamParams } from '@/apis/teams.api';
 import { useTeamsStore } from '@/stores/teams.store';
 import { useSoldiersStore } from '@/stores/soldiers.store';
@@ -13,15 +13,6 @@ import CreateSoldierModal from '@/components/modals/CreateSoldierModal.vue';
 const teamsStore = useTeamsStore();
 const soldiersStore = useSoldiersStore();
 const guardPostsStore = useGuardPostsStore();
-
-onMounted(async () => {
-  // ensures that the teams and soldiers data are up to date
-  await Promise.all([
-    teamsStore.refreshTeams(),
-    soldiersStore.refreshSoldiers(),
-    guardPostsStore.refreshGuardPosts(),
-  ]);
-});
 
 const activeTab = ref('teams');
 

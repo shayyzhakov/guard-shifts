@@ -6,6 +6,7 @@ import { useSoldiersStore } from './stores/soldiers.store';
 import * as authService from './auth';
 import UserInfoDropdown from './components/UserInfoDropdown.vue';
 import type { UserInfo } from './auth';
+import { useGuardPostsStore } from './stores/guardPosts.store';
 
 const route = useRoute();
 
@@ -23,11 +24,16 @@ watch(
 
 const teamsStore = useTeamsStore();
 const soldiersStore = useSoldiersStore();
+const guardPostsStore = useGuardPostsStore();
 const userInfo = ref<UserInfo>();
 
 onMounted(async () => {
-  teamsStore.refreshTeams();
-  soldiersStore.refreshSoldiers();
+  // ensures that all data is up to date
+  await Promise.all([
+    teamsStore.refreshTeams(),
+    soldiersStore.refreshSoldiers(),
+    guardPostsStore.refreshGuardPosts(),
+  ]);
 
   userInfo.value = await authService.getUserInfo();
 });

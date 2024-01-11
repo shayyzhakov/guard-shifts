@@ -1,16 +1,12 @@
 <script setup lang="ts">
 import { stringifyPeriod } from '@/helpers/periodHelpers';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useGuardPostsStore } from '@/stores/guardPosts.store';
 import CreateGuardPostModal from '@/components/modals/CreateGuardPostModal.vue';
 import EditGuardPostModal from '@/components/modals/EditGuardPostModal.vue';
 import type { CreateGuardPostParams, GuardPost } from '@/apis/guardPosts.api';
 
 const guardPostsStore = useGuardPostsStore();
-
-onMounted(async () => {
-  await guardPostsStore.refreshGuardPosts();
-});
 
 const showCreateGuardPostModal = ref<boolean>(false);
 const showEditGuardPostModal = ref<boolean>(false);

@@ -9,16 +9,6 @@ import {
   isGuardTimeGreaterThanOrEqual,
 } from './periodHelpers';
 
-export function getGuardPostDisplayName(guardPosts: GuardPost[], guardPostId: string): string {
-  const relevantGuardPost = guardPosts.find((gp) => gp.id === guardPostId);
-
-  if (!relevantGuardPost) {
-    console.error(`could not find guard post with id ${guardPostId}`);
-    return '';
-  }
-
-  return relevantGuardPost.displayName;
-}
 export function getGuardPostOrder(guardPosts: GuardPost[], guardPostId: string): number {
   const relevantGuardPost: GuardPost | undefined = guardPosts.find((gp) => gp.id === guardPostId);
   if (!relevantGuardPost) {

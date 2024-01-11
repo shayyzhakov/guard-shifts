@@ -9,9 +9,13 @@ export const useGuardPostsStore = defineStore('guardPosts', () => {
     guardPosts.value = await getGuardPosts();
   }
 
+  const isGuardPostDeleted = computed(() => (guardPostId: string) => {
+    return guardPosts.value && !guardPosts.value.find((guardPost) => guardPost.id === guardPostId);
+  });
+
   const guardPostNameById = computed(() => (guardPostId: string) => {
     return guardPosts.value?.find((guardPost) => guardPost.id === guardPostId)?.displayName;
   });
 
-  return { guardPosts, refreshGuardPosts, guardPostNameById };
+  return { guardPosts, refreshGuardPosts, isGuardPostDeleted, guardPostNameById };
 });
