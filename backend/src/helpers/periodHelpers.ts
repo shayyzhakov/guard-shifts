@@ -57,6 +57,10 @@ export function isGuardTimeBefore(gt1: GuardTime, gt2: GuardTime): boolean {
   return compareGuardTime(gt1, gt2) > 0 ? true : false;
 }
 
+/**
+ * Compare two guard times.
+ * @returns Returns -1 if gt1 is greater than gt2, 1 if gt1 is smaller than gt2, and 0 if they are equal.
+ */
 export function compareGuardTime(gt1: GuardTime, gt2: GuardTime): number {
   const date1 = new Date(gt1.date.toDateString());
   const date2 = new Date(gt2.date.toDateString());
