@@ -114,35 +114,3 @@ function orderTeamsByLastTeamGuard(teams: Team[], guardPostShifts: GuardListPeri
 
   return orderedTeams;
 }
-
-// function orderSoldiersByLastTeamGuard(soldiers: string[], guardList: GuardList[]): string[] {
-//   const soldiersLastGuardTime = soldiers.reduce((acc, soldier) => {
-//     // find the last soldier guard time for each guard post
-//     const soldierLastGuardTimePerGuardPost = guardList
-//       .filter((gl) => 'team' in gl.guardList[0]) // filter out when guard post is not relevant for a team
-//       .map((gl) => {
-//         // find the last guard list period for the current soldier
-//         return [...gl.guardList].reverse().find((glp) => glp.soldiers.includes(soldier));
-//       })
-//       .filter((glp): glp is GuardListPeriod => glp !== undefined) // filter out when soldier never guarded in the guard post
-//       .map((glp) => glp.guardTime);
-
-//     // find the last soldier guard time in any of the guard posts
-//     const soldierLastGuardTime = soldierLastGuardTimePerGuardPost.reduce(
-//       (acc, glp) => {
-//         return compareGuardTime(acc, glp) > 0 ? glp : acc;
-//       },
-//       { period: 0, date: new Date(0) } // default value is the earliest possible guard time, relevant if soldier was never in a guard list
-//     );
-
-//     acc[soldier] = soldierLastGuardTime;
-
-//     return acc;
-//   }, {} as Record<string, GuardTime>);
-
-//   const orderedTeamSoldiers = [...soldiers].sort((a, b) =>
-//     compareGuardTime(soldiersLastGuardTime[b], soldiersLastGuardTime[a])
-//   );
-
-//   return orderedTeamSoldiers;
-// }
