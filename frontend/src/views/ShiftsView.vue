@@ -22,15 +22,14 @@ const filteredShifts = computed<GuardList[]>(() => {
 
   return shiftsStore.shifts
     .map((guardPostShifts) => {
+      // filter out guard periods before the selected date
       const firstIndex = guardPostShifts.guardList.findIndex(
         (guardPeriod) => guardTimeToDate(guardPeriod.guardTime) > filterFromDate.value,
       );
 
       let guardList: GuardListPeriod[] = [];
-      if (firstIndex === 0) {
-        guardList = guardPostShifts.guardList;
-      } else if (firstIndex > 0) {
-        guardList = guardPostShifts.guardList.slice(firstIndex ? firstIndex - 1 : 0);
+      if (firstIndex >= 0) {
+        guardList = guardPostShifts.guardList.slice(firstIndex);
       }
       // for firstIndex === -1, leave guardList empty
 
