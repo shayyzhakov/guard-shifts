@@ -2,32 +2,22 @@ import { GuardTime } from '../../helpers/periodHelpers';
 import { GuardList } from '../../interfaces/guardList.interface';
 import { isSoldierBusy } from '../../helpers/guardListHelpers';
 import { getSoldierIdsByLatestGuardOrder } from '../../helpers/guardListHelpers';
-import { getSoldierIdsForGuardPost } from '../../helpers/guardPostHelpers';
-import { Team } from '../../interfaces/team.interface';
 
 /**
  * A round robin queue of soldiers to be used, while chronological order is the top priority.
  */
 export class SoldiersQueue {
-  /**
-   * Soldiers queue, from the oldest to the newest (such that the first element is the next one to be used).
-   */
   private orderedSoldiers: string[] = [];
 
-  constructor(guardPostId: string, teams: Team[], private guardLists: GuardList[]) {
-    const relevantSoldiers = getSoldierIdsForGuardPost(guardPostId, teams);
-
+  constructor(soldiers: string[], private guardLists: GuardList[]) {
     // insert soldiers that already appeared in the guard list, from the older to the newer
     this.orderedSoldiers.push(
-      ...getSoldierIdsByLatestGuardOrder(this.guardLists).filter((soldier) =>
-        relevantSoldiers.includes(soldier)
-      )
+      ...getSoldierIdsByLatestGuardOrder(guardLists).filter((soldier) => soldiers.includes(soldier))
     );
 
     // insert soldiers that didnt appear beforehand
-    const unusedSoldiers = relevantSoldiers.filter(
-      (soldier) => !this.orderedSoldiers.includes(soldier)
-    );
+    const unusedSoldiers = soldiers.filter((soldier) => !this.orderedSoldiers.includes(soldier));
+
     this.orderedSoldiers.unshift(...unusedSoldiers);
   }
 
@@ -38,29 +28,29 @@ export class SoldiersQueue {
    * @returns An array with the requested amount of soldiers to be used next for the specified guard post.
    */
   next(guardTime: GuardTime, amount: number = 1): string[] {
-    const soldierIds: string[] = [];
-    const busySoldierIds: string[] = [];
+    const nextSoldiers: string[] = [];
+    const busySoldiers: string[] = [];
 
-    while (soldierIds.length < amount) {
+    while (nextSoldiers.length < amount) {
       const nextSoldier = this.orderedSoldiers.shift();
 
       if (!nextSoldier) {
-        this.orderedSoldiers.unshift(...busySoldierIds); // add all the busy soldiers back to the queue
+        this.orderedSoldiers.unshift(...busySoldiers); // add all the busy soldiers back to the queue
 
-        throw new Error('no soldiers were found');
+        throw new Error('not enough soldiers were found');
       }
 
       const isBusy = isSoldierBusy(this.guardLists, guardTime, nextSoldier);
       if (isBusy) {
-        busySoldierIds.push(nextSoldier);
+        busySoldiers.push(nextSoldier);
       } else {
-        soldierIds.push(nextSoldier);
+        nextSoldiers.push(nextSoldier);
       }
     }
 
-    this.orderedSoldiers.push(...soldierIds); // add the soldiers to the end of the queue
-    this.orderedSoldiers.unshift(...busySoldierIds); // add the busy soldiers to the top of the queue so they will be the ones to use next
+    this.orderedSoldiers.push(...nextSoldiers); // add the soldiers to the end of the queue
+    this.orderedSoldiers.unshift(...busySoldiers); // add the busy soldiers to the top of the queue so they will be the ones to use next
 
-    return soldierIds;
+    return nextSoldiers;
   }
 }
