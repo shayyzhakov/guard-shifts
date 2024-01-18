@@ -5,6 +5,7 @@ import { useGuardPostsStore } from '@/stores/guardPosts.store';
 import CreateGuardPostModal from '@/components/modals/CreateGuardPostModal.vue';
 import EditGuardPostModal from '@/components/modals/EditGuardPostModal.vue';
 import type { CreateGuardPostParams, GuardPost } from '@/apis/guardPosts.api';
+import { strategies } from '@/consts';
 
 const guardPostsStore = useGuardPostsStore();
 
@@ -76,7 +77,7 @@ const noGuardPosts = computed<boolean>(
 
           <div class="card-body-section">
             <h4>Strategy</h4>
-            <p>{{ guardPost.strategy }}</p>
+            <p>{{ strategies[guardPost.strategy].name }}</p>
           </div>
 
           <div class="card-body-section">

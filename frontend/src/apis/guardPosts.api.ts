@@ -1,3 +1,4 @@
+import type { StrategyType } from '@/consts';
 import { fetcher } from '@/helpers/fetcherHelper';
 
 export interface GuardPostOccupation {
@@ -9,7 +10,7 @@ export interface GuardPostOccupation {
 export interface GuardPost {
   id: string;
   displayName: string;
-  strategy: string; // TODO: change to enum
+  strategy: StrategyType;
   numOfSoldiers: number;
   occupation: GuardPostOccupation[];
   constraints: string[]; // TODO: implement

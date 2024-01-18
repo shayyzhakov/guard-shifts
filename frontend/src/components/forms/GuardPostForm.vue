@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { type CreateGuardPostParams } from '@/apis/guardPosts.api';
+import { StrategyType, strategies } from '@/consts';
 import { stringifyPeriod, timeToPeriod } from '@/helpers/periodHelpers';
 import { reactive, watch } from 'vue';
 
@@ -51,14 +52,14 @@ watch(
   {},
 );
 
-const strategyOptions = [
+const strategyOptions: Array<{ value: StrategyType; label: string }> = [
   {
-    value: 'roundrobin',
-    label: 'Round-Robin',
+    value: StrategyType.RoundRobin,
+    label: strategies[StrategyType.RoundRobin].name,
   },
   {
-    value: 'team-roundrobin',
-    label: 'Team Round-Robin',
+    value: StrategyType.TeamRoundRobin,
+    label: strategies[StrategyType.TeamRoundRobin].name,
   },
 ];
 
@@ -88,7 +89,13 @@ function removeGuardTime(index: number) {
           :key="item.value"
           :label="item.label"
           :value="item.value"
-        />
+          style="height: unset"
+        >
+          <div class="strategy-content">
+            <span class="strategy-name">{{ item.label }}</span>
+            <span class="strategy-description">{{ strategies[item.value].description }}</span>
+          </div>
+        </el-option>
       </el-select>
     </el-form-item>
 
@@ -156,5 +163,21 @@ function removeGuardTime(index: number) {
   display: flex;
   gap: 6px;
   margin-bottom: 8px;
+}
+
+.strategy-content {
+  display: flex;
+  flex-direction: column;
+  padding: 4px 0;
+}
+
+.strategy-content .strategy-name {
+  line-height: 22px;
+}
+
+.strategy-content .strategy-description {
+  font-size: var(--el-font-size-extra-small);
+  line-height: 20px;
+  color: var(--el-color-info);
 }
 </style>
