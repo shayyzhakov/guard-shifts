@@ -6,7 +6,6 @@ import { Team } from './team.interface';
 export type StrategyHandler = (
   guardPost: GuardPost,
   guardList: GuardList[],
-  guardListHistory: GuardList[],
   startingGuardTime: GuardTime,
   endingGuardTime: GuardTime,
   teams: Team[]

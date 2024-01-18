@@ -3,7 +3,6 @@ import {
   compareGuardTime,
   addDurationToGuardTime,
 } from '../../helpers/periodHelpers';
-import { mergeGuardLists } from '../../helpers/guardListHelpers';
 import type { GuardList, GuardListPeriod } from '../../interfaces/guardList.interface';
 import {
   getGuardPostGuardPeriodDuration,
@@ -17,8 +16,7 @@ import { NextTeamAndSoldiers, TeamsQueue } from '../queues/teamsQueue';
 
 export const teamRoundRobinStrategyHandler: StrategyHandler = (
   guardPost: GuardPost,
-  guardList: GuardList[],
-  guardListHistory: GuardList[],
+  guardLists: GuardList[],
   startingGuardTime: GuardTime,
   endingGuardTime: GuardTime,
   teams: Team[]
@@ -26,11 +24,9 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
   const guardListPerPeriod: GuardListPeriod[] = [];
   let currentGuardTime = startingGuardTime;
 
-  const mergedGuardLists = mergeGuardLists(guardListHistory, guardList);
-
   // TODO: take and merge all guard posts that have team-roundrobin strategy
   const relevantTeams = getTeamsForGuardPost(guardPost.id, teams);
-  const relevantTeamsQueue = new TeamsQueue(guardPost.id, relevantTeams, mergedGuardLists);
+  const relevantTeamsQueue = new TeamsQueue(guardPost.id, relevantTeams, guardLists);
 
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
     const numOfSoldiersForCurrentPeriod = getGuardPostSoldiersAmount(

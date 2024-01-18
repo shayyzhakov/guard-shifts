@@ -3,7 +3,6 @@ import {
   compareGuardTime,
   addDurationToGuardTime,
 } from '../../helpers/periodHelpers';
-import { mergeGuardLists } from '../../helpers/guardListHelpers';
 import type { GuardList, GuardListPeriod } from '../../interfaces/guardList.interface';
 import {
   getGuardPostGuardPeriodDuration,
@@ -17,8 +16,7 @@ import { Team } from '../../interfaces/team.interface';
 
 export const roundRobinStrategyHandler: StrategyHandler = (
   guardPost: GuardPost,
-  guardList: GuardList[],
-  guardListHistory: GuardList[],
+  guardLists: GuardList[],
   startingGuardTime: GuardTime,
   endingGuardTime: GuardTime,
   teams: Team[]
@@ -26,10 +24,8 @@ export const roundRobinStrategyHandler: StrategyHandler = (
   const guardListPerPeriod: GuardListPeriod[] = [];
   let currentGuardTime = startingGuardTime;
 
-  const mergedGuardLists = mergeGuardLists(guardListHistory, guardList);
-
   const relevantSoldiers = getSoldierIdsForGuardPost(guardPost.id, teams);
-  const relevantSoldiersQueue = new SoldiersQueue(relevantSoldiers, mergedGuardLists);
+  const relevantSoldiersQueue = new SoldiersQueue(relevantSoldiers, guardLists);
 
   // TODO: calculate 3 times the duration, then submit just the requested duration
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {

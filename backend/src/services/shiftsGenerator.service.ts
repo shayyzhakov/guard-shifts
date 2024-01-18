@@ -6,6 +6,7 @@ import {
   truncateGuardListFromGuardTime,
   getGuardPostOrder,
   simplifyGuardList,
+  mergeGuardLists,
 } from '../helpers/guardListHelpers';
 import { getUpcomingGuardTimeForGuardPost } from '../helpers/guardPostHelpers';
 import { getUpcomingGuardTime, addDurationToGuardTime, GuardTime } from '../helpers/periodHelpers';
@@ -92,10 +93,11 @@ function buildGuardListForGuardPost(
       break;
   }
 
+  const mergedGuardLists = mergeGuardLists(guardListHistory, guardList);
+
   const guardListPerPeriod = strategyHandler(
     guardPost,
-    guardList,
-    guardListHistory,
+    mergedGuardLists,
     upcomingGuardTime,
     endingGuardTime,
     teams
