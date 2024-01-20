@@ -15,18 +15,9 @@ export interface GuardList {
   guardList: GuardListPeriod[];
 }
 
-export interface GenerateGuardListConstraints {
-  equalNightShifts: {
-    enabled: boolean;
-    from: string;
-    to: string;
-  };
-}
-
 export interface GenerateGuardListParams {
   startPeriod: number;
   duration: number;
-  constraints: GenerateGuardListConstraints;
 }
 
 export async function generateGuardList(params: GenerateGuardListParams): Promise<GuardList[]> {

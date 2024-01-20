@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
-import {
-  generateGuardList,
-  type GenerateGuardListConstraints,
-  type GuardList,
-} from '@/apis/guardLists.api';
+import { generateGuardList, type GuardList } from '@/apis/guardLists.api';
 import {
   GUARD_PERIODS_PER_DAY,
   getUpcomingTime,
@@ -23,14 +19,6 @@ const guardPostsStore = useGuardPostsStore();
 const configForm = reactive({
   startTime: getUpcomingTime(),
   duration: 24,
-});
-
-const constraintsForm = reactive<GenerateGuardListConstraints>({
-  equalNightShifts: {
-    enabled: false,
-    from: '22:00',
-    to: '05:00',
-  },
 });
 
 const endTime = computed<string>(() => {
@@ -53,7 +41,6 @@ async function generateShifts() {
   shiftsDraft.value = await generateGuardList({
     startPeriod: timeToPeriod(configForm.startTime),
     duration: configForm.duration * 2,
-    constraints: constraintsForm,
   });
 
   showShiftsDialog.value = true;
@@ -122,46 +109,6 @@ const warningText = computed(() => {
       <el-card>
         <template #header>
           <div class="card-header">
-            <h3>Constraints</h3>
-          </div>
-        </template>
-
-        <el-form :model="configForm" label-width="120px" label-position="left">
-          <el-form-item label="Night Shifts">
-            <div>
-              <el-checkbox
-                v-model="constraintsForm.equalNightShifts.enabled"
-                label="Ensure an equitable distribution of night shifts"
-              />
-
-              <div v-if="constraintsForm.equalNightShifts.enabled">
-                <span class="form-sub-label">Night Time:</span>
-                <el-time-select
-                  v-model="constraintsForm.equalNightShifts.from"
-                  start="00:00"
-                  step="00:30"
-                  end="23:30"
-                  :clearable="false"
-                  placeholder="From"
-                />
-                -
-                <el-time-select
-                  v-model="constraintsForm.equalNightShifts.to"
-                  start="00:00"
-                  step="00:30"
-                  end="23:30"
-                  :clearable="false"
-                  placeholder="To"
-                />
-              </div>
-            </div>
-          </el-form-item>
-        </el-form>
-      </el-card>
-
-      <el-card>
-        <template #header>
-          <div class="card-header">
             <h3>Events</h3>
           </div>
         </template>
@@ -200,9 +147,5 @@ const warningText = computed(() => {
 
 .buttons {
   margin-top: 8px;
-}
-
-.form-sub-label {
-  margin-right: 8px;
 }
 </style>

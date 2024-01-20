@@ -20,8 +20,8 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.post('/generate', async (req: Request, res: Response) => {
   try {
-    const { startPeriod, duration, constraints } = req.body;
-    const guardLists = await buildGuardList({ startPeriod, duration, constraints });
+    const { startPeriod, duration } = req.body;
+    const guardLists = await buildGuardList({ startPeriod, duration });
 
     return res.json({ guardLists });
   } catch (e) {

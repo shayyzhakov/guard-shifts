@@ -12,21 +12,12 @@ import { getUpcomingGuardTimeForGuardPost } from '../helpers/guardPostHelpers';
 import { getUpcomingGuardTime, addDurationToGuardTime, GuardTime } from '../helpers/periodHelpers';
 import { roundRobinStrategyHandler, teamRoundRobinStrategyHandler } from './strategyHandlers';
 
-interface Constraints {
-  equalNightShifts: {
-    enabled: boolean;
-    from: string;
-    to: string;
-  };
-}
-
 interface GenerateShiftsInput {
   guardPosts: GuardPost[];
   teams: Team[];
   shiftsHistory: GuardList[];
   startPeriod: number;
   duration: number;
-  constraints: Constraints;
 }
 
 export function generateShifts({
@@ -35,20 +26,20 @@ export function generateShifts({
   shiftsHistory,
   startPeriod,
   duration,
-  constraints,
 }: GenerateShiftsInput): GuardList[] {
   const fullGuardList: GuardList[] = [];
 
   const upcomingGuardTime = getUpcomingGuardTime(startPeriod);
   const endGuardTime = addDurationToGuardTime(upcomingGuardTime, duration);
 
-  // truncate history at the start of the upcoming guard time, since we are going to build the guard list from this point
   truncateGuardListFromGuardTime(shiftsHistory, upcomingGuardTime);
 
   // handle higher priority strategies first
   guardPosts.sort((a, b) => {
     return getGuardPostOrder(a) - getGuardPostOrder(b);
   });
+
+  // truncate history at the start of the upcoming guard time, since we are going to build the guard list from this point
 
   for (let i = 0; i < guardPosts.length; i++) {
     const guardListForGuardPost = buildGuardListForGuardPost(
@@ -57,8 +48,7 @@ export function generateShifts({
       shiftsHistory,
       upcomingGuardTime,
       endGuardTime,
-      teams,
-      constraints
+      teams
     );
     fullGuardList.push(guardListForGuardPost);
   }
@@ -72,8 +62,7 @@ function buildGuardListForGuardPost(
   guardListHistory: GuardList[],
   startingGuardTime: GuardTime,
   endingGuardTime: GuardTime,
-  teams: Team[],
-  constraints: Constraints
+  teams: Team[]
 ): GuardList {
   const upcomingGuardTime = getUpcomingGuardTimeForGuardPost(guardPost, startingGuardTime);
 
