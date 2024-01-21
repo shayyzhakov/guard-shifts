@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { type CreateGuardPostParams } from '@/apis/guardPosts.api';
-import { StrategyType, strategies } from '@/consts';
+import { strategies } from '@/consts';
 import { stringifyPeriod, timeToPeriod } from '@/helpers/periodHelpers';
 import { reactive, watch } from 'vue';
 
@@ -52,21 +52,19 @@ watch(
   {},
 );
 
-const strategyOptions: Array<{ value: StrategyType; label: string }> = [
-  {
-    value: StrategyType.RoundRobin,
-    label: strategies[StrategyType.RoundRobin].name,
-  },
-  {
-    value: StrategyType.TeamRoundRobin,
-    label: strategies[StrategyType.TeamRoundRobin].name,
-  },
-];
+const strategyOptions: Array<{ value: string; label: string; description: string }> =
+  Object.entries(strategies).map(([strategyId, strategy]) => {
+    return {
+      value: strategyId,
+      label: strategy.name,
+      description: strategy.description,
+    };
+  });
 
 function addGuardTime() {
   occupations.push({
     from: '00:00',
-    to: '23:30',
+    to: '00:00',
     duration: 4,
   });
 }
@@ -89,11 +87,11 @@ function removeGuardTime(index: number) {
           :key="item.value"
           :label="item.label"
           :value="item.value"
-          style="height: unset"
+          style="height: unset; width: 500px"
         >
           <div class="strategy-content">
             <span class="strategy-name">{{ item.label }}</span>
-            <span class="strategy-description">{{ strategies[item.value].description }}</span>
+            <span class="strategy-description">{{ item.description }}</span>
           </div>
         </el-option>
       </el-select>
@@ -168,7 +166,7 @@ function removeGuardTime(index: number) {
 .strategy-content {
   display: flex;
   flex-direction: column;
-  padding: 4px 0;
+  padding: 4px 0 6px 0;
 }
 
 .strategy-content .strategy-name {
@@ -177,7 +175,8 @@ function removeGuardTime(index: number) {
 
 .strategy-content .strategy-description {
   font-size: var(--el-font-size-extra-small);
-  line-height: 20px;
+  line-height: 16px;
   color: var(--el-color-info);
+  white-space: normal;
 }
 </style>
