@@ -43,10 +43,11 @@ export function generateShifts({
   // truncate history at the start of the upcoming guard time, since we are going to build the guard list from this point
 
   for (let i = 0; i < guardPosts.length; i++) {
+    const mergedGuardLists = mergeGuardLists(guardListHistory, fullGuardList);
+
     const guardListForGuardPost = buildGuardListForGuardPost(
       guardPosts[i],
-      fullGuardList,
-      guardListHistory,
+      mergedGuardLists,
       upcomingGuardTime,
       endGuardTime,
       teams
@@ -59,8 +60,7 @@ export function generateShifts({
 
 function buildGuardListForGuardPost(
   guardPost: GuardPost,
-  guardList: GuardList[],
-  guardListHistory: GuardList[],
+  guardLists: GuardList[],
   startingGuardTime: GuardTime,
   endingGuardTime: GuardTime,
   teams: Team[]
@@ -87,15 +87,7 @@ function buildGuardListForGuardPost(
       break;
   }
 
-  const mergedGuardLists = mergeGuardLists(guardListHistory, guardList);
-
-  const shifts = strategyHandler(
-    guardPost,
-    mergedGuardLists,
-    upcomingGuardTime,
-    endingGuardTime,
-    teams
-  );
+  const shifts = strategyHandler(guardPost, guardLists, upcomingGuardTime, endingGuardTime, teams);
 
   const simplifiedShifts = simplifyShifts(shifts);
   return {
