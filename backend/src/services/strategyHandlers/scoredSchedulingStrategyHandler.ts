@@ -25,7 +25,7 @@ export const scoredSchedulingStrategyHandler: StrategyHandler = (
   const shifts: GuardListShift[] = [];
   let currentGuardTime = startingGuardTime;
 
-  // fill empty periods (without soldiers) in the guard list
+  // fill empty shifts (without soldiers) in the guard list
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
     const periodsPerGuard = getShiftDuration(guardPost, currentGuardTime.period);
 
@@ -38,8 +38,8 @@ export const scoredSchedulingStrategyHandler: StrategyHandler = (
     currentGuardTime = addDurationToGuardTime(currentGuardTime, periodsPerGuard);
   }
 
-  // sort guard periods by score, highest first, and map to indexes
-  const sortedGuardListShiftsIndexesByScore = shifts
+  // sort guard periods by score, highest first
+  const sortedShiftsIndexesByScore = shifts
     .map((shift, index) => {
       const score = getShiftScore(guardPost, shift.guardTime.period);
       return {
@@ -49,13 +49,13 @@ export const scoredSchedulingStrategyHandler: StrategyHandler = (
     })
     .sort((a, b) => b.score - a.score);
 
-  // create a queue of soldiers, sorted by accumulated score (create a class in /queues). every time a soldier is being used, return him to the queue in the right place
+  // create a queue of soldiers, sorted by accumulated score
   const relevantSoldiers = getSoldierIdsForGuardPost(guardPost.id, teams);
   const scoredSoldiersQueue = new SoldiersScoredQueue(guardPost, relevantSoldiers, guardLists);
 
-  // fill the guard list with soldiers from the queue
-  while (sortedGuardListShiftsIndexesByScore.length > 0) {
-    const currentShiftReference = sortedGuardListShiftsIndexesByScore.shift();
+  // fill the shifts with soldiers from the queue
+  while (sortedShiftsIndexesByScore.length > 0) {
+    const currentShiftReference = sortedShiftsIndexesByScore.shift();
     if (!currentShiftReference) break;
 
     const currentShift = shifts[currentShiftReference.index];

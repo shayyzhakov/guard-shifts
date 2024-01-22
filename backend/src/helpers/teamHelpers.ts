@@ -5,19 +5,16 @@ import { Team } from '../interfaces/team.interface';
  * based on the guard post shifts, get a sorted list of teams that should be used next in the guard post.
  * @returns sorted list of teams (lower index should be used next)
  */
-export function orderTeamsByLastTeamGuard(
-  teams: Team[],
-  guardListShifts: GuardListShift[]
-): Team[] {
+export function orderTeamsByLastTeamGuard(teams: Team[], shifts: GuardListShift[]): Team[] {
   const orderedTeams: Team[] = [];
 
   // insert teams that already appeared in the guard list, from the older to the newer
-  for (const guardListShift of guardListShifts.reverse()) {
+  for (const shift of shifts.reverse()) {
     if (
-      guardListShift.team &&
-      orderedTeams.every((team) => team.id !== guardListShift.team) // should be unique in the queue
+      shift.team &&
+      orderedTeams.every((team) => team.id !== shift.team) // should be unique in the queue
     ) {
-      const team = teams.find((team) => team.id === guardListShift.team);
+      const team = teams.find((team) => team.id === shift.team);
       if (team) {
         orderedTeams.unshift(team);
       }
