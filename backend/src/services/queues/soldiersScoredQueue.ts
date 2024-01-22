@@ -14,6 +14,7 @@ interface SoldierWithScore {
  */
 export class SoldiersScoredQueue {
   private orderedSoldiersAndScore: SoldierWithScore[] = [];
+  private usedSoldiers: SoldierWithScore[] = []; // helps ensuring that soldiers will be used the same amount of times
 
   constructor(guardPost: GuardPost, soldiers: string[], private guardLists: GuardList[]) {
     // get score for soldiers that already appeared in the guard list
@@ -64,8 +65,9 @@ export class SoldiersScoredQueue {
       soldier.score += score;
     });
 
-    // add all soldiers back to the queue and re-sort
-    this.enqueue([...busySoldiers, ...nextSoldiers]);
+    // add all soldiers back to the queues
+    this.usedSoldiers.push(...nextSoldiers);
+    this.enqueue(busySoldiers);
 
     return nextSoldiers.map((soldier) => soldier.soldier);
   }
@@ -76,6 +78,12 @@ export class SoldiersScoredQueue {
   }
 
   private dequeue(): SoldierWithScore | undefined {
+    // if the queue is empty, add the used soldiers back to the queue
+    if (this.orderedSoldiersAndScore.length === 0) {
+      this.enqueue(this.usedSoldiers);
+      this.usedSoldiers = [];
+    }
+
     return this.orderedSoldiersAndScore.shift();
   }
 }
