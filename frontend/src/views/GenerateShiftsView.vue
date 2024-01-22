@@ -45,12 +45,13 @@ async function generateShifts() {
     });
     showShiftsDialog.value = true;
   } catch (err) {
-    isLoading.value = false;
     ElNotification({
       title: 'Action failed',
       message: 'Failed to generate shifts',
       type: 'error',
     });
+  } finally {
+    isLoading.value = false;
   }
 }
 
