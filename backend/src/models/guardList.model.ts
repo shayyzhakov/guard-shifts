@@ -1,6 +1,6 @@
-import type { GuardList, GuardListPeriod } from '../interfaces/guardList.interface';
+import type { GuardList, GuardListShift } from '../interfaces/guardList.interface';
 import { type GuardTime, compareGuardTime } from '../helpers/periodHelpers';
-import type { DbGuardList, DbGuardListPeriod, DbGuardTime } from '../interfaces/db.types';
+import type { DbGuardList, DbGuardListShift, DbGuardTime } from '../interfaces/db.types';
 import { marshall, unmarshall } from '@aws-sdk/util-dynamodb';
 import { PutItemCommand, ScanCommand, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
 import { getDbClient } from '../helpers/dbClient';
@@ -17,10 +17,10 @@ export async function saveGuardLists(
       // guard list history exist for this guard post. merge lists
 
       // remove overlapping items from the history
-      await removeHistoryGuardListPeriodsFromGuardTime(historyGl, startingFromGuardTime);
+      await removeHistoryShiftsFromGuardTime(historyGl, startingFromGuardTime);
 
       // add the new guard list to the history
-      addGuardPostShifts(historyGl.guardPostId, serializedGuardList.guardList);
+      addGuardPostShifts(historyGl.guardPostId, serializedGuardList.shifts);
     } else {
       // guard list history does not exist for this guard post
       await createGuardList(serializedGuardList);
@@ -30,79 +30,70 @@ export async function saveGuardLists(
   await Promise.all(promises);
 }
 
-export async function createGuardList(createParams: DbGuardList) {
+async function createGuardList(createParams: DbGuardList) {
   await getDbClient().send(
     new PutItemCommand({ TableName: 'GuardShifts', Item: marshall(createParams) })
   );
 }
 
-async function removeHistoryGuardListPeriodsFromGuardTime(
+async function removeHistoryShiftsFromGuardTime(
   guardList: DbGuardList,
   fromGuardTime: GuardTime
 ): Promise<void> {
-  const glOldOverrideIndex = guardList.guardList.findIndex(
-    (glp) => compareGuardTime(deserializeGuardTime(glp.guardTime), fromGuardTime) <= 0
+  const glOldOverrideIndex = guardList.shifts.findIndex(
+    (shift) => compareGuardTime(deserializeGuardTime(shift.guardTime), fromGuardTime) <= 0
   );
   if (glOldOverrideIndex > -1) {
-    await setGuardPostShifts(
-      guardList.guardPostId,
-      guardList.guardList.slice(0, glOldOverrideIndex)
-    );
+    await setGuardPostShifts(guardList.guardPostId, guardList.shifts.slice(0, glOldOverrideIndex));
   }
 }
 
-async function setGuardPostShifts(
-  guardPostId: string,
-  guardListPeriods: DbGuardListPeriod[]
-): Promise<void> {
+async function setGuardPostShifts(guardPostId: string, shifts: DbGuardListShift[]): Promise<void> {
   await getDbClient().send(
     new UpdateItemCommand({
       TableName: 'GuardShifts',
       Key: { guardPostId: { S: guardPostId } },
-      UpdateExpression: 'SET guardList = :guardList',
+      UpdateExpression: 'SET shifts = :shifts',
       ExpressionAttributeValues: {
-        ':guardList': { L: guardListPeriods.map((x) => ({ M: marshall(x) })) },
+        ':shifts': { L: shifts.map((shift) => ({ M: marshall(shift) })) },
       },
     })
   );
 }
 
-async function addGuardPostShifts(
-  guardPostId: string,
-  guardListPeriods: DbGuardListPeriod[]
-): Promise<void> {
+async function addGuardPostShifts(guardPostId: string, shifts: DbGuardListShift[]): Promise<void> {
   await getDbClient().send(
     new UpdateItemCommand({
       TableName: 'GuardShifts',
       Key: { guardPostId: { S: guardPostId } },
-      UpdateExpression: 'SET guardList = list_append(guardList, :guardList)',
+      UpdateExpression: 'SET shifts = list_append(shifts, :shifts)',
       ExpressionAttributeValues: {
-        ':guardList': { L: guardListPeriods.map((x) => ({ M: marshall(x) })) },
+        ':shifts': { L: shifts.map((shift) => ({ M: marshall(shift) })) },
       },
     })
   );
 }
 
-function serizlizeGuardListPeriod(guardListPeriod: GuardListPeriod[]): DbGuardListPeriod[] {
-  return guardListPeriod.map((glp) => ({
-    ...glp,
-    guardTime: serializeGuardTime(glp.guardTime),
+function serizlizeGuardListShifts(shifts: GuardListShift[]): DbGuardListShift[] {
+  return shifts.map((shift) => ({
+    ...shift,
+    guardTime: serializeGuardTime(shift.guardTime),
   }));
 }
 
 function serializeGuardList(guardList: GuardList): DbGuardList {
   return {
     ...guardList,
-    guardList: serizlizeGuardListPeriod(guardList.guardList),
+    shifts: serizlizeGuardListShifts(guardList.shifts),
   };
 }
 
 export function deserializeGuardList(dbGuardList: DbGuardList): GuardList {
   return {
     ...dbGuardList,
-    guardList: dbGuardList.guardList.map((glp) => ({
-      ...glp,
-      guardTime: deserializeGuardTime(glp.guardTime),
+    shifts: dbGuardList.shifts.map((shift) => ({
+      ...shift,
+      guardTime: deserializeGuardTime(shift.guardTime),
     })),
   };
 }

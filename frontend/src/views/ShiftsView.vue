@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type GuardList, type GuardListPeriod } from '@/apis/guardLists.api';
+import { type GuardList, type GuardListShift } from '@/apis/guardLists.api';
 import { GUARD_PERIODS_PER_DAY, guardTimeToDate, stringifyPeriod } from '@/helpers/periodHelpers';
 import { useGuardPostsStore } from '@/stores/guardPosts.store';
 import { useShiftsStore } from '@/stores/shifts.store';
@@ -23,25 +23,25 @@ const filteredShifts = computed<GuardList[]>(() => {
   return shiftsStore.shifts
     .map((guardPostShifts) => {
       // filter out guard periods before the selected date
-      const firstIndex = guardPostShifts.guardList.findIndex(
-        (guardPeriod) => guardTimeToDate(guardPeriod.guardTime) > filterFromDate.value,
+      const firstIndex = guardPostShifts.shifts.findIndex(
+        (shift) => guardTimeToDate(shift.guardTime) > filterFromDate.value,
       );
 
-      let guardList: GuardListPeriod[] = [];
+      let shifts: GuardListShift[] = [];
       if (firstIndex >= 0) {
-        guardList = guardPostShifts.guardList.slice(firstIndex);
+        shifts = guardPostShifts.shifts.slice(firstIndex);
       }
       // for firstIndex === -1, leave guardList empty
 
       return {
         ...guardPostShifts,
-        guardList,
+        shifts,
       };
     })
     .filter((guardPostShifts) => {
       // filter out deleted guard posts with no shifts to show (in the selected time range)
       const isGuardPostDeleted = guardPostsStore.isGuardPostDeleted(guardPostShifts.guardPostId);
-      return !isGuardPostDeleted || guardPostShifts.guardList.length > 0;
+      return !isGuardPostDeleted || guardPostShifts.shifts.length > 0;
     });
 });
 
@@ -139,7 +139,7 @@ const dateShortcuts = [
               </div>
             </template>
 
-            <el-table :data="guardPostShifts.guardList" stripe style="width: 100%">
+            <el-table :data="guardPostShifts.shifts" stripe style="width: 100%">
               <el-table-column prop="guardTime" label="Time" width="220">
                 <template #default="{ row }">
                   {{ stringifyPeriod(row.guardTime.period) }}-{{
@@ -153,7 +153,7 @@ const dateShortcuts = [
                 </template>
               </el-table-column>
               <el-table-column
-                v-if="guardPostShifts.guardList.some((glp) => glp.team)"
+                v-if="guardPostShifts.shifts.some((shift) => shift.team)"
                 prop="team"
                 label="Team"
                 width="120"

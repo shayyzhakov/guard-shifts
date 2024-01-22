@@ -29,12 +29,12 @@ export class TeamsQueue {
   constructor(guardPostId: string, teams: Team[], private guardLists: GuardList[]) {
     // order teams by last guard time
     const guardPostGuardList =
-      guardLists.find((gl) => gl.guardPostId === guardPostId)?.guardList ?? [];
+      guardLists.find((gl) => gl.guardPostId === guardPostId)?.shifts ?? [];
 
     const orderedTeams = orderTeamsByLastTeamGuard(teams, guardPostGuardList);
 
     // TODO: create soldiers queue based on soldiers appearance in team roundrobin guard lists only
-    // const teamRoundrobinGuardLists = guardLists.filter((gl) => 'team' in gl.guardList[0]);
+    // const teamRoundrobinGuardLists = guardLists.filter((gl) => 'team' in gl.shifts[0]);
 
     // for each ordered team, create an ordered soldiers queue
     this.orderedTeamsAndSoldiers = orderedTeams.map((team) => ({

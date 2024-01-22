@@ -3,7 +3,7 @@ import { DbGuardList } from '../interfaces/db.types';
 export const guardListHistory: DbGuardList[] = [
   // {
   //   guardPostId: 'konenut-morning',
-  //   guardList: [
+  //   shifts: [
   //     {
   //       soldiers: ['1ba', '1bb', '1bc', '1bd', '1be'],
   //       team: '1B',

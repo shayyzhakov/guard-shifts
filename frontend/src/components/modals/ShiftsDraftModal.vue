@@ -92,7 +92,7 @@ const teamSoldiersOptions = computed<
             </div>
           </template>
 
-          <el-table :data="guardPostShifts.guardList" stripe style="width: 100%">
+          <el-table :data="guardPostShifts.shifts" stripe style="width: 100%">
             <el-table-column prop="guardTime" label="Time" width="220">
               <template #default="{ row }">
                 {{ stringifyPeriod(row.guardTime.period) }}-{{
@@ -106,7 +106,7 @@ const teamSoldiersOptions = computed<
               </template>
             </el-table-column>
             <el-table-column
-              v-if="guardPostShifts.guardList.some((glp) => glp.team)"
+              v-if="guardPostShifts.shifts.some((shift) => shift.team)"
               prop="team"
               label="Team"
               width="120"

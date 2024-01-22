@@ -3,7 +3,7 @@ export interface DbGuardTime {
   date: string;
 }
 
-export interface DbGuardListPeriod {
+export interface DbGuardListShift {
   soldiers: string[];
   guardTime: DbGuardTime;
   duration: number;
@@ -14,5 +14,5 @@ export interface DbGuardListPeriod {
 export interface DbGuardList {
   guardPostId: string;
   guardPostDisplayName: string;
-  guardList: DbGuardListPeriod[];
+  shifts: DbGuardListShift[];
 }

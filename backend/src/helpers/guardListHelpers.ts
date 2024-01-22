@@ -1,5 +1,5 @@
 import { strategies } from '../consts';
-import { GuardList, GuardListPeriod } from '../interfaces/guardList.interface';
+import { GuardList, GuardListShift } from '../interfaces/guardList.interface';
 import { GuardPost } from '../interfaces/guardPost.interface';
 import {
   GuardTime,
@@ -23,15 +23,15 @@ export function getSoldierIdsByLatestGuardOrder(guardLists: GuardList[]): string
   const soldiers: string[] = [];
 
   // flatten guard lists to array of guard periods
-  const guardPeriods = guardLists.flatMap((gl) => gl.guardList);
+  const shifts = guardLists.flatMap((gl) => gl.shifts);
 
   // sort guard periods by guard time from latest to oldest
-  const sortedGuardPeriods = guardPeriods.sort((a, b) =>
+  const sortedShifts = shifts.sort((a, b) =>
     compareGuardTime(a.guardTime, b.guardTime) > 0 ? 1 : -1
   );
 
   // add soldiers to the list, from the oldest to the newest
-  sortedGuardPeriods.forEach((gp) => {
+  sortedShifts.forEach((gp) => {
     gp.soldiers.forEach((soldier) => {
       if (!soldiers.includes(soldier)) {
         soldiers.unshift(soldier);
@@ -53,7 +53,7 @@ export function mergeGuardLists(guardLists1: GuardList[], guardLists2: GuardList
     const mergedGuardList = mergedGuardLists.find((gl1) => gl1.guardPostId === gl.guardPostId);
     if (mergedGuardList) {
       // TODO: delete overlapping periods
-      mergedGuardList.guardList.push(...gl.guardList);
+      mergedGuardList.shifts.push(...gl.shifts);
     } else {
       mergedGuardLists.push(gl);
     }
@@ -70,11 +70,11 @@ export function truncateGuardListFromGuardTime(
   fromGuardTime: GuardTime
 ): void {
   guardLists.forEach((gl) => {
-    const glOldOverrideIndex = gl.guardList.findIndex(
-      (glp) => compareGuardTime(glp.guardTime, fromGuardTime) <= 0
+    const glOldOverrideIndex = gl.shifts.findIndex(
+      (shift) => compareGuardTime(shift.guardTime, fromGuardTime) <= 0
     );
     if (glOldOverrideIndex > -1) {
-      gl.guardList.splice(glOldOverrideIndex);
+      gl.shifts.splice(glOldOverrideIndex);
     }
 
     return gl;
@@ -86,7 +86,7 @@ export function truncateGuardListFromGuardTime(
  */
 export function isTeamBusy(guardList: GuardList[], guardTime: GuardTime, teamId: string): boolean {
   return guardList.some((guardPostList) => {
-    const guardPeriod = guardPostList.guardList.find((gp) => {
+    const shift = guardPostList.shifts.find((gp) => {
       const isLater = isGuardTimeGreaterThanOrEqual(guardTime, gp.guardTime);
       const isBefore = isGuardTimeBefore(
         guardTime,
@@ -95,7 +95,7 @@ export function isTeamBusy(guardList: GuardList[], guardTime: GuardTime, teamId:
       return isLater && isBefore;
     });
 
-    return guardPeriod && guardPeriod.team === teamId;
+    return shift && shift.team === teamId;
   });
 }
 
@@ -108,23 +108,23 @@ export function isSoldierBusy(
   soldierId: string
 ): boolean {
   return guardList.some((guardPostList) => {
-    const guardPeriod = guardPostList.guardList.find((glp) => {
-      const isLater = isGuardTimeGreaterThanOrEqual(guardTime, glp.guardTime);
+    const shift = guardPostList.shifts.find((shift) => {
+      const isLater = isGuardTimeGreaterThanOrEqual(guardTime, shift.guardTime);
       const isBefore = isGuardTimeBefore(
         guardTime,
-        addDurationToGuardTime(glp.guardTime, glp.duration)
+        addDurationToGuardTime(shift.guardTime, shift.duration)
       );
       return isLater && isBefore;
     });
 
-    return guardPeriod?.soldiers.includes(soldierId);
+    return shift?.soldiers.includes(soldierId);
   });
 }
 
-export function simplifyGuardList(guardListForGuardPost: GuardListPeriod[]): GuardListPeriod[] {
+export function simplifyShifts(shifts: GuardListShift[]): GuardListShift[] {
   // remove empty periods
-  const simplifiedGuardListForGuardPost = guardListForGuardPost.filter(
-    (guardPeriod) => guardPeriod.soldiers.length > 0 || guardPeriod.error
+  const simplifiedGuardListForGuardPost = shifts.filter(
+    (shift) => shift.soldiers.length > 0 || shift.error
   );
 
   return simplifiedGuardListForGuardPost;

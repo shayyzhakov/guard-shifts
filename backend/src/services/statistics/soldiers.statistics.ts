@@ -1,4 +1,4 @@
-import { getGuardPostScoreForGuardPeriod } from '../../helpers/guardPostHelpers';
+import { getShiftScore } from '../../helpers/guardPostHelpers';
 import { GuardList } from '../../interfaces/guardList.interface';
 import { GuardPost } from '../../interfaces/guardPost.interface';
 
@@ -15,8 +15,8 @@ export function getSoldiersWithScoreFromGuardList(
 
   // TODO: truncate guardList to show only last 7 days (should be configurable)
   guardLists.forEach((guardList) => {
-    guardList.guardList.forEach((shift) => {
-      const shiftScore = getGuardPostScoreForGuardPeriod(guardPost, shift.guardTime.period);
+    guardList.shifts.forEach((shift) => {
+      const shiftScore = getShiftScore(guardPost, shift.guardTime.period);
 
       shift.soldiers.forEach((soldier) => {
         if (!soldiersWithScoreMap[soldier]) soldiersWithScoreMap[soldier] = 0;

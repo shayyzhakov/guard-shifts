@@ -3,10 +3,10 @@ import {
   compareGuardTime,
   addDurationToGuardTime,
 } from '../../helpers/periodHelpers';
-import type { GuardList, GuardListPeriod } from '../../interfaces/guardList.interface';
+import type { GuardList, GuardListShift } from '../../interfaces/guardList.interface';
 import {
-  getGuardPostGuardPeriodDuration,
-  getGuardPostScoreForGuardPeriod,
+  getShiftDuration,
+  getShiftScore,
   getGuardPostSoldiersAmount,
   getSoldierIdsForGuardPost,
 } from '../../helpers/guardPostHelpers';
@@ -21,15 +21,15 @@ export const scoredSchedulingStrategyHandler: StrategyHandler = (
   startingGuardTime: GuardTime,
   endingGuardTime: GuardTime,
   teams: Team[]
-): GuardListPeriod[] => {
-  const guardListPerPeriods: GuardListPeriod[] = [];
+): GuardListShift[] => {
+  const shifts: GuardListShift[] = [];
   let currentGuardTime = startingGuardTime;
 
   // fill empty periods (without soldiers) in the guard list
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
-    const periodsPerGuard = getGuardPostGuardPeriodDuration(guardPost, currentGuardTime.period);
+    const periodsPerGuard = getShiftDuration(guardPost, currentGuardTime.period);
 
-    guardListPerPeriods.push({
+    shifts.push({
       soldiers: [],
       guardTime: currentGuardTime,
       duration: periodsPerGuard,
@@ -39,15 +39,12 @@ export const scoredSchedulingStrategyHandler: StrategyHandler = (
   }
 
   // sort guard periods by score, highest first, and map to indexes
-  const sortedGuardListPeriodsIndexesByScore = guardListPerPeriods
-    .map((guardListPeriod, index) => {
-      const scoreForGuardPeriod = getGuardPostScoreForGuardPeriod(
-        guardPost,
-        guardListPeriod.guardTime.period
-      );
+  const sortedGuardListShiftsIndexesByScore = shifts
+    .map((shift, index) => {
+      const score = getShiftScore(guardPost, shift.guardTime.period);
       return {
         index,
-        score: scoreForGuardPeriod,
+        score,
       };
     })
     .sort((a, b) => b.score - a.score);
@@ -57,29 +54,29 @@ export const scoredSchedulingStrategyHandler: StrategyHandler = (
   const scoredSoldiersQueue = new SoldiersScoredQueue(guardPost, relevantSoldiers, guardLists);
 
   // fill the guard list with soldiers from the queue
-  while (sortedGuardListPeriodsIndexesByScore.length > 0) {
-    const currentShiftReference = sortedGuardListPeriodsIndexesByScore.shift();
+  while (sortedGuardListShiftsIndexesByScore.length > 0) {
+    const currentShiftReference = sortedGuardListShiftsIndexesByScore.shift();
     if (!currentShiftReference) break;
 
-    const currentGuardListPeriod = guardListPerPeriods[currentShiftReference.index];
+    const currentShift = shifts[currentShiftReference.index];
 
     const numOfSoldiersForCurrentPeriod = getGuardPostSoldiersAmount(
       guardPost,
-      currentGuardListPeriod.guardTime.period
+      currentShift.guardTime.period
     );
 
     // find the next soldiers to guard
     try {
       // TODO: avoid consecutive shifts for soldiers, should be configurable
-      currentGuardListPeriod.soldiers = scoredSoldiersQueue.next(
-        currentGuardListPeriod.guardTime,
+      currentShift.soldiers = scoredSoldiersQueue.next(
+        currentShift.guardTime,
         numOfSoldiersForCurrentPeriod,
         currentShiftReference.score
       );
     } catch (err) {
-      currentGuardListPeriod.error = err instanceof Error ? err.message : 'unknown error';
+      currentShift.error = err instanceof Error ? err.message : 'unknown error';
     }
   }
 
-  return guardListPerPeriods;
+  return shifts;
 };

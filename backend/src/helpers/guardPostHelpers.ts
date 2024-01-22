@@ -18,12 +18,12 @@ export function getGuardPostSoldiersAmount(guardPost: GuardPost, period: number)
   return shouldGuardPostBeOccupied ? guardPost.numOfSoldiers : 0;
 }
 
-export function getGuardPostGuardPeriodDuration(guardPost: GuardPost, period: number): number {
+export function getShiftDuration(guardPost: GuardPost, period: number): number {
   const occupation = occupationByPeriod(guardPost, period);
   return occupation?.duration ?? 1;
 }
 
-export function getGuardPostScoreForGuardPeriod(guardPost: GuardPost, period: number): number {
+export function getShiftScore(guardPost: GuardPost, period: number): number {
   const scoresRange = scoreRangeByPeriod(guardPost, period);
   return scoresRange?.score ?? 1; // default score is 1
 }

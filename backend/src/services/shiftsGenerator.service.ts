@@ -5,7 +5,7 @@ import { Team } from '../interfaces/team.interface';
 import {
   truncateGuardListFromGuardTime,
   getGuardPostOrder,
-  simplifyGuardList,
+  simplifyShifts,
   mergeGuardLists,
 } from '../helpers/guardListHelpers';
 import { getUpcomingGuardTimeForGuardPost } from '../helpers/guardPostHelpers';
@@ -16,7 +16,7 @@ import { scoredSchedulingStrategyHandler } from './strategyHandlers/scoredSchedu
 interface GenerateShiftsInput {
   guardPosts: GuardPost[];
   teams: Team[];
-  shiftsHistory: GuardList[];
+  guardListHistory: GuardList[];
   startPeriod: number;
   duration: number;
 }
@@ -24,7 +24,7 @@ interface GenerateShiftsInput {
 export function generateShifts({
   guardPosts,
   teams,
-  shiftsHistory,
+  guardListHistory,
   startPeriod,
   duration,
 }: GenerateShiftsInput): GuardList[] {
@@ -33,7 +33,7 @@ export function generateShifts({
   const upcomingGuardTime = getUpcomingGuardTime(startPeriod);
   const endGuardTime = addDurationToGuardTime(upcomingGuardTime, duration);
 
-  truncateGuardListFromGuardTime(shiftsHistory, upcomingGuardTime);
+  truncateGuardListFromGuardTime(guardListHistory, upcomingGuardTime);
 
   // handle higher priority strategies first
   guardPosts.sort((a, b) => {
@@ -46,7 +46,7 @@ export function generateShifts({
     const guardListForGuardPost = buildGuardListForGuardPost(
       guardPosts[i],
       fullGuardList,
-      shiftsHistory,
+      guardListHistory,
       upcomingGuardTime,
       endGuardTime,
       teams
@@ -89,7 +89,7 @@ function buildGuardListForGuardPost(
 
   const mergedGuardLists = mergeGuardLists(guardListHistory, guardList);
 
-  const guardListPerPeriod = strategyHandler(
+  const shifts = strategyHandler(
     guardPost,
     mergedGuardLists,
     upcomingGuardTime,
@@ -97,10 +97,10 @@ function buildGuardListForGuardPost(
     teams
   );
 
-  const guardListPeriods = simplifyGuardList(guardListPerPeriod);
+  const simplifiedShifts = simplifyShifts(shifts);
   return {
     guardPostId: guardPost.id,
     guardPostDisplayName: guardPost.displayName,
-    guardList: guardListPeriods,
+    shifts: simplifiedShifts,
   };
 }

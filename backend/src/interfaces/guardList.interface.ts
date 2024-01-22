@@ -1,6 +1,6 @@
 import type { GuardTime } from '../helpers/periodHelpers';
 
-export interface GuardListPeriod {
+export interface GuardListShift {
   soldiers: string[];
   guardTime: GuardTime;
   duration: number;
@@ -11,5 +11,5 @@ export interface GuardListPeriod {
 export interface GuardList {
   guardPostId: string;
   guardPostDisplayName: string;
-  guardList: GuardListPeriod[];
+  shifts: GuardListShift[];
 }

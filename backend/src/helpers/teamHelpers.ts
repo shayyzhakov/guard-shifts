@@ -1,4 +1,4 @@
-import { GuardListPeriod } from '../interfaces/guardList.interface';
+import { GuardListShift } from '../interfaces/guardList.interface';
 import { Team } from '../interfaces/team.interface';
 
 /**
@@ -7,17 +7,17 @@ import { Team } from '../interfaces/team.interface';
  */
 export function orderTeamsByLastTeamGuard(
   teams: Team[],
-  guardPostShifts: GuardListPeriod[]
+  guardListShifts: GuardListShift[]
 ): Team[] {
   const orderedTeams: Team[] = [];
 
   // insert teams that already appeared in the guard list, from the older to the newer
-  for (const guardListPeriod of guardPostShifts.reverse()) {
+  for (const guardListShift of guardListShifts.reverse()) {
     if (
-      guardListPeriod.team &&
-      orderedTeams.every((team) => team.id !== guardListPeriod.team) // should be unique in the queue
+      guardListShift.team &&
+      orderedTeams.every((team) => team.id !== guardListShift.team) // should be unique in the queue
     ) {
-      const team = teams.find((team) => team.id === guardListPeriod.team);
+      const team = teams.find((team) => team.id === guardListShift.team);
       if (team) {
         orderedTeams.unshift(team);
       }

@@ -3,9 +3,9 @@ import {
   compareGuardTime,
   addDurationToGuardTime,
 } from '../../helpers/periodHelpers';
-import type { GuardList, GuardListPeriod } from '../../interfaces/guardList.interface';
+import type { GuardList, GuardListShift } from '../../interfaces/guardList.interface';
 import {
-  getGuardPostGuardPeriodDuration,
+  getShiftDuration,
   getGuardPostSoldiersAmount,
   getTeamsForGuardPost,
 } from '../../helpers/guardPostHelpers';
@@ -20,8 +20,8 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
   startingGuardTime: GuardTime,
   endingGuardTime: GuardTime,
   teams: Team[]
-): GuardListPeriod[] => {
-  const guardListPerPeriod: GuardListPeriod[] = [];
+): GuardListShift[] => {
+  const shifts: GuardListShift[] = [];
   let currentGuardTime = startingGuardTime;
 
   // TODO: take and merge all guard posts that have team-roundrobin strategy
@@ -33,7 +33,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
       guardPost,
       currentGuardTime.period
     );
-    const periodsPerGuard = getGuardPostGuardPeriodDuration(guardPost, currentGuardTime.period);
+    const periodsPerGuard = getShiftDuration(guardPost, currentGuardTime.period);
 
     // find the next team
     let teamAndSoldiers: NextTeamAndSoldiers | undefined = undefined;
@@ -44,7 +44,7 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
       error = err instanceof Error ? err.message : 'unknown error';
     }
 
-    guardListPerPeriod.push({
+    shifts.push({
       soldiers: teamAndSoldiers?.soldiers ?? [],
       team: teamAndSoldiers?.id,
       guardTime: currentGuardTime,
@@ -55,5 +55,5 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
     currentGuardTime = addDurationToGuardTime(currentGuardTime, periodsPerGuard);
   }
 
-  return guardListPerPeriod;
+  return shifts;
 };
