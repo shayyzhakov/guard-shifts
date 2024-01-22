@@ -33,14 +33,13 @@ export function generateShifts({
   const upcomingGuardTime = getUpcomingGuardTime(startPeriod);
   const endGuardTime = addDurationToGuardTime(upcomingGuardTime, duration);
 
+  // truncate history at the start of the upcoming guard time, since we are going to build the guard list from this point
   truncateGuardListFromGuardTime(guardListHistory, upcomingGuardTime);
 
   // handle higher priority strategies first
   guardPosts.sort((a, b) => {
     return getGuardPostOrder(a) - getGuardPostOrder(b);
   });
-
-  // truncate history at the start of the upcoming guard time, since we are going to build the guard list from this point
 
   for (let i = 0; i < guardPosts.length; i++) {
     const mergedGuardLists = mergeGuardLists(guardListHistory, fullGuardList);
