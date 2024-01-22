@@ -35,7 +35,7 @@ export interface CommitGuardListParams {
 }
 
 export async function commitGuardList(params: CommitGuardListParams): Promise<void> {
-  const response = await fetcher.fetch('/guard-list/commit', {
+  const response = await fetcher.fetch('/guard-list', {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify(params),

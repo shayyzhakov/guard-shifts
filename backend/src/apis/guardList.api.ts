@@ -30,7 +30,7 @@ router.post('/generate', async (req: Request, res: Response) => {
   }
 });
 
-router.post('/commit', async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
   try {
     const { guardLists, startPeriod } = req.body;
 

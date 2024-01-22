@@ -11,6 +11,7 @@ import { useTeamsStore } from '@/stores/teams.store';
 import { useSoldiersStore } from '@/stores/soldiers.store';
 import { useGuardPostsStore } from '@/stores/guardPosts.store';
 import ShiftsDraftModal from '@/components/modals/ShiftsDraftModal.vue';
+import { ElNotification } from 'element-plus';
 
 const teamsStore = useTeamsStore();
 const soldiersStore = useSoldiersStore();
@@ -37,15 +38,20 @@ const showShiftsDialog = ref<boolean>(false);
 
 async function generateShifts() {
   isLoading.value = true;
-
-  shiftsDraft.value = await generateGuardList({
-    startPeriod: timeToPeriod(configForm.startTime),
-    duration: configForm.duration * 2,
-  });
-
-  showShiftsDialog.value = true;
-
-  isLoading.value = false;
+  try {
+    shiftsDraft.value = await generateGuardList({
+      startPeriod: timeToPeriod(configForm.startTime),
+      duration: configForm.duration * 2,
+    });
+    showShiftsDialog.value = true;
+  } catch (err) {
+    isLoading.value = false;
+    ElNotification({
+      title: 'Action failed',
+      message: 'Failed to generate shifts',
+      type: 'error',
+    });
+  }
 }
 
 const warningText = computed(() => {
