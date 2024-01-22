@@ -1,4 +1,4 @@
-import type { GuardPost } from '../interfaces/guardPost.interface';
+import type { GuardPost, GuardPostOccupation } from '../interfaces/guardPost.interface';
 import {
   createGuardPost,
   deleteGuardPostById,
@@ -12,17 +12,12 @@ export async function getGuardPosts(): Promise<GuardPost[]> {
   return await getAllGuardPosts();
 }
 
-interface GuardPostOccupation {
-  from: number; // included
-  to: number; // excluded
-  duration: number;
-}
 interface CreateGuardPostParams {
   displayName: string;
   strategy: string;
   numOfSoldiers: number;
   occupation: GuardPostOccupation[];
-  constraints: string[];
+  config: Record<string, unknown>;
 }
 
 export async function createNewGuardPost(params: CreateGuardPostParams): Promise<void> {
@@ -48,6 +43,7 @@ export async function updateGuardPost(
 export async function deleteGuardPost(guardPostId: string): Promise<void> {
   // TODO: delete future guard shifts for this guard post
 
+  // TODO: not working, need to fix
   // delete guard post usages of teams
   const teams = await getAllTeams();
   await removeGuardPostsFromTeams(teams, [guardPostId]);

@@ -11,6 +11,7 @@ import {
 import { getUpcomingGuardTimeForGuardPost } from '../helpers/guardPostHelpers';
 import { getUpcomingGuardTime, addDurationToGuardTime, GuardTime } from '../helpers/periodHelpers';
 import { roundRobinStrategyHandler, teamRoundRobinStrategyHandler } from './strategyHandlers';
+import { scoredSchedulingStrategyHandler } from './strategyHandlers/scoredSchedulingStrategyHandler';
 
 interface GenerateShiftsInput {
   guardPosts: GuardPost[];
@@ -74,6 +75,10 @@ function buildGuardListForGuardPost(
 
     case 'team-roundrobin':
       strategyHandler = teamRoundRobinStrategyHandler;
+      break;
+
+    case 'scored-scheduling':
+      strategyHandler = scoredSchedulingStrategyHandler;
       break;
 
     default:

@@ -24,7 +24,7 @@ export const guardPosts: GuardPost[] = [
         duration: 2,
       },
     ],
-    constraints: [],
+    config: {},
   },
   {
     id: 'ofek',
@@ -43,7 +43,7 @@ export const guardPosts: GuardPost[] = [
         duration: 2,
       },
     ],
-    constraints: [],
+    config: {},
   },
   {
     id: 'konenut-morning',
@@ -57,7 +57,7 @@ export const guardPosts: GuardPost[] = [
         duration: 4,
       },
     ],
-    constraints: [],
+    config: {},
   },
   {
     id: 'konenut-evening',
@@ -71,6 +71,6 @@ export const guardPosts: GuardPost[] = [
         duration: 4,
       },
     ],
-    constraints: [],
+    config: {},
   },
 ];

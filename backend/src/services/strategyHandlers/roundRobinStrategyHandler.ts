@@ -21,7 +21,7 @@ export const roundRobinStrategyHandler: StrategyHandler = (
   endingGuardTime: GuardTime,
   teams: Team[]
 ): GuardListPeriod[] => {
-  const guardListPerPeriod: GuardListPeriod[] = [];
+  const guardListPerPeriods: GuardListPeriod[] = [];
   let currentGuardTime = startingGuardTime;
 
   const relevantSoldiers = getSoldierIdsForGuardPost(guardPost.id, teams);
@@ -44,7 +44,7 @@ export const roundRobinStrategyHandler: StrategyHandler = (
       error = err instanceof Error ? err.message : 'unknown error';
     }
 
-    guardListPerPeriod.push({
+    guardListPerPeriods.push({
       soldiers: soldierIds,
       guardTime: currentGuardTime,
       duration: periodsPerGuard,
@@ -54,5 +54,5 @@ export const roundRobinStrategyHandler: StrategyHandler = (
     currentGuardTime = addDurationToGuardTime(currentGuardTime, periodsPerGuard);
   }
 
-  return guardListPerPeriod;
+  return guardListPerPeriods;
 };

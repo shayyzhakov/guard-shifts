@@ -1,3 +1,9 @@
+export interface ScoreRange {
+  from: number; // included
+  to: number; // excluded
+  score: number;
+}
+
 export interface GuardPostOccupation {
   from: number; // included
   to: number; // excluded
@@ -10,5 +16,5 @@ export interface GuardPost {
   strategy: string; // TODO: change to enum
   numOfSoldiers: number;
   occupation: GuardPostOccupation[];
-  constraints: string[]; // TODO: implement
+  config: Record<string, unknown>;
 }

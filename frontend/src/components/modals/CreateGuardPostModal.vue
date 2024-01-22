@@ -14,7 +14,7 @@ const newGuardPostParams = reactive<CreateGuardPostParams>({
   strategy: '',
   numOfSoldiers: 1,
   occupation: [],
-  constraints: [],
+  config: {},
 });
 
 function resetNewGuardPostParams() {
@@ -22,7 +22,7 @@ function resetNewGuardPostParams() {
   newGuardPostParams.strategy = '';
   newGuardPostParams.numOfSoldiers = 1;
   newGuardPostParams.occupation = [];
-  newGuardPostParams.constraints = [];
+  newGuardPostParams.config = {};
 }
 
 async function saveNewGuardPost() {

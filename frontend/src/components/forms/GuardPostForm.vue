@@ -8,6 +8,7 @@ const formData = defineModel<CreateGuardPostParams>({
   required: true,
 });
 
+// OCCUPATIONS
 const occupations = reactive(
   formData.value.occupation.map((occupation) => {
     return {
@@ -52,15 +53,6 @@ watch(
   {},
 );
 
-const strategyOptions: Array<{ value: string; label: string; description: string }> =
-  Object.entries(strategies).map(([strategyId, strategy]) => {
-    return {
-      value: strategyId,
-      label: strategy.name,
-      description: strategy.description,
-    };
-  });
-
 function addGuardTime() {
   occupations.push({
     from: '00:00',
@@ -72,29 +64,85 @@ function addGuardTime() {
 function removeGuardTime(index: number) {
   occupations.splice(index, 1);
 }
+// END OCCUPATIONS
+
+const strategyOptions: Array<{ value: string; label: string; description: string }> =
+  Object.entries(strategies).map(([strategyId, strategy]) => {
+    return {
+      value: strategyId,
+      label: strategy.name,
+      description: strategy.description,
+    };
+  });
+
+// TODO: scores is the exact same as occupations, maybe we can refactor it to a single function
+// SCORES
+const scoreRanges = reactive(
+  Array.isArray(formData.value.config.scores)
+    ? formData.value.config.scores.map((scoreRange) => {
+        return {
+          from: stringifyPeriod(scoreRange.from),
+          to: stringifyPeriod(scoreRange.to),
+          score: scoreRange.score,
+        };
+      })
+    : [],
+);
+
+// when score ranges change, update parent component
+watch(scoreRanges, (newVal) => {
+  const adaptedScoreRanges = newVal.map((scoreRange) => {
+    return {
+      from: timeToPeriod(scoreRange.from),
+      to: timeToPeriod(scoreRange.to),
+      score: scoreRange.score,
+    };
+  });
+  formData.value.config.scores = adaptedScoreRanges;
+});
+
+// when parent component changes score ranges, update accordingly
+watch(
+  () => formData.value.config.scores,
+  (newScoreRanges, oldScoreRanges) => {
+    // a hack to prevent infinite loop when updating score ranges
+    if (JSON.stringify(newScoreRanges) === JSON.stringify(oldScoreRanges)) return;
+
+    // clear the array and replace it with the new score ranges (keep reactivity intact)
+    scoreRanges.splice(0, scoreRanges.length);
+    if (Array.isArray(newScoreRanges)) {
+      scoreRanges.push(
+        ...newScoreRanges.map((scoreRange) => {
+          return {
+            from: stringifyPeriod(scoreRange.from),
+            to: stringifyPeriod(scoreRange.to),
+            score: scoreRange.score,
+          };
+        }),
+      );
+    }
+  },
+  {},
+);
+
+function addScoreRange() {
+  scoreRanges.push({
+    from: '00:00',
+    to: '00:00',
+    score: 1,
+  });
+}
+
+function removeScoreRange(index: number) {
+  scoreRanges.splice(index, 1);
+}
+// END SCORES
 </script>
 
 <template>
   <el-form :model="formData" label-width="160px" label-position="left">
     <el-form-item label="Name">
       <el-input v-model="formData.displayName" />
-    </el-form-item>
-
-    <el-form-item label="Assignment Strategy">
-      <el-select v-model="formData.strategy" class="form-select">
-        <el-option
-          v-for="item in strategyOptions"
-          :key="item.value"
-          :label="item.label"
-          :value="item.value"
-          style="height: unset; width: 500px"
-        >
-          <div class="strategy-content">
-            <span class="strategy-name">{{ item.label }}</span>
-            <span class="strategy-description">{{ item.description }}</span>
-          </div>
-        </el-option>
-      </el-select>
     </el-form-item>
 
     <el-form-item label="Amount of Soldiers">
@@ -105,7 +153,7 @@ function removeGuardTime(index: number) {
       <div
         v-for="(occupation, i) in occupations"
         :key="`${occupation.from}-${occupation.to}-${occupation.duration}`"
-        class="guard-occupation"
+        class="time-range-container"
       >
         <el-col :span="5">
           <el-time-select
@@ -148,7 +196,71 @@ function removeGuardTime(index: number) {
       <el-button text bg @click="addGuardTime"> + Add </el-button>
     </el-form-item>
 
-    <!-- TODO: constraints -->
+    <el-form-item label="Assignment Strategy">
+      <el-select v-model="formData.strategy" class="form-select">
+        <el-option
+          v-for="item in strategyOptions"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+          style="height: unset; width: 500px"
+        >
+          <div class="strategy-content">
+            <span class="strategy-name">{{ item.label }}</span>
+            <span class="strategy-description">{{ item.description }}</span>
+          </div>
+        </el-option>
+      </el-select>
+    </el-form-item>
+
+    <!-- scored scheduling strategy settings -->
+    <template v-if="formData.strategy === 'scored-scheduling'">
+      <el-form-item label="Scores">
+        <div
+          v-for="(scoreRange, i) in scoreRanges"
+          :key="`${scoreRange.from}-${scoreRange.to}-${scoreRange.score}`"
+          class="time-range-container"
+        >
+          <el-col :span="5">
+            <el-time-select
+              v-model="scoreRange.from"
+              start="00:00"
+              end="23:30"
+              step="00:30"
+              :clearable="false"
+            />
+          </el-col>
+
+          to
+
+          <el-col :span="5">
+            <el-time-select
+              v-model="scoreRange.to"
+              start="00:00"
+              end="23:30"
+              step="00:30"
+              :clearable="false"
+            />
+          </el-col>
+
+          Score:
+
+          <el-input-number
+            v-model="scoreRange.score"
+            :min="1"
+            :max="100"
+            controls-position="right"
+            style="flex: 1"
+          />
+
+          <el-button text @click="() => removeScoreRange(i)">
+            <i class="fa-solid fa-trash" />
+          </el-button>
+        </div>
+
+        <el-button text bg @click="addScoreRange"> + Add </el-button>
+      </el-form-item>
+    </template>
   </el-form>
 </template>
 
@@ -157,7 +269,7 @@ function removeGuardTime(index: number) {
   flex: 1;
 }
 
-.guard-occupation {
+.time-range-container {
   display: flex;
   gap: 6px;
   margin-bottom: 8px;

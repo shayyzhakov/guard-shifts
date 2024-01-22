@@ -23,7 +23,7 @@ const selectedGuardPostParams = reactive<CreateGuardPostParams>({
   strategy: '',
   numOfSoldiers: 1,
   occupation: [],
-  constraints: [],
+  config: {},
 });
 
 watchEffect(() => {
@@ -31,7 +31,7 @@ watchEffect(() => {
   selectedGuardPostParams.strategy = props.guardPost?.strategy ?? '';
   selectedGuardPostParams.numOfSoldiers = props.guardPost?.numOfSoldiers ?? 1;
   selectedGuardPostParams.occupation = props.guardPost?.occupation ?? [];
-  selectedGuardPostParams.constraints = props.guardPost?.constraints ?? [];
+  selectedGuardPostParams.config = props.guardPost?.config ?? {};
 });
 
 async function saveGuardPostChanges() {

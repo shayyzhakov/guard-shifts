@@ -58,7 +58,7 @@ export async function updateGuardPostById(
       TableName: 'GuardPosts',
       Key: { id: { S: guardPostId } },
       UpdateExpression:
-        'SET displayName = :displayName, strategy = :strategy, numOfSoldiers = :numOfSoldiers, occupation = :occupation',
+        'SET displayName = :displayName, strategy = :strategy, numOfSoldiers = :numOfSoldiers, occupation = :occupation, config = :config',
       ExpressionAttributeValues: {
         ':displayName': { S: updateParams.displayName },
         ':strategy': { S: updateParams.strategy },
@@ -68,7 +68,9 @@ export async function updateGuardPostById(
             M: marshall(o),
           })),
         },
-        // TODO: constraints
+        ':config': {
+          M: marshall(updateParams.config),
+        },
       },
     })
   );

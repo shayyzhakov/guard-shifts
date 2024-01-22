@@ -1,11 +1,6 @@
 <script setup lang="ts">
-import { reactive, watch, watchEffect } from 'vue';
-import {
-  type CreateSoldierParams,
-  createSoldier,
-  updateSoldier,
-  deleteSoldier,
-} from '@/apis/soldiers.api';
+import { reactive, watchEffect } from 'vue';
+import { type CreateSoldierParams, updateSoldier, deleteSoldier } from '@/apis/soldiers.api';
 import { ElNotification } from 'element-plus';
 import { useSoldiersStore } from '@/stores/soldiers.store';
 import SoldierForm from '@/components/forms/SoldierForm.vue';

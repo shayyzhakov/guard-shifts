@@ -19,7 +19,7 @@ const selectedGuardPostParams = reactive<CreateGuardPostParams>({
   strategy: '',
   numOfSoldiers: 1,
   occupation: [],
-  constraints: [],
+  config: {},
 });
 
 function editGuardPost(guardPost: GuardPost) {
@@ -28,7 +28,7 @@ function editGuardPost(guardPost: GuardPost) {
   selectedGuardPostParams.strategy = guardPost.strategy;
   selectedGuardPostParams.numOfSoldiers = guardPost.numOfSoldiers;
   selectedGuardPostParams.occupation = JSON.parse(JSON.stringify(guardPost.occupation));
-  selectedGuardPostParams.constraints = JSON.parse(JSON.stringify(guardPost.constraints));
+  selectedGuardPostParams.config = JSON.parse(JSON.stringify(guardPost.config));
 
   showEditGuardPostModal.value = true;
 }
@@ -119,6 +119,7 @@ h3 {
   flex-direction: column;
   gap: 16px;
   flex: 1;
+  padding-bottom: 30px;
 }
 
 .card-header {

@@ -20,9 +20,9 @@ router.get('/', async (req: Request, res: Response) => {
 
 router.post('/', async (req: Request, res: Response) => {
   try {
-    const { displayName, strategy, numOfSoldiers, occupation, constraints } = req.body;
+    const { displayName, strategy, numOfSoldiers, occupation, config } = req.body;
 
-    await createNewGuardPost({ displayName, strategy, numOfSoldiers, occupation, constraints });
+    await createNewGuardPost({ displayName, strategy, numOfSoldiers, occupation, config });
     return res.json({});
   } catch (e) {
     console.log('[server] error:', e);
@@ -33,14 +33,14 @@ router.post('/', async (req: Request, res: Response) => {
 router.put('/:guard_post_id', async (req: Request, res: Response) => {
   try {
     const guardPostId = req.params.guard_post_id;
-    const { displayName, strategy, numOfSoldiers, occupation, constraints } = req.body;
+    const { displayName, strategy, numOfSoldiers, occupation, config } = req.body;
 
     await updateGuardPost(guardPostId, {
       displayName,
       strategy,
       numOfSoldiers,
       occupation,
-      constraints,
+      config,
     });
     return res.json({});
   } catch (e) {

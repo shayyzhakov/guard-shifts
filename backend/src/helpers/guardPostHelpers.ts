@@ -1,4 +1,4 @@
-import { GuardPost, GuardPostOccupation } from '../interfaces/guardPost.interface';
+import { GuardPost, GuardPostOccupation, ScoreRange } from '../interfaces/guardPost.interface';
 import { Team } from '../interfaces/team.interface';
 import { GuardTime, addDays, GUARD_PERIODS_PER_DAY } from './periodHelpers';
 
@@ -23,14 +23,33 @@ export function getGuardPostGuardPeriodDuration(guardPost: GuardPost, period: nu
   return occupation?.duration ?? 1;
 }
 
+export function getGuardPostScoreForGuardPeriod(guardPost: GuardPost, period: number): number {
+  const scoresRange = scoreRangeByPeriod(guardPost, period);
+  return scoresRange?.score ?? 1; // default score is 1
+}
+
 function occupationByPeriod(guardPost: GuardPost, period: number): GuardPostOccupation | undefined {
-  return guardPost.occupation.find((occupation) => {
-    if (occupation.from < occupation.to) {
-      if (period >= occupation.from && period < occupation.to) return occupation;
-    } else if (period >= occupation.from || period < occupation.to) {
-      return occupation;
-    }
-  });
+  return guardPost.occupation.find((occupation) =>
+    isPeriodInRange(period, occupation.from, occupation.to)
+  );
+}
+
+function scoreRangeByPeriod(guardPost: GuardPost, period: number): ScoreRange | undefined {
+  if ('scores' in guardPost.config && Array.isArray(guardPost.config.scores)) {
+    return guardPost.config.scores.find((scoreRange) =>
+      isPeriodInRange(period, scoreRange.from, scoreRange.to)
+    );
+  }
+}
+
+function isPeriodInRange(period: number, from: number, to: number): boolean {
+  if (from < to) {
+    // same day
+    return period >= from && period < to;
+  } else {
+    // overnight
+    return period >= from || period < to;
+  }
 }
 
 export function getUpcomingGuardTimeForGuardPost(

@@ -13,7 +13,7 @@ export interface GuardPost {
   strategy: StrategyType;
   numOfSoldiers: number;
   occupation: GuardPostOccupation[];
-  constraints: string[]; // TODO: implement
+  config: Record<string, unknown>;
 }
 
 export async function getGuardPosts(): Promise<GuardPost[]> {
@@ -26,7 +26,7 @@ export interface CreateGuardPostParams {
   strategy: string;
   numOfSoldiers: number;
   occupation: GuardPostOccupation[];
-  constraints: string[];
+  config: Record<string, unknown>;
 }
 
 export async function createGuardPost(params: CreateGuardPostParams): Promise<void> {
