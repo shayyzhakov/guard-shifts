@@ -15,6 +15,7 @@ interface SoldierWithScore {
 export class SoldiersScoredQueue {
   private orderedSoldiersAndScore: SoldierWithScore[] = [];
   private usedSoldiers: SoldierWithScore[] = []; // helps ensuring that soldiers will be used the same amount of times
+  private numberOfSoldiers: number;
 
   constructor(
     guardPost: GuardPost,
@@ -35,6 +36,7 @@ export class SoldiersScoredQueue {
 
     // add soldiers sorted by score to the queue
     this.enqueue([...soldiersWithScore, ...unusedSoldiersWithScore]);
+    this.numberOfSoldiers = this.orderedSoldiersAndScore.length;
   }
 
   /**
@@ -59,7 +61,7 @@ export class SoldiersScoredQueue {
 
       const isBusy = isSoldierBusy(this.guardLists, guardTime, nextSoldier.soldier, {
         uncommitedShifts: this.uncommitedShifts,
-        timeOffset: Math.ceil((shiftDuration * this.numberOfSoldiers * 2) / 3),
+        timeOffset: Math.ceil((shiftDuration * this.numberOfSoldiers) / 2), // minimal resting time between shifts
       });
       if (isBusy) {
         busySoldiers.push(nextSoldier);
@@ -93,9 +95,5 @@ export class SoldiersScoredQueue {
     }
 
     return this.orderedSoldiersAndScore.shift();
-  }
-
-  private get numberOfSoldiers(): number {
-    return this.orderedSoldiersAndScore.length + this.usedSoldiers.length;
   }
 }
