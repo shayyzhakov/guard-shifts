@@ -43,7 +43,6 @@ export async function updateGuardPost(
 export async function deleteGuardPost(guardPostId: string): Promise<void> {
   // TODO: delete future guard shifts for this guard post
 
-  // TODO: not working, need to fix
   // delete guard post usages of teams
   const teams = await getAllTeams();
   await removeGuardPostsFromTeams(teams, [guardPostId]);

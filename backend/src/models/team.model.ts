@@ -99,10 +99,7 @@ export async function removeSoldiersFromTeams(teams: Team[], soldierIds: string[
         new UpdateItemCommand({
           TableName: 'Teams',
           Key: { id: { S: soldierTeam.teamId } },
-          UpdateExpression: 'SET #people = :people',
-          ExpressionAttributeNames: {
-            '#people': 'people',
-          },
+          UpdateExpression: 'SET people = :people',
           ExpressionAttributeValues: {
             ':people': { L: soldierTeam.soldiers.map((soldier) => ({ S: soldier })) },
           },
@@ -142,17 +139,14 @@ export async function removeGuardPostsFromTeams(
 
   // update the teams
   await Promise.all(
-    modifiedTeamGuardPosts.map(async (soldierTeam) => {
+    modifiedTeamGuardPosts.map(async (modifiedTeam) => {
       return await getDbClient().send(
         new UpdateItemCommand({
           TableName: 'Teams',
-          Key: { id: { S: soldierTeam.teamId } },
-          UpdateExpression: 'SET #guardPosts = :guardPosts',
-          ExpressionAttributeNames: {
-            '#guardPosts': 'guardPosts',
-          },
+          Key: { id: { S: modifiedTeam.teamId } },
+          UpdateExpression: 'SET guardPosts = :guardPosts',
           ExpressionAttributeValues: {
-            ':guardPosts': { L: soldierTeam.guardPosts.map((guardPost) => ({ S: guardPost })) },
+            ':guardPosts': { L: modifiedTeam.guardPosts.map((guardPost) => ({ S: guardPost })) },
           },
         })
       );
