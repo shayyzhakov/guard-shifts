@@ -8,6 +8,7 @@ import {
 import { ElNotification } from 'element-plus';
 import { useGuardPostsStore } from '@/stores/guardPosts.store';
 import GuardPostForm from '@/components/forms/GuardPostForm.vue';
+import { useTeamsStore } from '@/stores/teams.store';
 
 const showModal = defineModel('showModal');
 
@@ -17,6 +18,7 @@ const props = defineProps<{
 }>();
 
 const guardPostsStore = useGuardPostsStore();
+const teamsStore = useTeamsStore();
 
 const selectedGuardPostParams = reactive<CreateGuardPostParams>({
   displayName: '',
@@ -69,6 +71,7 @@ async function deleteExistingGuardPost() {
     });
 
     guardPostsStore.refreshGuardPosts();
+    teamsStore.refreshTeams();
   } catch (e) {
     ElNotification({
       title: 'Action failed',
