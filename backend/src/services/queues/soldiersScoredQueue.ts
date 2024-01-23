@@ -61,7 +61,7 @@ export class SoldiersScoredQueue {
 
       const isBusy = isSoldierBusy(this.guardLists, guardTime, nextSoldier.soldier, {
         uncommitedShifts: this.uncommitedShifts,
-        timeOffset: Math.ceil((shiftDuration * this.numberOfSoldiers) / 2), // minimal resting time between shifts
+        restTime: Math.ceil(shiftDuration * Math.sqrt(this.numberOfSoldiers)),
       });
       if (isBusy) {
         busySoldiers.push(nextSoldier);

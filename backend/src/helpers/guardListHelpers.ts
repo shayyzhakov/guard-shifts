@@ -102,7 +102,7 @@ export function isTeamBusy(guardList: GuardList[], guardTime: GuardTime, teamId:
 
 interface BusyCheckConfig {
   uncommitedShifts?: GuardListShift[];
-  timeOffset?: number;
+  restTime?: number; // minimal resting time between shifts
 }
 
 /**
@@ -112,7 +112,7 @@ export function isSoldierBusy(
   guardList: GuardList[],
   guardTime: GuardTime,
   soldierId: string,
-  { uncommitedShifts, timeOffset = 0 }: BusyCheckConfig = {}
+  { uncommitedShifts, restTime = 0 }: BusyCheckConfig = {}
 ): boolean {
   const allShifts = guardList.flatMap((gl) => gl.shifts);
   if (uncommitedShifts) {
@@ -123,8 +123,8 @@ export function isSoldierBusy(
   const relevantShifts = allShifts.filter((shift) => {
     return checkIntersectionOfGuardTimeRanges(
       {
-        from: subtractDurationFromGuardTime(guardTime, timeOffset),
-        to: addDurationToGuardTime(guardTime, timeOffset),
+        from: subtractDurationFromGuardTime(guardTime, restTime),
+        to: addDurationToGuardTime(guardTime, restTime),
       },
       {
         from: shift.guardTime, // shift start time
