@@ -39,6 +39,19 @@ export function addDurationToGuardTime(guardTime: GuardTime, duration: number): 
   };
 }
 
+export function subtractDurationFromGuardTime(guardTime: GuardTime, duration: number): GuardTime {
+  const daysSubtraction = Math.floor((guardTime.period - duration) / GUARD_PERIODS_PER_DAY);
+  const newPeriod =
+    (-1 * daysSubtraction * GUARD_PERIODS_PER_DAY + guardTime.period - duration) %
+    GUARD_PERIODS_PER_DAY;
+  const newDate = addDays(guardTime.date, daysSubtraction);
+
+  return {
+    period: newPeriod,
+    date: newDate,
+  };
+}
+
 export function addDays(date: Date, days: number): Date {
   const newDate = new Date(date);
   newDate.setDate(date.getDate() + days);

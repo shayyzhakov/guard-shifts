@@ -1,5 +1,5 @@
 import { GuardTime } from '../../helpers/periodHelpers';
-import { GuardList } from '../../interfaces/guardList.interface';
+import { GuardList, GuardListShift } from '../../interfaces/guardList.interface';
 import { isSoldierBusy } from '../../helpers/guardListHelpers';
 import { getSoldiersWithScoreFromGuardList } from '../statistics/soldiers.statistics';
 import { GuardPost } from '../../interfaces/guardPost.interface';
@@ -16,7 +16,12 @@ export class SoldiersScoredQueue {
   private orderedSoldiersAndScore: SoldierWithScore[] = [];
   private usedSoldiers: SoldierWithScore[] = []; // helps ensuring that soldiers will be used the same amount of times
 
-  constructor(guardPost: GuardPost, soldiers: string[], private guardLists: GuardList[]) {
+  constructor(
+    guardPost: GuardPost,
+    soldiers: string[],
+    private guardLists: GuardList[],
+    private uncommitedShifts: GuardListShift[]
+  ) {
     // get score for soldiers that already appeared in the guard list
     // TODO: what if a new sodier is created? he wont have a score and will be over-used
     const soldiersWithScore = getSoldiersWithScoreFromGuardList(guardPost, guardLists).filter(
@@ -39,7 +44,7 @@ export class SoldiersScoredQueue {
    * @param score The score to be added to the soldiers.
    * @returns An array with the requested amount of soldiers to be used next for the specified guard post.
    */
-  next(guardTime: GuardTime, amount: number, score: number): string[] {
+  next(guardTime: GuardTime, amount: number, score: number, shiftDuration: number): string[] {
     const nextSoldiers: SoldierWithScore[] = [];
     const busySoldiers: SoldierWithScore[] = [];
 
@@ -52,7 +57,10 @@ export class SoldiersScoredQueue {
         throw new Error('not enough soldiers were found');
       }
 
-      const isBusy = isSoldierBusy(this.guardLists, guardTime, nextSoldier.soldier);
+      const isBusy = isSoldierBusy(this.guardLists, guardTime, nextSoldier.soldier, {
+        uncommitedShifts: this.uncommitedShifts,
+        timeOffset: Math.ceil((shiftDuration * this.numberOfSoldiers * 2) / 3),
+      });
       if (isBusy) {
         busySoldiers.push(nextSoldier);
       } else {
@@ -85,5 +93,9 @@ export class SoldiersScoredQueue {
     }
 
     return this.orderedSoldiersAndScore.shift();
+  }
+
+  private get numberOfSoldiers(): number {
+    return this.orderedSoldiersAndScore.length + this.usedSoldiers.length;
   }
 }

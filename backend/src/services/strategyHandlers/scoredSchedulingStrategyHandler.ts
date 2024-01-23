@@ -51,7 +51,12 @@ export const scoredSchedulingStrategyHandler: StrategyHandler = (
 
   // create a queue of soldiers, sorted by accumulated score
   const relevantSoldiers = getSoldierIdsForGuardPost(guardPost.id, teams);
-  const scoredSoldiersQueue = new SoldiersScoredQueue(guardPost, relevantSoldiers, guardLists);
+  const scoredSoldiersQueue = new SoldiersScoredQueue(
+    guardPost,
+    relevantSoldiers,
+    guardLists,
+    shifts
+  );
 
   // fill the shifts with soldiers from the queue
   while (sortedShiftsIndexesByScore.length > 0) {
@@ -71,7 +76,8 @@ export const scoredSchedulingStrategyHandler: StrategyHandler = (
       currentShift.soldiers = scoredSoldiersQueue.next(
         currentShift.guardTime,
         numOfSoldiersForCurrentPeriod,
-        currentShiftReference.score
+        currentShiftReference.score,
+        currentShift.duration
       );
     } catch (err) {
       currentShift.error = err instanceof Error ? err.message : 'unknown error';

@@ -7,6 +7,7 @@ import {
   compareGuardTime,
   isGuardTimeBefore,
   isGuardTimeGreaterThanOrEqual,
+  subtractDurationFromGuardTime,
 } from './periodHelpers';
 
 export function getGuardPostOrder(guardPost: GuardPost): number {
@@ -99,26 +100,57 @@ export function isTeamBusy(guardList: GuardList[], guardTime: GuardTime, teamId:
   });
 }
 
+interface BusyCheckConfig {
+  uncommitedShifts?: GuardListShift[];
+  timeOffset?: number;
+}
+
 /**
  * Returns true if the soldier is busy in the specified guard time, given a guard list.
  */
 export function isSoldierBusy(
   guardList: GuardList[],
   guardTime: GuardTime,
-  soldierId: string
+  soldierId: string,
+  { uncommitedShifts, timeOffset = 0 }: BusyCheckConfig = {}
 ): boolean {
-  return guardList.some((guardPostList) => {
-    const shift = guardPostList.shifts.find((shift) => {
-      const isLater = isGuardTimeGreaterThanOrEqual(guardTime, shift.guardTime);
-      const isBefore = isGuardTimeBefore(
-        guardTime,
-        addDurationToGuardTime(shift.guardTime, shift.duration)
-      );
-      return isLater && isBefore;
-    });
+  const allShifts = guardList.flatMap((gl) => gl.shifts);
+  if (uncommitedShifts) {
+    allShifts.push(...uncommitedShifts);
+  }
 
-    return shift?.soldiers.includes(soldierId);
+  // find shifts that intersect with the specified guard time
+  const relevantShifts = allShifts.filter((shift) => {
+    return checkIntersectionOfGuardTimeRanges(
+      {
+        from: subtractDurationFromGuardTime(guardTime, timeOffset),
+        to: addDurationToGuardTime(guardTime, timeOffset),
+      },
+      {
+        from: shift.guardTime, // shift start time
+        to: addDurationToGuardTime(shift.guardTime, shift.duration), // shift end time
+      }
+    );
   });
+
+  return relevantShifts.some((shift) => shift.soldiers.includes(soldierId));
+}
+
+interface GuardTimeRange {
+  from: GuardTime;
+  to: GuardTime;
+}
+
+function checkIntersectionOfGuardTimeRanges(gt1: GuardTimeRange, gt2: GuardTimeRange): boolean {
+  const isShiftStartingBefore = isGuardTimeGreaterThanOrEqual(
+    gt1.to,
+    gt2.from // shift start time
+  );
+  const isShiftEndingAfter = isGuardTimeBefore(
+    gt1.from,
+    gt2.to // shift end time
+  );
+  return isShiftStartingBefore && isShiftEndingAfter;
 }
 
 export function simplifyShifts(shifts: GuardListShift[]): GuardListShift[] {
