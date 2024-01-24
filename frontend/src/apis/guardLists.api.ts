@@ -31,7 +31,7 @@ export async function generateGuardList(params: GenerateGuardListParams): Promis
 
 export interface CommitGuardListParams {
   guardLists: GuardList[];
-  startPeriod: number;
+  startPeriod?: number;
 }
 
 export async function commitGuardList(params: CommitGuardListParams): Promise<void> {

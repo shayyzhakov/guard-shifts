@@ -161,3 +161,15 @@ export function simplifyShifts(shifts: GuardListShift[]): GuardListShift[] {
 
   return simplifiedGuardListForGuardPost;
 }
+
+export function getEarliestGuardTime(guardLists: GuardList[]): GuardTime {
+  const earliestGuardTimePerGuardList = guardLists
+    .map((gl) => gl.shifts[0].guardTime) // find earliest guard time per guard list
+    .filter(Boolean); // remove empty guard lists
+
+  const earliestGuardTime = earliestGuardTimePerGuardList.reduce((earliest, current) => {
+    return isGuardTimeBefore(current, earliest) ? current : earliest;
+  });
+
+  return earliestGuardTime;
+}

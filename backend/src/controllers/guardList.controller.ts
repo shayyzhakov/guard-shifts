@@ -9,6 +9,7 @@ import {
 import { DbGuardList } from '../interfaces/db.types';
 import { getAllTeams } from '../models/team.model';
 import { generateShifts } from '../services/shiftsGenerator.service';
+import { getEarliestGuardTime } from '../helpers/guardListHelpers';
 
 interface BuildGuardListParams {
   startPeriod: number;
@@ -38,14 +39,16 @@ export async function getGuardListHistory(): Promise<GuardList[]> {
 
 interface CommitGuardListParams {
   guardLists: GuardList[];
-  startPeriod: number;
+  startPeriod?: number;
 }
 
 export async function commitGuardLists({
   guardLists,
   startPeriod,
 }: CommitGuardListParams): Promise<void> {
-  const upcomingGuardTime = getUpcomingGuardTime(startPeriod);
+  const upcomingGuardTime = startPeriod
+    ? getUpcomingGuardTime(startPeriod)
+    : getEarliestGuardTime(guardLists);
 
   await saveGuardLists(guardLists, upcomingGuardTime);
 }

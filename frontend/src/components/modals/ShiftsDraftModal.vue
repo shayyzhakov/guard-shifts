@@ -11,7 +11,7 @@ const showModal = defineModel('showModal');
 
 const props = defineProps<{
   shiftsDraft: GuardList[];
-  startTime: string;
+  startTime?: string;
 }>();
 
 const router = useRouter();
@@ -27,7 +27,7 @@ async function submitShifts() {
 
     await commitGuardList({
       guardLists: props.shiftsDraft,
-      startPeriod: timeToPeriod(props.startTime),
+      startPeriod: props.startTime ? timeToPeriod(props.startTime) : undefined,
     });
 
     ElNotification({

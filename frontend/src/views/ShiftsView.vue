@@ -6,6 +6,7 @@ import { useShiftsStore } from '@/stores/shifts.store';
 import { useTeamsStore } from '@/stores/teams.store';
 import { computed, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import ShiftsDraftModal from '@/components/modals/ShiftsDraftModal.vue';
 
 const router = useRouter();
 const shiftsStore = useShiftsStore();
@@ -13,28 +14,32 @@ const teamsStore = useTeamsStore();
 const guardPostsStore = useGuardPostsStore();
 
 const now = new Date().toDateString();
-const loading = computed<boolean>(() => !shiftsStore.shifts);
+const filterFromDate = ref<Date>(new Date());
+const loading = computed<boolean>(() => !shiftsStore.guardLists);
+const showEditShiftsModal = ref<boolean>(false);
 
-const noShifts = computed<boolean>(() => !!(shiftsStore.shifts && !shiftsStore.shifts.length));
+const noShifts = computed<boolean>(
+  () => !!(shiftsStore.guardLists && !shiftsStore.guardLists.length),
+);
 
-const filteredShifts = computed<GuardList[]>(() => {
-  if (!shiftsStore.shifts) return [];
+const filteredGuardLists = computed<GuardList[]>(() => {
+  if (!shiftsStore.guardLists) return [];
 
-  return shiftsStore.shifts
-    .map((guardPostShifts) => {
+  return shiftsStore.guardLists
+    .map((guardList) => {
       // filter out guard periods before the selected date
-      const firstIndex = guardPostShifts.shifts.findIndex(
+      const firstIndex = guardList.shifts.findIndex(
         (shift) => guardTimeToDate(shift.guardTime) > filterFromDate.value,
       );
 
       let shifts: GuardListShift[] = [];
       if (firstIndex >= 0) {
-        shifts = guardPostShifts.shifts.slice(firstIndex);
+        shifts = guardList.shifts.slice(firstIndex);
       }
       // for firstIndex === -1, leave guardList empty
 
       return {
-        ...guardPostShifts,
+        ...guardList,
         shifts,
       };
     })
@@ -48,8 +53,6 @@ const filteredShifts = computed<GuardList[]>(() => {
 async function goToGenerateShifts() {
   router.push('generate-shifts');
 }
-
-const filterFromDate = ref<Date>(new Date());
 
 const dateShortcuts = [
   {
@@ -99,6 +102,13 @@ const dateShortcuts = [
     },
   },
 ];
+
+const guardListsToEdit = ref<GuardList[]>([]);
+
+function editShifts(guardPostShifts: GuardList) {
+  guardListsToEdit.value = [guardPostShifts];
+  showEditShiftsModal.value = true;
+}
 </script>
 
 <template>
@@ -113,7 +123,7 @@ const dateShortcuts = [
       </div>
 
       <div v-else v-loading="loading" class="shifts-content">
-        <div v-if="shiftsStore.shifts?.length" class="actions">
+        <div v-if="shiftsStore.guardLists?.length" class="actions">
           <span>Show shifts from:</span>
           <el-date-picker
             v-model="filterFromDate"
@@ -127,19 +137,25 @@ const dateShortcuts = [
         </div>
 
         <div class="cards-container">
-          <el-card v-for="guardPostShifts in filteredShifts" :key="guardPostShifts.guardPostId">
+          <el-card v-for="guardList in filteredGuardLists" :key="guardList.guardPostId">
             <template #header>
               <div class="card-header">
-                <h3 v-if="!guardPostsStore.isGuardPostDeleted(guardPostShifts.guardPostId)">
-                  {{ guardPostsStore.guardPostNameById(guardPostShifts.guardPostId) }}
+                <h3 v-if="!guardPostsStore.isGuardPostDeleted(guardList.guardPostId)">
+                  {{ guardPostsStore.guardPostNameById(guardList.guardPostId) }}
                 </h3>
                 <h3 v-else>
-                  <i>{{ guardPostShifts.guardPostDisplayName }} (Deleted)</i>
+                  <i>{{ guardList.guardPostDisplayName }} (Deleted)</i>
                 </h3>
+
+                <div class="card-actions">
+                  <el-button circle text @click="() => editShifts(guardList)">
+                    <i class="fa-solid fa-pen-to-square" />
+                  </el-button>
+                </div>
               </div>
             </template>
 
-            <el-table :data="guardPostShifts.shifts" stripe style="width: 100%">
+            <el-table :data="guardList.shifts" stripe style="width: 100%">
               <el-table-column prop="guardTime" label="Time" width="220">
                 <template #default="{ row }">
                   {{ stringifyPeriod(row.guardTime.period) }}-{{
@@ -153,7 +169,7 @@ const dateShortcuts = [
                 </template>
               </el-table-column>
               <el-table-column
-                v-if="guardPostShifts.shifts.some((shift) => shift.team)"
+                v-if="guardList.shifts.some((shift) => shift.team)"
                 prop="team"
                 label="Team"
                 width="120"
@@ -177,6 +193,8 @@ const dateShortcuts = [
         </div>
       </div>
     </section>
+
+    <ShiftsDraftModal v-model:showModal="showEditShiftsModal" :shiftsDraft="guardListsToEdit" />
   </div>
 </template>
 
@@ -243,5 +261,10 @@ const dateShortcuts = [
 .no-soldiers {
   color: #c0c4cc;
   font-style: italic;
+}
+
+.card-actions {
+  margin-left: auto;
+  margin-right: 8px;
 }
 </style>

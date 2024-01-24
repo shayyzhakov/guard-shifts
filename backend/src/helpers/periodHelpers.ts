@@ -5,6 +5,10 @@ export interface GuardTime {
   date: Date;
 }
 
+/**
+ * Returns the next guard time period.
+ * Example: if current time is 10:15, the upcoming period would be 21, which is 10:30.
+ */
 export function getUpcomingPeriod(): number {
   const now = new Date();
   const totalMinutesInDay = 24 * 60; // 24 hours in a day, 60 minutes in an hour
@@ -15,6 +19,9 @@ export function getUpcomingPeriod(): number {
   return Math.ceil(totalMinutesPassed / minutesPerPeriod);
 }
 
+/**
+ * Returns a guard time object for the specified period, with the date set to the next date that this period occurs.
+ */
 export function getUpcomingGuardTime(fromPeriod: number): GuardTime {
   const now = new Date();
   const upcomingPeriod = getUpcomingPeriod();
@@ -28,6 +35,10 @@ export function getUpcomingGuardTime(fromPeriod: number): GuardTime {
   };
 }
 
+/**
+ * Adds the specified duration (periods) to the given guard time.
+ * @returns A new guard time after adding the specified duration to the given guard time.
+ */
 export function addDurationToGuardTime(guardTime: GuardTime, duration: number): GuardTime {
   const newPeriod = (guardTime.period + duration) % GUARD_PERIODS_PER_DAY;
   const daysPassed = Math.floor((guardTime.period + duration) / GUARD_PERIODS_PER_DAY);
@@ -39,6 +50,10 @@ export function addDurationToGuardTime(guardTime: GuardTime, duration: number): 
   };
 }
 
+/**
+ * Subtracts the specified duration (periods) from the given guard time.
+ * @returns A new guard time after subtracting the specified duration from the given guard time.
+ */
 export function subtractDurationFromGuardTime(guardTime: GuardTime, duration: number): GuardTime {
   const daysSubtraction = Math.floor((guardTime.period - duration) / GUARD_PERIODS_PER_DAY);
   const newPeriod =
@@ -52,6 +67,10 @@ export function subtractDurationFromGuardTime(guardTime: GuardTime, duration: nu
   };
 }
 
+/**
+ * Adds the specified number of days to the given date.
+ * @returns A new date after adding the specified number of days to the given date.
+ */
 export function addDays(date: Date, days: number): Date {
   const newDate = new Date(date);
   newDate.setDate(date.getDate() + days);
