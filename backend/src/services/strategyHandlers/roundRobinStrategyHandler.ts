@@ -25,7 +25,7 @@ export const roundRobinStrategyHandler: StrategyHandler = (
   let currentGuardTime = startingGuardTime;
 
   const relevantSoldiers = getSoldierIdsForGuardPost(guardPost.id, teams);
-  const relevantSoldiersQueue = new SoldiersQueue(relevantSoldiers, guardLists);
+  const relevantSoldiersQueue = new SoldiersQueue(relevantSoldiers, guardLists, shifts);
 
   // TODO: calculate 3 times the duration, then submit just the requested duration
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
@@ -33,13 +33,17 @@ export const roundRobinStrategyHandler: StrategyHandler = (
       guardPost,
       currentGuardTime.period
     );
-    const periodsPerGuard = getShiftDuration(guardPost, currentGuardTime.period);
+    const shiftDuration = getShiftDuration(guardPost, currentGuardTime.period);
 
     // find the next soldiers to guard
     let soldierIds: string[] = [];
     let error: string | undefined;
     try {
-      soldierIds = relevantSoldiersQueue.next(currentGuardTime, numOfSoldiersForCurrentPeriod);
+      soldierIds = relevantSoldiersQueue.next(
+        currentGuardTime,
+        numOfSoldiersForCurrentPeriod,
+        shiftDuration
+      );
     } catch (err) {
       error = err instanceof Error ? err.message : 'unknown error';
     }
@@ -47,11 +51,11 @@ export const roundRobinStrategyHandler: StrategyHandler = (
     shifts.push({
       soldiers: soldierIds,
       guardTime: currentGuardTime,
-      duration: periodsPerGuard,
+      duration: shiftDuration,
       error,
     });
 
-    currentGuardTime = addDurationToGuardTime(currentGuardTime, periodsPerGuard);
+    currentGuardTime = addDurationToGuardTime(currentGuardTime, shiftDuration);
   }
 
   return shifts;

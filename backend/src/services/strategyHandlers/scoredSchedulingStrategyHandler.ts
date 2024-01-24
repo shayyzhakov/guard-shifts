@@ -27,15 +27,15 @@ export const scoredSchedulingStrategyHandler: StrategyHandler = (
 
   // fill empty shifts (without soldiers) in the guard list
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
-    const periodsPerGuard = getShiftDuration(guardPost, currentGuardTime.period);
+    const shiftDuration = getShiftDuration(guardPost, currentGuardTime.period);
 
     shifts.push({
       soldiers: [],
       guardTime: currentGuardTime,
-      duration: periodsPerGuard,
+      duration: shiftDuration,
     });
 
-    currentGuardTime = addDurationToGuardTime(currentGuardTime, periodsPerGuard);
+    currentGuardTime = addDurationToGuardTime(currentGuardTime, shiftDuration);
   }
 
   // sort guard periods by score, highest first

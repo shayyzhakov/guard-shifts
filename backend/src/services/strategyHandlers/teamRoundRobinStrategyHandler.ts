@@ -26,20 +26,24 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
 
   // TODO: take and merge all guard posts that have team-roundrobin strategy
   const relevantTeams = getTeamsForGuardPost(guardPost.id, teams);
-  const relevantTeamsQueue = new TeamsQueue(guardPost.id, relevantTeams, guardLists);
+  const relevantTeamsQueue = new TeamsQueue(guardPost.id, relevantTeams, guardLists, shifts);
 
   while (compareGuardTime(currentGuardTime, endingGuardTime) >= 0) {
     const numOfSoldiersForCurrentPeriod = getGuardPostSoldiersAmount(
       guardPost,
       currentGuardTime.period
     );
-    const periodsPerGuard = getShiftDuration(guardPost, currentGuardTime.period);
+    const shiftDuration = getShiftDuration(guardPost, currentGuardTime.period);
 
     // find the next team
     let teamAndSoldiers: NextTeamAndSoldiers | undefined = undefined;
     let error: string | undefined;
     try {
-      teamAndSoldiers = relevantTeamsQueue.next(currentGuardTime, numOfSoldiersForCurrentPeriod);
+      teamAndSoldiers = relevantTeamsQueue.next(
+        currentGuardTime,
+        numOfSoldiersForCurrentPeriod,
+        shiftDuration
+      );
     } catch (err) {
       error = err instanceof Error ? err.message : 'unknown error';
     }
@@ -48,11 +52,11 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
       soldiers: teamAndSoldiers?.soldiers ?? [],
       team: teamAndSoldiers?.id,
       guardTime: currentGuardTime,
-      duration: periodsPerGuard,
+      duration: shiftDuration,
       error,
     });
 
-    currentGuardTime = addDurationToGuardTime(currentGuardTime, periodsPerGuard);
+    currentGuardTime = addDurationToGuardTime(currentGuardTime, shiftDuration);
   }
 
   return shifts;

@@ -1,5 +1,5 @@
 import { GuardTime } from '../../helpers/periodHelpers';
-import { GuardList } from '../../interfaces/guardList.interface';
+import { GuardList, GuardListShift } from '../../interfaces/guardList.interface';
 import { isTeamBusy } from '../../helpers/guardListHelpers';
 import { Team } from '../../interfaces/team.interface';
 import { SoldiersQueue } from './soldiersQueue';
@@ -26,7 +26,12 @@ export class TeamsQueue {
    */
   private orderedTeamsAndSoldiers: OrderedTeam[] = [];
 
-  constructor(guardPostId: string, teams: Team[], private guardLists: GuardList[]) {
+  constructor(
+    guardPostId: string,
+    teams: Team[],
+    private guardLists: GuardList[],
+    private uncommitedShifts: GuardListShift[]
+  ) {
     // order teams by last guard time
     const guardPostGuardList =
       guardLists.find((gl) => gl.guardPostId === guardPostId)?.shifts ?? [];
@@ -40,7 +45,7 @@ export class TeamsQueue {
     this.orderedTeamsAndSoldiers = orderedTeams.map((team) => ({
       id: team.id,
       name: team.name,
-      soldiersQueue: new SoldiersQueue(team.people, guardLists),
+      soldiersQueue: new SoldiersQueue(team.people, guardLists, uncommitedShifts),
     }));
   }
 
@@ -50,7 +55,7 @@ export class TeamsQueue {
    * @param soldiersAmount Amount of soldiers to retrieve. Soldiers will be taken from the same team.
    * @returns A team along with an array of the requested amount of soldiers to be used next for the specified guard post.
    */
-  next(guardTime: GuardTime, soldiersAmount: number): NextTeamAndSoldiers {
+  next(guardTime: GuardTime, soldiersAmount: number, shiftDuration: number): NextTeamAndSoldiers {
     const busyTeams: OrderedTeam[] = [];
     let selectedTeamAndSoldiers: NextTeamAndSoldiers | undefined;
 
@@ -69,7 +74,11 @@ export class TeamsQueue {
       } else {
         try {
           // find the next soldiers to use from the selected team
-          const selectedSoldiers = nextTeam.soldiersQueue.next(guardTime, soldiersAmount);
+          const selectedSoldiers = nextTeam.soldiersQueue.next(
+            guardTime,
+            soldiersAmount,
+            shiftDuration
+          );
 
           // if soldiers are found, return the team and soldiers
           this.orderedTeamsAndSoldiers.push(nextTeam); // add the team to the end of the queue

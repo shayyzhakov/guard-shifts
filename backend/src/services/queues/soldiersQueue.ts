@@ -1,5 +1,5 @@
 import { GuardTime } from '../../helpers/periodHelpers';
-import { GuardList } from '../../interfaces/guardList.interface';
+import { GuardList, GuardListShift } from '../../interfaces/guardList.interface';
 import { isSoldierBusy } from '../../helpers/guardListHelpers';
 import { getSoldierIdsByLatestGuardOrder } from '../../helpers/guardListHelpers';
 
@@ -8,8 +8,13 @@ import { getSoldierIdsByLatestGuardOrder } from '../../helpers/guardListHelpers'
  */
 export class SoldiersQueue {
   private orderedSoldiers: string[] = [];
+  private numberOfSoldiers: number;
 
-  constructor(soldiers: string[], private guardLists: GuardList[]) {
+  constructor(
+    soldiers: string[],
+    private guardLists: GuardList[],
+    private uncommitedShifts: GuardListShift[]
+  ) {
     // insert soldiers that already appeared in the guard list, from the older to the newer
     this.orderedSoldiers.push(
       ...getSoldierIdsByLatestGuardOrder(guardLists).filter((soldier) => soldiers.includes(soldier))
@@ -19,6 +24,7 @@ export class SoldiersQueue {
     const unusedSoldiers = soldiers.filter((soldier) => !this.orderedSoldiers.includes(soldier));
 
     this.orderedSoldiers.unshift(...unusedSoldiers);
+    this.numberOfSoldiers = this.orderedSoldiers.length;
   }
 
   /**
@@ -27,7 +33,7 @@ export class SoldiersQueue {
    * @param amount Amount of soldiers to retrieve. default is 1.
    * @returns An array with the requested amount of soldiers to be used next for the specified guard post.
    */
-  next(guardTime: GuardTime, amount: number = 1): string[] {
+  next(guardTime: GuardTime, amount: number, shiftDuration: number): string[] {
     const nextSoldiers: string[] = [];
     const busySoldiers: string[] = [];
 
@@ -40,7 +46,10 @@ export class SoldiersQueue {
         throw new Error('not enough soldiers were found');
       }
 
-      const isBusy = isSoldierBusy(this.guardLists, guardTime, nextSoldier);
+      const isBusy = isSoldierBusy(this.guardLists, guardTime, nextSoldier, {
+        uncommitedShifts: this.uncommitedShifts,
+        restTime: Math.ceil(shiftDuration * Math.sqrt(this.numberOfSoldiers)),
+      });
       if (isBusy) {
         busySoldiers.push(nextSoldier);
       } else {
