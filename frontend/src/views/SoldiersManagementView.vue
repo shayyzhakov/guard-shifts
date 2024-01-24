@@ -87,8 +87,8 @@ const noSoldiers = computed<boolean>(
             </el-empty>
           </div>
 
-          <template v-else>
-            <el-card v-for="team in teamsStore.teams" :key="team.id">
+          <div v-else class="cards-container">
+            <el-card v-for="team in teamsStore.teams" :key="team.id" class="team-card">
               <template #header>
                 <div class="header-container">
                   <h3>Team {{ team.name }}</h3>
@@ -113,7 +113,7 @@ const noSoldiers = computed<boolean>(
               </div>
             </el-card>
 
-            <el-card v-if="teamsStore.unteamedSoldiers.length">
+            <el-card v-if="teamsStore.unteamedSoldiers.length" class="team-card">
               <template #header>
                 <div class="header-container">
                   <h3><i>No Team</i></h3>
@@ -123,7 +123,7 @@ const noSoldiers = computed<boolean>(
                 {{ soldier.first_name }} {{ soldier.last_name }}
               </div>
             </el-card>
-          </template>
+          </div>
         </section>
 
         <div v-else v-loading="true" style="height: 200px" />
@@ -202,10 +202,22 @@ h3 {
   gap: 16px;
 }
 
+.cards-container {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.team-card {
+  flex: 0 1 450px;
+  min-height: 200px;
+}
+
 .header-container {
   display: flex;
   gap: 6px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .card-actions {
