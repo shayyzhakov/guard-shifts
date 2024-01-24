@@ -113,7 +113,7 @@ const warningText = computed(() => {
         </el-form>
       </el-card>
 
-      <el-card>
+      <!-- <el-card>
         <template #header>
           <div class="card-header">
             <h3>Events</h3>
@@ -121,7 +121,7 @@ const warningText = computed(() => {
         </template>
 
         (here we will define events like changes in the teams during the upcoming day)
-      </el-card>
+      </el-card> -->
 
       <div class="buttons">
         <el-button type="primary" @click="generateShifts" :disabled="warningText"
