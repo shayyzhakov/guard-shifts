@@ -35,26 +35,28 @@ export const teamRoundRobinStrategyHandler: StrategyHandler = (
     );
     const shiftDuration = getShiftDuration(guardPost, currentGuardTime.period);
 
-    // find the next team
-    let teamAndSoldiers: NextTeamAndSoldiers | undefined = undefined;
-    let error: string | undefined;
-    try {
-      teamAndSoldiers = relevantTeamsQueue.next(
-        currentGuardTime,
-        numOfSoldiersForCurrentPeriod,
-        shiftDuration
-      );
-    } catch (err) {
-      error = err instanceof Error ? err.message : 'unknown error';
-    }
+    if (numOfSoldiersForCurrentPeriod !== 0) {
+      // find the next team
+      let teamAndSoldiers: NextTeamAndSoldiers | undefined = undefined;
+      let error: string | undefined;
+      try {
+        teamAndSoldiers = relevantTeamsQueue.next(
+          currentGuardTime,
+          numOfSoldiersForCurrentPeriod,
+          shiftDuration
+        );
+      } catch (err) {
+        error = err instanceof Error ? err.message : 'unknown error';
+      }
 
-    shifts.push({
-      soldiers: teamAndSoldiers?.soldiers ?? [],
-      team: teamAndSoldiers?.id,
-      guardTime: currentGuardTime,
-      duration: shiftDuration,
-      error,
-    });
+      shifts.push({
+        soldiers: teamAndSoldiers?.soldiers ?? [],
+        team: teamAndSoldiers?.id,
+        guardTime: currentGuardTime,
+        duration: shiftDuration,
+        error,
+      });
+    }
 
     currentGuardTime = addDurationToGuardTime(currentGuardTime, shiftDuration);
   }

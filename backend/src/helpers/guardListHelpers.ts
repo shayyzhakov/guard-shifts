@@ -156,7 +156,7 @@ function checkIntersectionOfGuardTimeRanges(gt1: GuardTimeRange, gt2: GuardTimeR
 export function simplifyShifts(shifts: GuardListShift[]): GuardListShift[] {
   // remove empty periods
   const simplifiedGuardListForGuardPost = shifts.filter(
-    (shift) => shift.soldiers.length > 0 || shift.error
+    (shift) => shift.soldiers.length > 0 || shift.team || shift.error
   );
 
   return simplifiedGuardListForGuardPost;

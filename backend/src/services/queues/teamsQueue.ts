@@ -30,7 +30,7 @@ export class TeamsQueue {
     guardPostId: string,
     teams: Team[],
     private guardLists: GuardList[],
-    private uncommitedShifts: GuardListShift[]
+    uncommitedShifts: GuardListShift[]
   ) {
     // order teams by last guard time
     const guardPostGuardList =
