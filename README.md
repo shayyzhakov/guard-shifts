@@ -19,8 +19,13 @@
 
 - run `cd backend`
 - install serverless framework: `npm install -g serverless`
+- run `npm run build`
 - run `serverless deploy`
 
 ## Frontend
 
 - automatically deploys on every commit (aws amplify)
+
+# Architecture
+
+Web App (Vue) -> AWS Gateway -> AWS Lambda (Node) -> DynamoDB
