@@ -23,4 +23,4 @@
 
 # Frontend
 
-- aws amplify
+- automatically deploys on every commit (aws amplify)
