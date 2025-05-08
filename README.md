@@ -29,3 +29,5 @@
 # Architecture
 
 Web App (Vue) -> AWS Gateway -> AWS Lambda (Node) -> DynamoDB
+
+AWS IAM
