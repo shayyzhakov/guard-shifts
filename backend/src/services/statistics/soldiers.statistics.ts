@@ -7,6 +7,15 @@ interface SoldierWithScore {
   score: number;
 }
 
+/**
+ * Calculates and returns a list of soldiers with their total scores based on recent guard shifts.
+ *
+ * Only guard lists with a `time` value within the last 7 milliseconds are considered. Each soldier's score is the sum of shift scores from these filtered guard lists.
+ *
+ * @returns An array of objects containing each soldier's name and their aggregated score.
+ *
+ * @remark The time filter uses a 7-millisecond window, which may be narrower than intended.
+ */
 export function getSoldiersWithScoreFromGuardList(
   guardPost: GuardPost,
   guardLists: GuardList[]
