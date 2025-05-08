@@ -13,8 +13,7 @@ export function getSoldiersWithScoreFromGuardList(
 ): SoldierWithScore[] {
   const soldiersWithScoreMap: Record<string, number> = {};
 
-  // TODO: truncate guardList to show only last 7 days (should be configurable)
-  guardLists.forEach((guardList) => {
+  guardLists.filter(g => g.time > Date.now() - 7).forEach((guardList) => {
     guardList.shifts.forEach((shift) => {
       const shiftScore = getShiftScore(guardPost, shift.guardTime.period);
 
